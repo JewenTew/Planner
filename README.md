@@ -14,7 +14,7 @@ Single HTML file. No build step, no server, no dependencies to install.
 - **Task details**: bucket, progress, priority, start and due date, assigned person, labels, notes, checklist.
 - Search and filters (due date, priority, hide completed).
 - English and Chinese, switch with the EN / 中 button. English by default.
-- Light theme in white, pale pink and pale blue, with a matching dark theme. Works on phone width.
+- White, pale pink and pale blue light theme by default, with an optional dark theme (sun / moon switch). Works on phone width.
 
 ## Usage
 

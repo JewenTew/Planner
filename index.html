@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -101,6 +101,8 @@ button { cursor: pointer; }
 .lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface-solid); flex: none; }
 .lang button { border: 0; background: transparent; border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 700; color: var(--muted); }
 .lang button.on { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--accent-ink); }
+.lang button svg { width: 13px; height: 13px; display: block; }
+.prefs { display: flex; gap: 8px; padding: 0 6px; }
 .rail-label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: 0 10px; margin-bottom: 4px; font-weight: 700; }
 .nav { display: flex; flex-direction: column; gap: 2px; }
 .nav-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0; background: none; padding: 8px 10px; border-radius: 10px; color: var(--ink); font-weight: 600; }
@@ -357,7 +359,7 @@ textarea.input { width: 100%; min-height: 96px; resize: vertical; line-height: 1
 /* ---------- strings ---------- */
 const I18N = {
   en: {
-    appSub: 'Tasks and due dates', overview: 'Overview', plans: 'Plans', newPlan: 'New plan', planNamePh: 'Plan name, e.g. Data Structures', create: 'Create',
+    appSub: 'Tasks and due dates', theme: 'Theme', light: 'Light', dark: 'Dark', overview: 'Overview', plans: 'Plans', newPlan: 'New plan', planNamePh: 'Plan name, e.g. Data Structures', create: 'Create',
     syncOn: 'Synced to the cloud. Share this page to plan together.', syncRO: 'Read only. You can view but not edit.', syncLocal: 'Saved in this browser only.',
     loading: 'Loading your plans…', openN: n => `${n} open`, newTask: 'New task', planSettings: 'Plan settings',
     views: { board: 'Board', grid: 'Grid', schedule: 'Schedule', charts: 'Charts' },
@@ -390,7 +392,7 @@ const I18N = {
     taskDeleted: 'Task deleted', planDeleted: 'Plan deleted', errPerm: 'You do not have permission to edit this planner. Switched to read only.', errQuota: 'Storage is full. Delete some finished tasks and try again.', errNet: 'Could not save. Check your connection and try again.'
   },
   zh: {
-    appSub: '任务与截止日期', overview: '概览', plans: '计划', newPlan: '新建计划', planNamePh: '计划名称，例如：数据结构', create: '创建',
+    appSub: '任务与截止日期', theme: '主题', light: '浅色', dark: '深色', overview: '概览', plans: '计划', newPlan: '新建计划', planNamePh: '计划名称，例如：数据结构', create: '创建',
     syncOn: '已云端同步。分享这个页面就能一起规划。', syncRO: '只读模式。你可以查看，但不能修改。', syncLocal: '数据只保存在这个浏览器里。',
     loading: '正在加载计划…', openN: n => `${n} 项未完成`, newTask: '新建任务', planSettings: '计划设置',
     views: { board: '看板', grid: '表格', schedule: '日程', charts: '图表' },
@@ -431,6 +433,8 @@ const LABEL_KEYS = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'];
 const PRI_ORDER = { urgent: 0, important: 1, medium: 2, low: 3 };
 const AVATAR_COLORS = ['#d9588f', '#4f86d9', '#8a6ad6', '#2f9e7e', '#d07a3c', '#c0508a', '#3f8fb8', '#7a68c9'];
 const ICON_MARK = '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 1.8l1.7 4.6 4.7 1.6-4.7 1.7L9 14.3l-1.7-4.6L2.6 8l4.7-1.6z"/></svg>';
+const ICON_SUN = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="2.6"/><path d="M7 1v1.4M7 11.6V13M1 7h1.4M11.6 7H13M2.8 2.8l1 1M10.2 10.2l1 1M2.8 11.2l1-1M10.2 3.8l1-1"/></svg>';
+const ICON_MOON = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M11.8 8.6A5 5 0 0 1 5.4 2.2a5 5 0 1 0 6.4 6.4z"/></svg>';
 const ICON_CHECK = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>';
 const ICON_CAL = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="2.5" width="9" height="8" rx="1.5"/><path d="M1.5 5h9M4 1.2v2.4M8 1.2v2.4"/></svg>';
 const ICON_LIST = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1.5 3l1 1 1.6-1.8M1.5 8l1 1 1.6-1.8M6 3.2h4.5M6 8.2h4.5"/></svg>';
@@ -455,7 +459,7 @@ const diffDays = (a, b) => Math.round((parse(b) - parse(a)) / 86400000);
 const state = { plans: {}, tasks: {}, plansReady: false, tasksReady: false, mode: 'local', readonly: false };
 const PREF_KEY = 'planner-prefs';
 const LOCAL_KEY = 'planner-data';
-let ui = { lang: 'en', planId: 'hub', view: 'board', groupBy: 'bucket', filter: { q: '', due: 'all', pri: 'all', hideDone: false }, calMonth: today().slice(0, 7), sort: { key: 'due', dir: 1 } };
+let ui = { lang: 'en', theme: 'light', planId: 'hub', view: 'board', groupBy: 'bucket', filter: { q: '', due: 'all', pri: 'all', hideDone: false }, calMonth: today().slice(0, 7), sort: { key: 'due', dir: 1 } };
 try { const p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null'); if (p) ui = Object.assign(ui, p, { filter: Object.assign(ui.filter, p.filter || {}) }); } catch (e) {}
 if (!I18N[ui.lang]) ui.lang = 'en';
 const savePrefs = () => { try { localStorage.setItem(PREF_KEY, JSON.stringify(ui)); } catch (e) {} };
@@ -636,6 +640,7 @@ function restoreFocus(f) {
 /* ---------- render ---------- */
 function render() {
   document.documentElement.lang = ui.lang === 'zh' ? 'zh-CN' : 'en';
+  document.documentElement.setAttribute('data-theme', ui.theme === 'dark' ? 'dark' : 'light');
   if (ui.planId !== 'hub' && state.plansReady && !state.plans[ui.planId]) ui.planId = 'hub';
   const f = captureFocus();
   renderRail();
@@ -651,7 +656,10 @@ function renderRail() {
     <div class="brand">
       <div class="brand-mark">${ICON_MARK}</div>
       <div class="brand-text"><b>Planner</b><small>${esc(L.appSub)}</small></div>
+    </div>
+    <div class="prefs">
       <div class="lang" role="group" aria-label="Language"><button class="${ui.lang === 'en' ? 'on' : ''}" data-act="lang" data-lang="en">EN</button><button class="${ui.lang === 'zh' ? 'on' : ''}" data-act="lang" data-lang="zh">中</button></div>
+      <div class="lang" role="group" aria-label="${esc(L.theme)}"><button class="${ui.theme !== 'dark' ? 'on' : ''}" data-act="theme" data-theme-val="light" aria-label="${esc(L.light)}" title="${esc(L.light)}">${ICON_SUN}</button><button class="${ui.theme === 'dark' ? 'on' : ''}" data-act="theme" data-theme-val="dark" aria-label="${esc(L.dark)}" title="${esc(L.dark)}">${ICON_MOON}</button></div>
     </div>
     <div>
       <nav class="nav">
@@ -1048,6 +1056,7 @@ document.addEventListener('click', e => {
   const RO = state.readonly, L = T();
   switch (act) {
     case 'lang': ui.lang = el.dataset.lang; savePrefs(); render(); break;
+    case 'theme': ui.theme = el.dataset.themeVal; savePrefs(); render(); break;
     case 'goto': ui.planId = el.dataset.plan; savePrefs(); render(); window.scrollTo(0, 0); break;
     case 'view': ui.view = el.dataset.view; savePrefs(); render(); break;
     case 'new-plan-show': $('#new-plan-form').hidden = false; $('#new-plan-name').focus(); break;
