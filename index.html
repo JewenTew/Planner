@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -9,49 +9,64 @@
 <title>Planner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
-/* Layout: fixed plan rail on the left, working surface on the right (board / grid / schedule / charts). Rail folds into a chip row on phones. */
+/* Layout: frosted plan rail on the left, working surface on the right, floating over a soft pink-to-blue sky. Rail folds into a chip row on phones. */
 :root {
-  --bg: #eef2f0;
-  --surface: #ffffff;
-  --surface-2: #e4eae7;
-  --ink: #16201c;
-  --muted: #5a6964;
-  --line: #d3dcd8;
-  --accent: #0b7560;
-  --accent-ink: #ffffff;
-  --accent-soft: #d3ebe3;
-  --danger: #bf3328;
-  --danger-soft: #f9e0dc;
-  --warn: #a86300;
-  --warn-soft: #f8e9cb;
-  --ok: #2c7a36;
-  --ok-soft: #dcefdc;
-  --info: #22609f;
-  --info-soft: #dce8f6;
-  --c1: #d9483b; --c2: #e0901c; --c3: #c9b21a; --c4: #3e9a52; --c5: #2f7fc4; --c6: #8a56c2;
-  --shadow: 0 1px 2px rgba(20,40,32,.08), 0 2px 8px rgba(20,40,32,.05);
-  --font-body: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
-  --r: 8px;
+  --bg: #ffffff;
+  --glow-1: #ffeaf3;
+  --glow-2: #e6f2ff;
+  --glow-3: #ffffff;
+  --star: rgba(224, 96, 154, .0);
+  --surface: rgba(255, 255, 255, .9);
+  --surface-solid: #ffffff;
+  --surface-2: #f4f9ff;
+  --ink: #33304a;
+  --muted: #7d7a96;
+  --line: #ece6f1;
+  --accent: #f5aecb;
+  --accent-2: #a8d0f5;
+  --accent-ink: #33304a;
+  --accent-deep: #d86f9c;
+  --accent-soft: #feeef5;
+  --blue-soft: #e9f3ff;
+  --danger: #d63d57;
+  --danger-soft: #fde0e5;
+  --warn: #b8660f;
+  --warn-soft: #ffead6;
+  --ok: #2f8a64;
+  --ok-soft: #dcf3e8;
+  --info: #3f73cf;
+  --info-soft: #e0ebff;
+  --c1: #ec5f97; --c2: #f59a5b; --c3: #d9b52e; --c4: #3fb48f; --c5: #4d9be6; --c6: #9a7be0;
+  --shadow: 0 1px 2px rgba(120, 80, 160, .08), 0 6px 18px rgba(120, 80, 160, .07);
+  --overlay: rgba(60, 40, 90, .28);
+  --font-display: "Quicksand", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-body: "Nunito", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --r: 12px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0f1513; --surface: #171f1c; --surface-2: #202a26; --ink: #e4ebe8; --muted: #93a29c; --line: #2b3732;
-    --accent: #3fc3a1; --accent-ink: #062219; --accent-soft: #15392f;
-    --danger: #ff7b6f; --danger-soft: #3b1c19; --warn: #f0b24e; --warn-soft: #372910; --ok: #71cf78; --ok-soft: #1a321e; --info: #7fb5f0; --info-soft: #16293e;
-    --c1: #f06a5d; --c2: #f0a640; --c3: #e0cb45; --c4: #5cbf70; --c5: #5aa3e6; --c6: #a980dd;
-    --shadow: 0 1px 2px rgba(0,0,0,.4);
+    --bg: #14112a; --glow-1: #4d2552; --glow-2: #1c3566; --glow-3: #2d2260; --star: rgba(255, 220, 240, .5);
+    --surface: rgba(34, 29, 60, .72); --surface-solid: #221d3c; --surface-2: rgba(46, 39, 80, .72);
+    --ink: #f2edff; --muted: #a9a1ca; --line: #3a3363;
+    --accent: #f5b8d2; --accent-2: #afd3f7; --accent-ink: #231d38; --accent-deep: #f5b8d2; --accent-soft: #45293f; --blue-soft: #1f3150;
+    --danger: #ff7d8f; --danger-soft: #4a1f2b; --warn: #ffbd7a; --warn-soft: #43301c; --ok: #6fdcaa; --ok-soft: #173a2e; --info: #8fb8ff; --info-soft: #1f2f58;
+    --c1: #ff85b5; --c2: #ffb07a; --c3: #f0d060; --c4: #62d4ad; --c5: #7ab8ff; --c6: #b89cff;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
+    --overlay: rgba(5, 3, 15, .55);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0f1513; --surface: #171f1c; --surface-2: #202a26; --ink: #e4ebe8; --muted: #93a29c; --line: #2b3732;
-  --accent: #3fc3a1; --accent-ink: #062219; --accent-soft: #15392f;
-  --danger: #ff7b6f; --danger-soft: #3b1c19; --warn: #f0b24e; --warn-soft: #372910; --ok: #71cf78; --ok-soft: #1a321e; --info: #7fb5f0; --info-soft: #16293e;
-  --c1: #f06a5d; --c2: #f0a640; --c3: #e0cb45; --c4: #5cbf70; --c5: #5aa3e6; --c6: #a980dd;
-  --shadow: 0 1px 2px rgba(0,0,0,.4);
+  --bg: #14112a; --glow-1: #4d2552; --glow-2: #1c3566; --glow-3: #2d2260; --star: rgba(255, 220, 240, .5);
+  --surface: rgba(34, 29, 60, .72); --surface-solid: #221d3c; --surface-2: rgba(46, 39, 80, .72);
+  --ink: #f2edff; --muted: #a9a1ca; --line: #3a3363;
+  --accent: #f5b8d2; --accent-2: #afd3f7; --accent-ink: #231d38; --accent-deep: #f5b8d2; --accent-soft: #45293f; --blue-soft: #1f3150;
+  --danger: #ff7d8f; --danger-soft: #4a1f2b; --warn: #ffbd7a; --warn-soft: #43301c; --ok: #6fdcaa; --ok-soft: #173a2e; --info: #8fb8ff; --info-soft: #1f2f58;
+  --c1: #ff85b5; --c2: #ffb07a; --c3: #f0d060; --c4: #62d4ad; --c5: #7ab8ff; --c6: #b89cff;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
+  --overlay: rgba(5, 3, 15, .55);
   color-scheme: dark;
 }
 html, body { height: 100%; }
@@ -59,237 +74,252 @@ body { background: var(--bg); color: var(--ink); font-family: var(--font-body); 
 * { box-sizing: border-box; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2px solid var(--accent-deep); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
 
-#app { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100%; }
+/* Dreamy sky behind everything */
+.sky { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+  background:
+    radial-gradient(60vmax 45vmax at 8% 0%, var(--glow-1), transparent 62%),
+    radial-gradient(55vmax 45vmax at 100% 100%, var(--glow-2), transparent 60%),
+    radial-gradient(40vmax 35vmax at 70% 20%, var(--glow-3), transparent 65%),
+    var(--bg); }
+.sky::after { content: ""; position: absolute; inset: 0;
+  background-image: radial-gradient(1.4px 1.4px at 20px 30px, var(--star), transparent 60%), radial-gradient(1px 1px at 120px 80px, var(--star), transparent 60%), radial-gradient(1.2px 1.2px at 200px 160px, var(--star), transparent 60%), radial-gradient(1px 1px at 60px 190px, var(--star), transparent 60%);
+  background-size: 240px 220px; }
 
-/* Sidebar */
-.rail { background: var(--surface); border-right: 1px solid var(--line); padding: 18px 12px; display: flex; flex-direction: column; gap: 18px; position: sticky; top: env(safe-area-inset-top, 0px); height: 100vh; overflow-y: auto; }
+#app { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100%; }
+
+/* Rail */
+.rail { background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-right: 1px solid var(--line); padding: 20px 12px; display: flex; flex-direction: column; gap: 18px; position: sticky; top: env(safe-area-inset-top, 0px); height: 100vh; overflow-y: auto; }
 .brand { display: flex; align-items: center; gap: 10px; padding: 0 6px; }
-.brand-mark { width: 30px; height: 30px; border-radius: 7px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 700; font-size: 15px; }
-.brand b { font-size: 15px; letter-spacing: .01em; display: block; line-height: 1.2; }
+.brand-mark { width: 34px; height: 34px; border-radius: 11px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--accent-ink); display: grid; place-items: center; box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 35%, transparent); flex: none; }
+.brand-mark svg { width: 18px; height: 18px; }
+.brand-text { flex: 1; min-width: 0; }
+.brand b { font-family: var(--font-display); font-size: 18px; font-weight: 700; display: block; line-height: 1.15; letter-spacing: .01em; }
 .brand small { color: var(--muted); font-size: 12px; }
-.rail-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 0 8px; margin-bottom: 4px; }
+.lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface-solid); flex: none; }
+.lang button { border: 0; background: transparent; border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 700; color: var(--muted); }
+.lang button.on { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--accent-ink); }
+.rail-label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: 0 10px; margin-bottom: 4px; font-weight: 700; }
 .nav { display: flex; flex-direction: column; gap: 2px; }
-.nav-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0; background: none; padding: 7px 8px; border-radius: 6px; color: var(--ink); }
+.nav-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0; background: none; padding: 8px 10px; border-radius: 10px; color: var(--ink); font-weight: 600; }
 .nav-item:hover { background: var(--surface-2); }
-.nav-item.active { background: var(--accent-soft); font-weight: 600; }
+.nav-item.active { background: linear-gradient(90deg, var(--accent-soft), var(--blue-soft)); }
 .nav-item .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dot { width: 10px; height: 10px; border-radius: 3px; flex: none; }
-.badge { font-size: 11px; font-family: var(--font-mono); background: var(--danger-soft); color: var(--danger); border-radius: 10px; padding: 0 7px; line-height: 18px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.dot.hub { background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.badge { font-size: 11px; font-weight: 800; background: var(--danger-soft); color: var(--danger); border-radius: 10px; padding: 0 7px; line-height: 18px; font-variant-numeric: tabular-nums; }
 .new-plan { display: flex; gap: 6px; padding: 4px 2px 0; }
 .new-plan input { flex: 1; min-width: 0; }
-.rail-foot { margin-top: auto; font-size: 12px; color: var(--muted); padding: 0 8px; display: flex; gap: 6px; align-items: flex-start; }
+.rail-foot { margin-top: auto; font-size: 12px; color: var(--muted); padding: 0 10px; display: flex; gap: 6px; align-items: flex-start; }
 .sync-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex: none; background: var(--warn); }
 .sync-dot.on { background: var(--ok); }
 
 /* Controls */
-.input, select.input, textarea.input { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; min-height: 34px; }
-.input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
-.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 12px; min-height: 34px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
-.btn:hover { background: var(--surface-2); }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
-.btn.primary:hover { filter: brightness(1.07); }
+.input, select.input, textarea.input { background: var(--surface-solid); border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; min-height: 34px; }
+.input:focus { border-color: var(--accent-deep); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+.btn { border: 1px solid var(--line); background: var(--surface-solid); border-radius: 999px; padding: 6px 14px; min-height: 34px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-weight: 600; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; color: var(--accent-ink); font-weight: 700; box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 30%, transparent); }
+.btn.primary:hover { filter: brightness(1.06); }
 .btn.danger { color: var(--danger); border-color: var(--danger); background: transparent; }
-.btn.danger.solid { background: var(--danger); color: var(--surface); }
-.btn.ghost { border-color: transparent; background: transparent; }
-.btn.ghost:hover { background: var(--surface-2); }
-.icon-btn { border: 0; background: transparent; width: 30px; height: 30px; border-radius: 6px; display: grid; place-items: center; color: var(--muted); }
+.btn.danger.solid { background: var(--danger); color: var(--surface-solid); }
+.icon-btn { border: 0; background: transparent; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; color: var(--muted); }
 .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
 
 /* Main */
-main { min-width: 0; padding-inline: 24px; padding-block: 20px 40px; display: flex; flex-direction: column; gap: 16px; }
+main { min-width: 0; padding-inline: 28px; padding-block: 22px 44px; display: flex; flex-direction: column; gap: 16px; }
 .head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
-.head h1 { font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -.01em; text-wrap: balance; display: flex; align-items: center; gap: 10px; }
-.head h1 .dot { width: 14px; height: 14px; border-radius: 4px; }
-.head .sub { color: var(--muted); font-size: 13px; }
+.head h1 { font-family: var(--font-display); font-size: 26px; font-weight: 700; margin: 0; letter-spacing: -.005em; text-wrap: balance; display: flex; align-items: center; gap: 10px; }
+.head h1 .dot { width: 14px; height: 14px; }
+.head .sub { color: var(--muted); font-size: 13px; font-weight: 600; }
 .head .spacer { flex: 1; }
-.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); overflow-x: auto; }
-.tab { border: 0; background: none; padding: 8px 14px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.tabs { display: flex; gap: 4px; overflow-x: auto; background: var(--surface); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 999px; padding: 4px; align-self: flex-start; max-width: 100%; }
+.tab { border: 0; background: none; padding: 6px 16px; color: var(--muted); border-radius: 999px; white-space: nowrap; font-weight: 700; }
 .tab:hover { color: var(--ink); }
-.tab.active { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+.tab.active { color: var(--accent-ink); background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
 .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .toolbar .input { min-height: 32px; }
-.toolbar #f-q { width: 200px; max-width: 100%; }
-.toolbar label.chk { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); font-size: 13px; }
+.toolbar #f-q { width: 220px; max-width: 100%; }
+.toolbar label.chk { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); font-size: 13px; font-weight: 600; }
 .toolbar .grow { flex: 1; }
 
-/* Due chips */
-.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; line-height: 20px; padding: 0 7px; border-radius: 4px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+/* Chips */
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; line-height: 20px; padding: 0 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); white-space: nowrap; font-weight: 700; }
 .chip svg { width: 12px; height: 12px; }
-.chip.overdue { background: var(--danger); color: var(--surface); font-weight: 600; }
-.chip.today { background: var(--warn-soft); color: var(--warn); font-weight: 600; }
+.chip.overdue { background: var(--danger); color: var(--surface-solid); }
+.chip.today { background: var(--warn-soft); color: var(--warn); }
 .chip.tomorrow, .chip.week { background: var(--info-soft); color: var(--info); }
 .chip.done { background: var(--ok-soft); color: var(--ok); }
-.chip.pri-urgent { background: var(--danger-soft); color: var(--danger); font-weight: 600; }
+.chip.pri-urgent { background: var(--danger-soft); color: var(--danger); }
 .chip.pri-important { background: var(--warn-soft); color: var(--warn); }
-.chip.pri-low { color: var(--muted); }
 .chip.doing { background: var(--info-soft); color: var(--info); }
 .lbl-c1 { --lc: var(--c1); } .lbl-c2 { --lc: var(--c2); } .lbl-c3 { --lc: var(--c3); } .lbl-c4 { --lc: var(--c4); } .lbl-c5 { --lc: var(--c5); } .lbl-c6 { --lc: var(--c6); }
 .bg-c1 { background: var(--c1); } .bg-c2 { background: var(--c2); } .bg-c3 { background: var(--c3); } .bg-c4 { background: var(--c4); } .bg-c5 { background: var(--c5); } .bg-c6 { background: var(--c6); }
-.tag { font-size: 11px; line-height: 18px; padding: 0 7px; border-radius: 9px; color: var(--ink); background: color-mix(in srgb, var(--lc) 22%, transparent); border: 1px solid color-mix(in srgb, var(--lc) 45%, transparent); white-space: nowrap; }
-.avatar { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff; flex: none; }
+.tag { font-size: 11px; line-height: 18px; padding: 0 8px; border-radius: 999px; color: var(--ink); background: color-mix(in srgb, var(--lc) 20%, transparent); border: 1px solid color-mix(in srgb, var(--lc) 45%, transparent); white-space: nowrap; font-weight: 700; }
+.avatar { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 10px; font-weight: 800; color: #fff; flex: none; }
 
 /* Board */
 .board { display: flex; gap: 14px; align-items: flex-start; overflow-x: auto; padding-bottom: 12px; }
-.col { flex: 0 0 284px; background: var(--surface-2); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px; border: 2px solid transparent; }
+.col { flex: 0 0 286px; background: var(--surface-2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 10px; display: flex; flex-direction: column; gap: 8px; border: 1.5px solid var(--line); }
 .col.drop-ok { border-color: var(--accent); border-style: dashed; }
-.col-head { display: flex; align-items: center; gap: 8px; padding: 2px 4px; }
-.col-head h3 { margin: 0; font-size: 14px; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.col-head .count { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.col-head { display: flex; align-items: center; gap: 8px; padding: 2px 6px; }
+.col-head h3 { margin: 0; font-family: var(--font-display); font-size: 15px; font-weight: 700; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.col-head .count { font-size: 12px; font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
 .col-head.overdue h3 { color: var(--danger); }
-.qa { width: 100%; background: var(--surface); border: 1px dashed var(--line); border-radius: 6px; padding: 7px 10px; min-height: 36px; }
+.qa { width: 100%; background: var(--surface); border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 10px; padding: 7px 10px; min-height: 36px; }
 .qa::placeholder { color: var(--muted); }
-.qa:focus { border-style: solid; border-color: var(--accent); outline: none; }
-.card { background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; border: 1px solid transparent; }
-.card:hover { border-color: var(--line); }
+.qa:focus { border-style: solid; border-color: var(--accent); outline: none; background: var(--surface-solid); }
+.card { background: var(--surface-solid); border-radius: var(--r); box-shadow: var(--shadow); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; border: 1px solid transparent; }
+.card:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
 .card.is-done h4 { text-decoration: line-through; color: var(--muted); }
-.card.is-done { opacity: .75; }
+.card.is-done { opacity: .72; }
 .card.dragging { opacity: .4; }
 .card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .card-top { display: flex; gap: 8px; align-items: flex-start; }
-.card-top h4 { margin: 0; font-size: 14px; font-weight: 500; line-height: 1.4; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.card-top h4 { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.4; flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .check { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--muted); background: transparent; flex: none; margin-top: 1px; display: grid; place-items: center; padding: 0; color: transparent; }
 .check:hover { border-color: var(--ok); color: var(--ok); }
-.check.on { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+.check.on { background: var(--ok); border-color: var(--ok); color: var(--surface-solid); }
 .check svg { width: 11px; height: 11px; }
 .card-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .card-meta .avatar { margin-left: auto; }
-.card-plan { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
-.add-col { flex: 0 0 220px; }
+.add-col { flex: 0 0 230px; }
 .empty-col { color: var(--muted); font-size: 12px; text-align: center; padding: 10px 0 4px; }
 
 /* Grid */
-.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.table-wrap { overflow-x: auto; background: var(--surface); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 16px; }
 table.grid { width: 100%; border-collapse: collapse; min-width: 820px; }
-.grid th { text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); padding: 10px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; user-select: none; }
+.grid th { text-align: left; font-size: 12px; font-weight: 800; color: var(--muted); padding: 11px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; user-select: none; }
 .grid th[data-sort] { cursor: pointer; }
 .grid th[data-sort]:hover { color: var(--ink); }
-.grid th .arr { font-family: var(--font-mono); }
 .grid td { padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
 .grid tr:last-child td { border-bottom: 0; }
 .grid tbody tr { cursor: pointer; }
 .grid tbody tr:hover td { background: var(--surface-2); }
-.grid td.title { font-weight: 500; }
+.grid td.title { font-weight: 700; }
 .grid tr.is-done td.title { text-decoration: line-through; color: var(--muted); }
+.faint { color: var(--muted); }
 
 /* Schedule */
 .cal-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.cal-bar h2 { margin: 0 8px 0 0; font-size: 17px; font-weight: 600; min-width: 120px; }
+.cal-bar h2 { font-family: var(--font-display); margin: 0 8px 0 0; font-size: 19px; font-weight: 700; min-width: 150px; }
+.cal-bar .hint { color: var(--muted); font-size: 12px; font-weight: 600; }
 .cal-wrap { overflow-x: auto; }
-.cal { min-width: 720px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); background: var(--line); gap: 1px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-.cal .dow { background: var(--surface-2); font-size: 12px; color: var(--muted); padding: 6px 8px; font-weight: 600; }
-.cal .day { background: var(--surface); min-height: 108px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.cal .day.out { background: var(--bg); }
-.cal .day.out .num { opacity: .45; }
-.cal .day.weekend { background: color-mix(in srgb, var(--surface) 70%, var(--surface-2)); }
+.cal { min-width: 720px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); background: var(--line); gap: 1px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.cal .dow { background: var(--surface-2); font-size: 12px; color: var(--muted); padding: 7px 8px; font-weight: 800; }
+.cal .day { background: var(--surface-solid); min-height: 110px; padding: 6px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.cal .day.out { background: color-mix(in srgb, var(--surface-solid) 55%, var(--bg)); }
+.cal .day.out .n { opacity: .45; }
+.cal .day.weekend { background: color-mix(in srgb, var(--surface-solid) 82%, var(--accent-soft)); }
 .cal .day-head { display: flex; align-items: center; justify-content: space-between; }
-.cal .num { font-family: var(--font-mono); font-size: 12px; color: var(--muted); width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; }
-.cal .day.is-today .num { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.cal .n { font-size: 12px; font-weight: 700; color: var(--muted); width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; font-variant-numeric: tabular-nums; }
+.cal .day.is-today .n { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--accent-ink); }
 .cal .add { opacity: 0; width: 22px; height: 22px; }
 .cal .day:hover .add, .cal .add:focus-visible { opacity: 1; }
-.cal-task { font-size: 12px; line-height: 1.35; padding: 3px 6px; border-radius: 4px; background: var(--surface-2); border-left: 3px solid var(--muted); cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-top: 0; border-right: 0; border-bottom: 0; text-align: left; width: 100%; }
+.cal-task { font-size: 12px; line-height: 1.35; padding: 3px 7px; border-radius: 6px; background: var(--surface-2); border: 0; border-left: 3px solid var(--muted); cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; width: 100%; font-weight: 600; }
 .cal-task.overdue { border-left-color: var(--danger); background: var(--danger-soft); }
 .cal-task.today { border-left-color: var(--warn); background: var(--warn-soft); }
 .cal-task.done { border-left-color: var(--ok); text-decoration: line-through; color: var(--muted); }
-.cal-task.week, .cal-task.tomorrow, .cal-task.nextweek, .cal-task.later { border-left-color: var(--info); }
-.unsched { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
-.unsched h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 600; }
+.cal-task.week, .cal-task.tomorrow, .cal-task.nextweek, .cal-task.later { border-left-color: var(--info); background: var(--info-soft); }
+.unsched { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
+.unsched h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 800; }
 .unsched .list { display: flex; flex-wrap: wrap; gap: 6px; }
 .unsched .cal-task { width: auto; max-width: 260px; }
 
-/* Hub + charts */
+/* Hub and charts */
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; text-align: left; }
-button.stat { cursor: pointer; }
+.stat { background: var(--surface); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 16px; padding: 12px 16px; display: flex; flex-direction: column; gap: 2px; text-align: left; }
 button.stat:hover { border-color: var(--accent); }
-.stat .k { font-size: 12px; color: var(--muted); }
-.stat .v { font-family: var(--font-mono); font-size: 28px; font-weight: 500; line-height: 1.2; }
+.stat .k { font-size: 12px; color: var(--muted); font-weight: 700; }
+.stat .v { font-family: var(--font-display); font-size: 30px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
 .stat.danger .v { color: var(--danger); }
 .stat.warn .v { color: var(--warn); }
 .stat.info .v { color: var(--info); }
 .stat.ok .v { color: var(--ok); }
 .hub { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; align-items: start; }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
-.panel h2 { font-size: 15px; margin: 0 0 10px; font-weight: 600; display: flex; align-items: baseline; gap: 8px; }
-.panel h2 small { color: var(--muted); font-weight: 400; font-size: 12px; }
+.panel { background: var(--surface); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; min-width: 0; }
+.panel h2 { font-family: var(--font-display); font-size: 17px; margin: 0 0 10px; font-weight: 700; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.panel h2 small { font-family: var(--font-body); color: var(--muted); font-weight: 600; font-size: 12px; }
 .due-list { display: flex; flex-direction: column; }
-.due-group { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 10px 0 4px; font-weight: 600; }
+.due-group { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: 10px 0 4px; font-weight: 800; }
 .due-group.overdue { color: var(--danger); }
-.due-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 7px 4px; border-top: 1px solid var(--line); cursor: pointer; border-radius: 4px; }
+.due-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 6px; border-top: 1px solid var(--line); cursor: pointer; border-radius: 8px; }
 .due-row:hover { background: var(--surface-2); }
-.due-row .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.due-row .p { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.due-row .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.due-row .p { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; font-weight: 600; }
 .plan-cards { display: flex; flex-direction: column; gap: 10px; }
-.plan-card { border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; background: var(--surface); text-align: left; width: 100%; }
+.plan-card { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; background: var(--surface-solid); text-align: left; width: 100%; }
 .plan-card:hover { border-color: var(--accent); }
 .plan-card .row { display: flex; align-items: center; gap: 8px; }
 .plan-card .row b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.plan-card .nums { display: flex; gap: 14px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
-.plan-card .nums .mono { color: var(--ink); }
-.plan-card .nums .od .mono { color: var(--danger); font-weight: 600; }
-.bar { height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; display: flex; }
+.plan-card .nums { display: flex; gap: 14px; font-size: 12px; color: var(--muted); flex-wrap: wrap; font-weight: 600; }
+.plan-card .nums b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.plan-card .nums .od b { color: var(--danger); }
+.bar { height: 7px; border-radius: 999px; background: var(--surface-2); overflow: hidden; display: flex; }
 .bar i { display: block; height: 100%; }
 .charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .hbars { display: flex; flex-direction: column; gap: 10px; }
-.hbar { display: grid; grid-template-columns: 96px minmax(0, 1fr) 36px; gap: 10px; align-items: center; font-size: 13px; }
+.hbar { display: grid; grid-template-columns: 100px minmax(0, 1fr) 36px; gap: 10px; align-items: center; font-size: 13px; font-weight: 600; }
 .hbar .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hbar .v { font-family: var(--font-mono); text-align: right; color: var(--muted); font-size: 12px; }
-.hbar .bar { height: 14px; border-radius: 3px; }
-.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.hbar .v { text-align: right; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.hbar .bar { height: 14px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
 .legend span { display: inline-flex; align-items: center; gap: 5px; }
-.legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
-.s-todo { background: color-mix(in srgb, var(--muted) 45%, var(--surface-2)); }
-.s-doing { background: var(--info); }
+.legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.s-todo { background: color-mix(in srgb, var(--muted) 40%, var(--surface-2)); }
+.s-doing { background: var(--accent-2); }
 .s-done { background: var(--ok); }
 .s-overdue { background: var(--danger); }
+.big-pct { font-family: var(--font-display); font-size: 36px; font-weight: 700; color: var(--accent-deep); font-variant-numeric: tabular-nums; }
 
-.empty { text-align: center; padding: 48px 16px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 12px; background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; }
-.empty h2 { color: var(--ink); margin: 0; font-size: 18px; }
-.empty p { margin: 0; max-width: 42ch; }
+.empty { text-align: center; padding: 48px 16px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 12px; background: var(--surface); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px dashed color-mix(in srgb, var(--accent) 40%, var(--line)); border-radius: 18px; }
+.empty h2 { font-family: var(--font-display); color: var(--ink); margin: 0; font-size: 20px; }
+.empty p { margin: 0; max-width: 44ch; }
 
 /* Dialog */
-.overlay { position: fixed; inset: 0; background: rgba(8,16,13,.45); display: flex; justify-content: flex-end; z-index: 50; }
-.sheet { background: var(--surface); width: min(560px, 100%); height: 100%; overflow-y: auto; padding-inline: 22px; padding-block: calc(18px + env(safe-area-inset-top, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 16px; box-shadow: -8px 0 30px rgba(0,0,0,.15); }
-.sheet-head { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+.overlay { position: fixed; inset: 0; background: var(--overlay); display: flex; justify-content: flex-end; z-index: 50; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.sheet { background: var(--surface-solid); width: min(560px, 100%); height: 100%; overflow-y: auto; padding-inline: 24px; padding-block: calc(18px + env(safe-area-inset-top, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 16px; box-shadow: -10px 0 40px rgba(80, 40, 120, .18); border-left: 1px solid var(--line); }
+.sheet::before { content: ""; display: block; height: 4px; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); flex: none; }
+.sheet-head { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; font-weight: 700; }
 .sheet-head .grow { flex: 1; }
-.title-input { font-size: 20px; font-weight: 600; border: 1px solid transparent; background: transparent; border-radius: 6px; padding: 4px 6px; margin-left: -6px; width: calc(100% + 6px); }
+.title-input { font-family: var(--font-display); font-size: 22px; font-weight: 700; border: 1px solid transparent; background: transparent; border-radius: 10px; padding: 4px 8px; margin-left: -8px; width: calc(100% + 8px); }
 .title-input:hover { border-color: var(--line); }
-.title-input:focus { border-color: var(--accent); outline: none; background: var(--surface); }
+.title-input:focus { border-color: var(--accent); outline: none; }
 .fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.field > span { font-size: 12px; color: var(--muted); font-weight: 500; }
+.field > span { font-size: 12px; color: var(--muted); font-weight: 700; }
 .field .input { width: 100%; }
-.section-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 6px; display: block; }
+.section-label { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 6px; display: block; }
 .label-picks { display: flex; flex-wrap: wrap; gap: 6px; }
-.label-pick { border: 1px solid color-mix(in srgb, var(--lc) 50%, transparent); background: transparent; border-radius: 12px; padding: 2px 10px; font-size: 12px; display: inline-flex; gap: 6px; align-items: center; }
+.label-pick { border: 1px solid color-mix(in srgb, var(--lc) 50%, transparent); background: transparent; border-radius: 999px; padding: 2px 11px; font-size: 12px; display: inline-flex; gap: 6px; align-items: center; font-weight: 700; }
 .label-pick i { width: 8px; height: 8px; border-radius: 50%; background: var(--lc); }
-.label-pick.on { background: color-mix(in srgb, var(--lc) 25%, transparent); font-weight: 600; }
+.label-pick.on { background: color-mix(in srgb, var(--lc) 24%, transparent); }
 .checklist { display: flex; flex-direction: column; gap: 4px; }
 .cl-item { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
-.cl-item input[type="text"] { flex: 1; min-width: 0; border: 1px solid transparent; background: transparent; padding: 3px 6px; border-radius: 4px; }
+.cl-item input[type="text"] { flex: 1; min-width: 0; border: 1px solid transparent; background: transparent; padding: 3px 6px; border-radius: 6px; }
 .cl-item input[type="text"]:hover { border-color: var(--line); }
 .cl-item.done input[type="text"] { text-decoration: line-through; color: var(--muted); }
 .cl-item .icon-btn { width: 26px; height: 26px; }
 textarea.input { width: 100%; min-height: 96px; resize: vertical; line-height: 1.5; }
-.sheet-foot { margin-top: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+.sheet-foot { margin-top: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; font-weight: 600; }
 .sheet-foot .grow { flex: 1; }
-.swatches { display: flex; gap: 8px; }
-.swatch { width: 28px; height: 28px; border-radius: 6px; border: 2px solid transparent; }
-.swatch.on { border-color: var(--ink); }
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+.swatch { width: 30px; height: 30px; border-radius: 50%; border: 3px solid var(--surface-solid); box-shadow: 0 0 0 1px var(--line); }
+.swatch.on { box-shadow: 0 0 0 2px var(--ink); }
 .bucket-rows { display: flex; flex-direction: column; gap: 6px; }
 .bucket-rows .r { display: flex; gap: 6px; }
 .bucket-rows .r .input { flex: 1; min-width: 0; }
 .label-names { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .label-names label { display: flex; gap: 8px; align-items: center; }
-.label-names label i { width: 12px; height: 12px; border-radius: 3px; background: var(--lc); flex: none; }
+.label-names label i { width: 12px; height: 12px; border-radius: 50%; background: var(--lc); flex: none; }
 .label-names .input { flex: 1; min-width: 0; }
-.confirm { background: var(--danger-soft); border-radius: 8px; padding: 10px 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; color: var(--ink); font-size: 13px; }
+.confirm { background: var(--danger-soft); border-radius: 12px; padding: 10px 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; color: var(--ink); font-size: 13px; width: 100%; }
 .confirm .grow { flex: 1; min-width: 160px; }
 
-.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 16px; border-radius: 8px; font-size: 13px; z-index: 80; max-width: calc(100% - 32px); }
-.loading { color: var(--muted); padding: 40px 0; text-align: center; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--surface-solid); padding: 9px 18px; border-radius: 999px; font-size: 13px; font-weight: 700; z-index: 80; max-width: calc(100% - 32px); }
+.loading { color: var(--muted); padding: 40px 0; text-align: center; font-weight: 600; }
 
 @media (max-width: 960px) {
   .hub { grid-template-columns: minmax(0, 1fr); }
@@ -300,7 +330,7 @@ textarea.input { width: 100%; min-height: 96px; resize: vertical; line-height: 1
   .rail { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 16px; gap: 10px; }
   .rail-label, .brand small, .rail-foot { display: none; }
   .nav { flex-direction: row; overflow-x: auto; gap: 6px; padding-bottom: 2px; }
-  .nav-item { width: auto; flex: none; border: 1px solid var(--line); border-radius: 16px; padding: 4px 12px; }
+  .nav-item { width: auto; flex: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
   .nav-item .name { max-width: 140px; }
   main { padding-inline: 16px; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -309,13 +339,14 @@ textarea.input { width: 100%; min-height: 96px; resize: vertical; line-height: 1
   .sheet { padding-inline: 16px; }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .card, .nav-item, .btn, .plan-card { transition: background-color .12s, border-color .12s; }
+  .card, .nav-item, .btn, .plan-card, .tab { transition: background-color .15s, border-color .15s, color .15s; }
 }
 </style>
 
+<div class="sky" aria-hidden="true"></div>
 <div id="app">
   <aside class="rail" id="rail"></aside>
-  <main id="main"><div class="loading">正在加载计划…</div></main>
+  <main id="main"><div class="loading">Loading…</div></main>
 </div>
 <div id="dialog-root"></div>
 
@@ -323,19 +354,88 @@ textarea.input { width: 100%; min-height: 96px; resize: vertical; line-height: 1
 (() => {
 'use strict';
 
+/* ---------- strings ---------- */
+const I18N = {
+  en: {
+    appSub: 'Tasks and due dates', overview: 'Overview', plans: 'Plans', newPlan: 'New plan', planNamePh: 'Plan name, e.g. Data Structures', create: 'Create',
+    syncOn: 'Synced to the cloud. Share this page to plan together.', syncRO: 'Read only. You can view but not edit.', syncLocal: 'Saved in this browser only.',
+    loading: 'Loading your plans…', openN: n => `${n} open`, newTask: 'New task', planSettings: 'Plan settings',
+    views: { board: 'Board', grid: 'Grid', schedule: 'Schedule', charts: 'Charts' },
+    searchPh: 'Search tasks, people, notes',
+    dueOpts: { all: 'Any due date', overdue: 'Overdue', today: 'Due today', week: 'Due this week', next14: 'Due in 14 days', none: 'No due date' },
+    priAll: 'Any priority', hideDone: 'Hide completed', groupBy: 'Group by',
+    groupOpts: { bucket: 'Bucket', due: 'Due date', progress: 'Progress', priority: 'Priority' },
+    progress: { todo: 'Not started', doing: 'In progress', done: 'Completed' },
+    priority: { urgent: 'Urgent', important: 'Important', medium: 'Medium', low: 'Low' },
+    labels: { c1: 'Important', c2: 'Waiting on others', c3: 'Group', c4: 'Research', c5: 'Reading', c6: 'Personal' },
+    dueGroups: { overdue: 'Overdue', today: 'Today', tomorrow: 'Tomorrow', week: 'This week', nextweek: 'Next week', later: 'Later', none: 'No due date' },
+    defaultBuckets: ['To do', 'In progress', 'Waiting'], newTaskTitle: 'New task',
+    quickAdd: '+ Add task, press Enter', noTasks: 'No tasks yet', addBucket: 'Add bucket', add: 'Add',
+    dueOverdue: (d, n) => `${d} · ${n} day${n === 1 ? '' : 's'} late`, dueToday: 'Due today', dueTomorrow: 'Due tomorrow',
+    markDone: 'Mark complete', markUndone: 'Mark not complete',
+    col: { title: 'Task', bucket: 'Bucket', progress: 'Progress', priority: 'Priority', start: 'Start', due: 'Due', assignee: 'Assigned to' },
+    emptyFilterH: 'No tasks match', emptyFilterP: 'Clear the search, or set the due date and priority filters back to Any.', clearFilter: 'Clear filters',
+    byDue: 'Shown on each due date', today: 'Today', prevMonth: 'Previous month', nextMonth: 'Next month', addOn: d => `Add a task on ${d}`, noDueN: n => `No due date (${n})`,
+    noTasksH: 'No tasks yet', noTasksP: 'Add some tasks and this page will show progress, late work and who is doing what.',
+    byBucket: 'By bucket', byPriority: 'By priority', byPerson: 'By person', openOnly: 'open tasks', overall: 'Overall progress', doneOf: (a, b) => `${a} of ${b} completed`, allDone: 'Everything is done.', unassigned: 'Unassigned', overdue: 'Overdue',
+    noPlansH: 'No plans yet', noPlansP: 'Make a plan for each class or project, then add tasks with due dates. Anything late or due soon shows up here.', firstPlan: 'Create your first plan',
+    todayIs: d => `Today is ${d}`, statOverdue: 'Overdue', statToday: 'Due today', statWeek: 'Due this week', statDoing: 'In progress',
+    attention: 'Needs attention', attentionSub: 'Open tasks that are late or due in the next 14 days', restOfWeek: 'Later this week', next14: 'Next 14 days', nothingSoon: 'Nothing due in the next two weeks.',
+    allPlans: 'All plans', plansN: n => `${n} total`, overdueLbl: 'Overdue', weekLbl: 'This week', nextDue: d => `Next: ${d}`, noMatch: 'No tasks match.',
+    taskDetails: 'Task details', close: 'Close', taskName: 'Task name', start: 'Start date', due: 'Due date', assignee: 'Assigned to', personPh: 'Name',
+    labelsH: 'Labels', notesH: 'Notes', notesPh: 'Links, requirements, contacts, anything useful', checklistH: 'Checklist', addItem: 'Add an item', deleteItem: 'Delete item', toggle: 'Toggle',
+    deleteTask: 'Delete task', deleteTaskQ: 'Delete this task? This cannot be undone.', cancel: 'Cancel', del: 'Delete', createdOn: d => `Created ${d}`, doneOn: d => ` · Completed ${d}`,
+    planName: 'Plan name', color: 'Color', bucketsH: 'Buckets (board columns)', bucketDelTitle: 'Tasks in this bucket move to the first bucket', deleteBucket: 'Delete bucket', newBucketPh: 'New bucket name',
+    labelNames: 'Label names', totalN: n => `${n} task${n === 1 ? '' : 's'}`, deletePlan: 'Delete plan', deletePlanQ: n => `Delete this plan and its ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`,
+    taskDeleted: 'Task deleted', planDeleted: 'Plan deleted', errPerm: 'You do not have permission to edit this planner. Switched to read only.', errQuota: 'Storage is full. Delete some finished tasks and try again.', errNet: 'Could not save. Check your connection and try again.'
+  },
+  zh: {
+    appSub: '任务与截止日期', overview: '概览', plans: '计划', newPlan: '新建计划', planNamePh: '计划名称，例如：数据结构', create: '创建',
+    syncOn: '已云端同步。分享这个页面就能一起规划。', syncRO: '只读模式。你可以查看，但不能修改。', syncLocal: '数据只保存在这个浏览器里。',
+    loading: '正在加载计划…', openN: n => `${n} 项未完成`, newTask: '新建任务', planSettings: '计划设置',
+    views: { board: '看板', grid: '表格', schedule: '日程', charts: '图表' },
+    searchPh: '搜索任务、负责人、备注',
+    dueOpts: { all: '所有截止日期', overdue: '已逾期', today: '今天到期', week: '本周内到期', next14: '14 天内到期', none: '没有截止日期' },
+    priAll: '所有优先级', hideDone: '隐藏已完成', groupBy: '分组',
+    groupOpts: { bucket: '存储桶', due: '截止日期', progress: '进度', priority: '优先级' },
+    progress: { todo: '未开始', doing: '进行中', done: '已完成' },
+    priority: { urgent: '紧急', important: '重要', medium: '中等', low: '低' },
+    labels: { c1: '重要', c2: '等待他人', c3: '小组', c4: '调研', c5: '阅读', c6: '个人' },
+    dueGroups: { overdue: '已逾期', today: '今天', tomorrow: '明天', week: '本周', nextweek: '下周', later: '以后', none: '没有截止日期' },
+    defaultBuckets: ['待办', '进行中', '等待中'], newTaskTitle: '新任务',
+    quickAdd: '+ 添加任务，回车保存', noTasks: '暂无任务', addBucket: '添加存储桶', add: '添加',
+    dueOverdue: (d, n) => `${d} · 逾期 ${n} 天`, dueToday: '今天到期', dueTomorrow: '明天到期',
+    markDone: '标记为已完成', markUndone: '标记为未完成',
+    col: { title: '任务名称', bucket: '存储桶', progress: '进度', priority: '优先级', start: '开始日期', due: '截止日期', assignee: '负责人' },
+    emptyFilterH: '没有符合条件的任务', emptyFilterP: '试试清除搜索词，或把截止日期和优先级筛选改回“所有”。', clearFilter: '清除筛选',
+    byDue: '按截止日期显示', today: '今天', prevMonth: '上个月', nextMonth: '下个月', addOn: d => `在 ${d} 添加任务`, noDueN: n => `没有截止日期（${n}）`,
+    noTasksH: '还没有任务', noTasksP: '添加任务之后，这里会显示进度、逾期情况和每个人的工作量。',
+    byBucket: '按存储桶', byPriority: '按优先级', byPerson: '按负责人', openOnly: '未完成的任务', overall: '整体进度', doneOf: (a, b) => `已完成 ${a} / ${b}`, allDone: '所有任务都完成了。', unassigned: '未分配', overdue: '已逾期',
+    noPlansH: '还没有任何计划', noPlansP: '为每门课或每个项目建一个计划，再把任务和截止日期放进去。逾期和快到期的任务会集中显示在这里。', firstPlan: '新建第一个计划',
+    todayIs: d => `今天是 ${d}`, statOverdue: '已逾期', statToday: '今天到期', statWeek: '本周内到期', statDoing: '进行中',
+    attention: '需要关注', attentionSub: '逾期及 14 天内到期的未完成任务', restOfWeek: '本周剩余', next14: '未来 14 天', nothingSoon: '未来两周没有到期的任务。',
+    allPlans: '所有计划', plansN: n => `${n} 个`, overdueLbl: '逾期', weekLbl: '本周到期', nextDue: d => `下一个：${d}`, noMatch: '没有符合条件的任务。',
+    taskDetails: '任务详情', close: '关闭', taskName: '任务名称', start: '开始日期', due: '截止日期', assignee: '负责人', personPh: '姓名',
+    labelsH: '标签', notesH: '备注', notesPh: '链接、要求、联系人等', checklistH: '清单', addItem: '添加清单项', deleteItem: '删除清单项', toggle: '切换',
+    deleteTask: '删除任务', deleteTaskQ: '删除这个任务？此操作无法撤销。', cancel: '取消', del: '删除', createdOn: d => `创建于 ${d}`, doneOn: d => ` · 完成于 ${d}`,
+    planName: '计划名称', color: '颜色', bucketsH: '存储桶（看板上的列）', bucketDelTitle: '删除后，里面的任务会移到第一个存储桶', deleteBucket: '删除存储桶', newBucketPh: '新存储桶名称',
+    labelNames: '标签名称', totalN: n => `共 ${n} 项任务`, deletePlan: '删除计划', deletePlanQ: n => `删除这个计划和其中的 ${n} 项任务？此操作无法撤销。`,
+    taskDeleted: '任务已删除', planDeleted: '计划已删除', errPerm: '你没有编辑这个计划板的权限，已切换为只读。', errQuota: '存储空间已满，请删除一些已完成的任务后再试。', errNet: '保存失败，请检查网络后重试。'
+  }
+};
+const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const WEEKDAYS = { en: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], zh: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] };
+
 /* ---------- constants ---------- */
 const LABEL_KEYS = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'];
-const DEFAULT_LABELS = { c1: '紧急客户', c2: '等待回复', c3: '采购', c4: '内部', c5: '现场', c6: '文档' };
-const PROGRESS = { todo: '未开始', doing: '进行中', done: '已完成' };
-const PRIORITY = { urgent: '紧急', important: '重要', medium: '中等', low: '低' };
 const PRI_ORDER = { urgent: 0, important: 1, medium: 2, low: 3 };
-const WEEKDAYS = ['一', '二', '三', '四', '五', '六', '日'];
-const AVATAR_COLORS = ['#0b7560', '#22609f', '#a0522d', '#7a4bb0', '#b03a5b', '#56733a', '#2f6f8f', '#8a6a12'];
+const AVATAR_COLORS = ['#d9588f', '#4f86d9', '#8a6ad6', '#2f9e7e', '#d07a3c', '#c0508a', '#3f8fb8', '#7a68c9'];
+const ICON_MARK = '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 1.8l1.7 4.6 4.7 1.6-4.7 1.7L9 14.3l-1.7-4.6L2.6 8l4.7-1.6z"/></svg>';
 const ICON_CHECK = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>';
-const ICON_CAL = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="2.5" width="9" height="8" rx="1.2"/><path d="M1.5 5h9M4 1.2v2.4M8 1.2v2.4"/></svg>';
+const ICON_CAL = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="2.5" width="9" height="8" rx="1.5"/><path d="M1.5 5h9M4 1.2v2.4M8 1.2v2.4"/></svg>';
 const ICON_LIST = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1.5 3l1 1 1.6-1.8M1.5 8l1 1 1.6-1.8M6 3.2h4.5M6 8.2h4.5"/></svg>';
 const ICON_X = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l8 8M11 3l-8 8"/></svg>';
-const ICON_PLUS = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 2.5v9M2.5 7h9"/></svg>';
+const ICON_PLUS = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 2.5v9M2.5 7h9"/></svg>';
 const ICON_GEAR = '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"/></svg>';
 
 /* ---------- helpers ---------- */
@@ -350,12 +450,26 @@ const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); retu
 const today = () => ymd(new Date());
 const endOfWeek = s => { const d = parse(s); const dow = (d.getDay() + 6) % 7; d.setDate(d.getDate() + 6 - dow); return ymd(d); };
 const diffDays = (a, b) => Math.round((parse(b) - parse(a)) / 86400000);
+
+/* ---------- state ---------- */
+const state = { plans: {}, tasks: {}, plansReady: false, tasksReady: false, mode: 'local', readonly: false };
+const PREF_KEY = 'planner-prefs';
+const LOCAL_KEY = 'planner-data';
+let ui = { lang: 'en', planId: 'hub', view: 'board', groupBy: 'bucket', filter: { q: '', due: 'all', pri: 'all', hideDone: false }, calMonth: today().slice(0, 7), sort: { key: 'due', dir: 1 } };
+try { const p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null'); if (p) ui = Object.assign(ui, p, { filter: Object.assign(ui.filter, p.filter || {}) }); } catch (e) {}
+if (!I18N[ui.lang]) ui.lang = 'en';
+const savePrefs = () => { try { localStorage.setItem(PREF_KEY, JSON.stringify(ui)); } catch (e) {} };
+const T = () => I18N[ui.lang];
+
 const fmtDate = s => {
   if (!s) return '';
-  const d = parse(s);
-  return (d.getFullYear() !== new Date().getFullYear() ? d.getFullYear() + '年' : '') + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+  const d = parse(s), other = d.getFullYear() !== new Date().getFullYear();
+  if (ui.lang === 'zh') return (other ? d.getFullYear() + '年' : '') + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+  return MONTHS_EN[d.getMonth()].slice(0, 3) + ' ' + d.getDate() + (other ? ', ' + d.getFullYear() : '');
 };
-const fmtWeekday = s => '周' + WEEKDAYS[(parse(s).getDay() + 6) % 7];
+const weekday = s => WEEKDAYS[ui.lang][(parse(s).getDay() + 6) % 7];
+const monthTitle = (y, m) => ui.lang === 'zh' ? `${y}年${m}月` : `${MONTHS_EN[m - 1]} ${y}`;
+const labelName = (plan, k) => (plan && plan.labels && plan.labels[k]) || T().labels[k];
 
 function dueGroup(t) {
   if (!t.due) return 'none';
@@ -372,15 +486,12 @@ const dueStatus = t => t.progress === 'done' ? 'done' : dueGroup(t);
 function dueText(t) {
   if (!t.due) return '';
   const st = dueStatus(t);
-  if (st === 'overdue') return `${fmtDate(t.due)} · 逾期 ${diffDays(t.due, today())} 天`;
-  if (st === 'today') return '今天到期';
-  if (st === 'tomorrow') return '明天到期';
+  if (st === 'overdue') return T().dueOverdue(fmtDate(t.due), diffDays(t.due, today()));
+  if (st === 'today') return T().dueToday;
+  if (st === 'tomorrow') return T().dueTomorrow;
   return fmtDate(t.due);
 }
-function dueChip(t) {
-  if (!t.due) return '';
-  return `<span class="chip ${dueStatus(t)}">${ICON_CAL}${esc(dueText(t))}</span>`;
-}
+const dueChip = t => t.due ? `<span class="chip ${dueStatus(t)}">${ICON_CAL}${esc(dueText(t))}</span>` : '';
 function avatar(name) {
   if (!name) return '';
   const n = name.trim();
@@ -398,14 +509,6 @@ function cmpTasks(a, b) {
   return (a.createdAt || 0) - (b.createdAt || 0);
 }
 
-/* ---------- state ---------- */
-const state = { plans: {}, tasks: {}, plansReady: false, tasksReady: false, mode: 'local', readonly: false };
-const PREF_KEY = 'planner-prefs';
-const LOCAL_KEY = 'planner-data';
-let ui = { planId: 'hub', view: 'board', groupBy: 'bucket', filter: { q: '', due: 'all', pri: 'all', hideDone: false }, calMonth: today().slice(0, 7), sort: { key: 'due', dir: 1 } };
-try { const p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null'); if (p) ui = Object.assign(ui, p, { filter: Object.assign(ui.filter, p.filter || {}) }); } catch (e) {}
-const savePrefs = () => { try { localStorage.setItem(PREF_KEY, JSON.stringify(ui)); } catch (e) {} };
-
 const plansList = () => Object.values(state.plans).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 const tasksOf = planId => Object.values(state.tasks).filter(t => t.planId === planId);
 const allTasks = () => Object.values(state.tasks).filter(t => state.plans[t.planId]);
@@ -416,16 +519,16 @@ const queues = {};
 
 function toast(msg) {
   const el = document.createElement('div');
-  el.className = 'toast'; el.textContent = msg;
+  el.className = 'toast'; el.setAttribute('role', 'status'); el.textContent = msg;
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 3200);
 }
 function handleErr(e) {
   const code = e && e.code;
-  if (code === 'invalid_argument') { state.readonly = true; toast('你没有编辑这个计划板的权限，已切换为只读。'); render(); }
-  else if (code === 'quota_exceeded') toast('存储空间已满，请删除一些已完成的任务后再试。');
+  if (code === 'invalid_argument') { state.readonly = true; toast(T().errPerm); render(); }
+  else if (code === 'quota_exceeded') toast(T().errQuota);
   else if (code === 'revoked') { state.readonly = true; render(); }
-  else toast('保存失败，请检查网络后重试。');
+  else toast(T().errNet);
 }
 function saveLocal() {
   try { localStorage.setItem(LOCAL_KEY, JSON.stringify({ plans: state.plans, tasks: state.tasks })); } catch (e) {}
@@ -444,15 +547,14 @@ function write(col, id, data) {
 async function drain(path) {
   const q = queues[path];
   q.running = true;
+  const put = body => { const ref = db.doc(path); return body === null ? ref.delete() : ref.set(body); };
   while (q.has) {
     const body = q.next; q.has = false;
-    try {
-      const ref = db.doc(path);
-      if (body === null) await ref.delete(); else await ref.set(body);
-    } catch (e) {
+    try { await put(body); }
+    catch (e) {
       if (e && e.code === 'unavailable') {
         await new Promise(r => setTimeout(r, 400 + Math.random() * 600));
-        try { const ref = db.doc(path); if (body === null) await ref.delete(); else await ref.set(body); } catch (e2) { handleErr(e2); }
+        try { await put(body); } catch (e2) { handleErr(e2); }
       } else handleErr(e);
     }
   }
@@ -472,7 +574,7 @@ function createTask(planId, fields) {
   const plan = state.plans[planId]; if (!plan) return null;
   const id = uid();
   const t = Object.assign({
-    planId, title: '新任务', bucketId: plan.buckets[0]?.id || '', progress: 'todo', priority: 'medium',
+    planId, title: T().newTaskTitle, bucketId: plan.buckets[0]?.id || '', progress: 'todo', priority: 'medium',
     start: '', due: '', assignee: '', labels: [], notes: '', checklist: [], createdAt: Date.now(), updatedAt: Date.now(), completedAt: null
   }, fields);
   if (t.progress === 'done') t.completedAt = Date.now();
@@ -483,7 +585,7 @@ function createPlan(name) {
   const id = uid();
   const used = plansList().map(p => p.color);
   const color = LABEL_KEYS.find(c => !used.includes(c)) || LABEL_KEYS[plansList().length % 6];
-  write('plans', id, { name, color, createdAt: Date.now(), labels: Object.assign({}, DEFAULT_LABELS), buckets: [{ id: uid(), name: '待办' }, { id: uid(), name: '进行中' }, { id: uid(), name: '等待客户' }] });
+  write('plans', id, { name, color, createdAt: Date.now(), labels: {}, buckets: T().defaultBuckets.map(n => ({ id: uid(), name: n })) });
   return id;
 }
 
@@ -533,6 +635,7 @@ function restoreFocus(f) {
 
 /* ---------- render ---------- */
 function render() {
+  document.documentElement.lang = ui.lang === 'zh' ? 'zh-CN' : 'en';
   if (ui.planId !== 'hub' && state.plansReady && !state.plans[ui.planId]) ui.planId = 'hub';
   const f = captureFocus();
   renderRail();
@@ -541,62 +644,65 @@ function render() {
 }
 
 function renderRail() {
-  const RO = state.readonly;
+  const RO = state.readonly, L = T();
   const plans = plansList();
   const hubOverdue = allTasks().filter(t => dueStatus(t) === 'overdue').length;
   $('#rail').innerHTML = `
-    <div class="brand"><div class="brand-mark">P</div><div><b>Planner</b><small>项目与截止日期</small></div></div>
+    <div class="brand">
+      <div class="brand-mark">${ICON_MARK}</div>
+      <div class="brand-text"><b>Planner</b><small>${esc(L.appSub)}</small></div>
+      <div class="lang" role="group" aria-label="Language"><button class="${ui.lang === 'en' ? 'on' : ''}" data-act="lang" data-lang="en">EN</button><button class="${ui.lang === 'zh' ? 'on' : ''}" data-act="lang" data-lang="zh">中</button></div>
+    </div>
     <div>
       <nav class="nav">
-        <button class="nav-item ${ui.planId === 'hub' ? 'active' : ''}" data-act="goto" data-plan="hub"><span class="dot" style="background:var(--ink)"></span><span class="name">概览</span>${hubOverdue ? `<span class="badge">${hubOverdue}</span>` : ''}</button>
+        <button class="nav-item ${ui.planId === 'hub' ? 'active' : ''}" data-act="goto" data-plan="hub"><span class="dot hub"></span><span class="name">${esc(L.overview)}</span>${hubOverdue ? `<span class="badge">${hubOverdue}</span>` : ''}</button>
       </nav>
     </div>
     <div>
-      <div class="rail-label">计划</div>
+      <div class="rail-label">${esc(L.plans)}</div>
       <nav class="nav">
         ${plans.map(p => {
           const od = tasksOf(p.id).filter(t => dueStatus(t) === 'overdue').length;
-          return `<button class="nav-item ${ui.planId === p.id ? 'active' : ''}" data-act="goto" data-plan="${p.id}"><span class="dot bg-${esc(p.color)}"></span><span class="name">${esc(p.name)}</span>${od ? `<span class="badge" title="逾期任务">${od}</span>` : ''}</button>`;
+          return `<button class="nav-item ${ui.planId === p.id ? 'active' : ''}" data-act="goto" data-plan="${p.id}"><span class="dot bg-${esc(p.color)}"></span><span class="name">${esc(p.name)}</span>${od ? `<span class="badge" title="${esc(L.overdue)}">${od}</span>` : ''}</button>`;
         }).join('')}
-        ${!RO ? `<button class="nav-item" data-act="new-plan-show" style="color:var(--muted)">${ICON_PLUS}<span class="name">新建计划</span></button>` : ''}
+        ${!RO ? `<button class="nav-item" data-act="new-plan-show" style="color:var(--muted)">${ICON_PLUS}<span class="name">${esc(L.newPlan)}</span></button>` : ''}
       </nav>
       <form class="new-plan" id="new-plan-form" hidden>
-        <input class="input" id="new-plan-name" placeholder="计划名称，例如：ABC 公司服务器迁移" maxlength="80" autocomplete="off">
-        <button class="btn primary" type="submit">创建</button>
+        <input class="input" id="new-plan-name" placeholder="${esc(L.planNamePh)}" maxlength="80" autocomplete="off">
+        <button class="btn primary" type="submit">${esc(L.create)}</button>
       </form>
     </div>
-    <div class="rail-foot"><span class="sync-dot ${state.mode === 'db' ? 'on' : ''}"></span><span>${state.mode === 'db' ? (RO ? '只读模式。你可以查看，但不能修改。' : '已云端同步。分享后团队成员可以一起编辑。') : '数据只保存在这个浏览器里。'}</span></div>`;
+    <div class="rail-foot"><span class="sync-dot ${state.mode === 'db' ? 'on' : ''}"></span><span>${esc(state.mode === 'db' ? (RO ? L.syncRO : L.syncOn) : L.syncLocal)}</span></div>`;
 }
 
 function renderMain() {
-  const main = $('#main');
-  if (!state.plansReady || !state.tasksReady) { main.innerHTML = '<div class="loading">正在加载计划…</div>'; return; }
+  const main = $('#main'), L = T();
+  if (!state.plansReady || !state.tasksReady) { main.innerHTML = `<div class="loading">${esc(L.loading)}</div>`; return; }
   if (ui.planId === 'hub') { main.innerHTML = hubHTML(); return; }
   const plan = state.plans[ui.planId];
   const RO = state.readonly;
-  const views = { board: '看板', grid: '表格', schedule: '日程', charts: '图表' };
   main.innerHTML = `
     <div class="head">
       <h1><span class="dot bg-${esc(plan.color)}"></span>${esc(plan.name)}</h1>
-      <span class="sub">${tasksOf(plan.id).filter(t => t.progress !== 'done').length} 项未完成</span>
+      <span class="sub">${esc(L.openN(tasksOf(plan.id).filter(t => t.progress !== 'done').length))}</span>
       <span class="spacer"></span>
-      ${!RO ? `<button class="btn primary" data-act="new-task">${ICON_PLUS}新建任务</button><button class="btn" data-act="plan-settings">${ICON_GEAR}计划设置</button>` : ''}
+      ${!RO ? `<button class="btn primary" data-act="new-task">${ICON_PLUS}${esc(L.newTask)}</button><button class="btn" data-act="plan-settings">${ICON_GEAR}${esc(L.planSettings)}</button>` : ''}
     </div>
-    <div class="tabs" role="tablist">${Object.entries(views).map(([k, v]) => `<button class="tab ${ui.view === k ? 'active' : ''}" role="tab" aria-selected="${ui.view === k}" data-act="view" data-view="${k}">${v}</button>`).join('')}</div>
+    <div class="tabs" role="tablist">${Object.entries(L.views).map(([k, v]) => `<button class="tab ${ui.view === k ? 'active' : ''}" role="tab" aria-selected="${ui.view === k}" data-act="view" data-view="${k}">${esc(v)}</button>`).join('')}</div>
     ${ui.view !== 'charts' ? toolbarHTML() : ''}
     <div id="view">${ui.view === 'board' ? boardHTML(plan) : ui.view === 'grid' ? gridHTML(plan) : ui.view === 'schedule' ? scheduleHTML(plan) : chartsHTML(plan)}</div>`;
 }
 
 function toolbarHTML() {
-  const f = ui.filter;
-  const opt = (obj, cur) => Object.entries(obj).map(([k, v]) => `<option value="${k}" ${cur === k ? 'selected' : ''}>${v}</option>`).join('');
+  const f = ui.filter, L = T();
+  const opt = (obj, cur) => Object.entries(obj).map(([k, v]) => `<option value="${k}" ${cur === k ? 'selected' : ''}>${esc(v)}</option>`).join('');
   return `<div class="toolbar">
-    <input class="input" id="f-q" type="search" placeholder="搜索任务、负责人、备注" value="${esc(f.q)}" autocomplete="off">
-    <select class="input" id="f-due" aria-label="截止日期">${opt({ all: '所有截止日期', overdue: '已逾期', today: '今天到期', week: '本周内到期', next14: '14 天内到期', none: '没有截止日期' }, f.due)}</select>
-    <select class="input" id="f-pri" aria-label="优先级">${opt({ all: '所有优先级', urgent: '紧急', important: '重要', medium: '中等', low: '低' }, f.pri)}</select>
-    <label class="chk"><input type="checkbox" id="f-done" ${f.hideDone ? 'checked' : ''}>隐藏已完成</label>
+    <input class="input" id="f-q" type="search" placeholder="${esc(L.searchPh)}" value="${esc(f.q)}" autocomplete="off">
+    <select class="input" id="f-due" aria-label="${esc(L.col.due)}">${opt(L.dueOpts, f.due)}</select>
+    <select class="input" id="f-pri" aria-label="${esc(L.col.priority)}">${opt(Object.assign({ all: L.priAll }, L.priority), f.pri)}</select>
+    <label class="chk"><input type="checkbox" id="f-done" ${f.hideDone ? 'checked' : ''}>${esc(L.hideDone)}</label>
     <span class="grow"></span>
-    ${ui.view === 'board' ? `<label class="chk">分组 <select class="input" id="f-group">${opt({ bucket: '存储桶', due: '截止日期', progress: '进度', priority: '优先级' }, ui.groupBy)}</select></label>` : ''}
+    ${ui.view === 'board' ? `<label class="chk">${esc(L.groupBy)} <select class="input" id="f-group">${opt(L.groupOpts, ui.groupBy)}</select></label>` : ''}
   </div>`;
 }
 
@@ -618,93 +724,91 @@ function applyFilter(list) {
   });
 }
 
-function cardHTML(t, showPlan) {
-  const RO = state.readonly;
+function cardHTML(t) {
+  const RO = state.readonly, L = T();
   const plan = state.plans[t.planId];
   const cl = t.checklist || [];
   const clDone = cl.filter(c => c.done).length;
   const labels = (t.labels || []).filter(k => LABEL_KEYS.includes(k));
+  const showMeta = t.due || cl.length || t.assignee || t.priority === 'urgent' || t.priority === 'important' || t.progress === 'doing';
   return `<article class="card ${t.progress === 'done' ? 'is-done' : ''}" draggable="${!RO}" data-act="open-task" data-id="${t.id}" tabindex="0">
-    ${showPlan && plan ? `<div class="card-plan"><span class="dot bg-${esc(plan.color)}" style="width:8px;height:8px"></span>${esc(plan.name)}</div>` : ''}
-    ${labels.length ? `<div class="card-tags">${labels.map(k => `<span class="tag lbl-${k}">${esc(plan?.labels?.[k] || DEFAULT_LABELS[k])}</span>`).join('')}</div>` : ''}
+    ${labels.length ? `<div class="card-tags">${labels.map(k => `<span class="tag lbl-${k}">${esc(labelName(plan, k))}</span>`).join('')}</div>` : ''}
     <div class="card-top">
-      <button class="check ${t.progress === 'done' ? 'on' : ''}" data-act="toggle-done" data-id="${t.id}" aria-label="${t.progress === 'done' ? '标记为未完成' : '标记为已完成'}" ${RO ? 'disabled' : ''}>${ICON_CHECK}</button>
+      <button class="check ${t.progress === 'done' ? 'on' : ''}" data-act="toggle-done" data-id="${t.id}" aria-label="${esc(t.progress === 'done' ? L.markUndone : L.markDone)}" ${RO ? 'disabled' : ''}>${ICON_CHECK}</button>
       <h4>${esc(t.title)}</h4>
     </div>
-    ${(t.due || cl.length || t.assignee || t.priority === 'urgent' || t.priority === 'important' || t.progress === 'doing') ? `<div class="card-meta">
+    ${showMeta ? `<div class="card-meta">
       ${dueChip(t)}
-      ${t.priority === 'urgent' || t.priority === 'important' ? `<span class="chip pri-${t.priority}">${PRIORITY[t.priority]}</span>` : ''}
-      ${t.progress === 'doing' ? '<span class="chip doing">进行中</span>' : ''}
-      ${cl.length ? `<span class="chip ${clDone === cl.length ? 'done' : ''}">${ICON_LIST}<span class="mono">${clDone}/${cl.length}</span></span>` : ''}
+      ${t.priority === 'urgent' || t.priority === 'important' ? `<span class="chip pri-${t.priority}">${esc(L.priority[t.priority])}</span>` : ''}
+      ${t.progress === 'doing' ? `<span class="chip doing">${esc(L.progress.doing)}</span>` : ''}
+      ${cl.length ? `<span class="chip ${clDone === cl.length ? 'done' : ''}">${ICON_LIST}<span class="num">${clDone}/${cl.length}</span></span>` : ''}
       ${avatar(t.assignee)}
     </div>` : ''}
   </article>`;
 }
 
 function boardColumns(plan) {
-  const td = today();
+  const td = today(), L = T();
   const g = ui.groupBy;
-  if (g === 'progress') return Object.entries(PROGRESS).map(([k, v]) => ({ key: k, name: v, match: t => (t.progress || 'todo') === k, drop: { progress: k }, add: { progress: k } }));
-  if (g === 'priority') return Object.entries(PRIORITY).map(([k, v]) => ({ key: k, name: v, match: t => (t.priority || 'medium') === k, drop: { priority: k }, add: { priority: k } }));
+  if (g === 'progress') return Object.entries(L.progress).map(([k, v]) => ({ key: k, name: v, match: t => (t.progress || 'todo') === k, drop: { progress: k }, add: { progress: k } }));
+  if (g === 'priority') return Object.entries(L.priority).map(([k, v]) => ({ key: k, name: v, match: t => (t.priority || 'medium') === k, drop: { priority: k }, add: { priority: k } }));
   if (g === 'due') {
-    const defs = [
-      ['overdue', '已逾期', null], ['today', '今天', td], ['tomorrow', '明天', addDays(td, 1)], ['week', '本周', null],
-      ['nextweek', '下周', null], ['later', '以后', null], ['none', '没有截止日期', '']
-    ];
-    return defs.map(([k, v, date]) => ({ key: k, name: v, match: t => dueGroup(t) === k, drop: date === null ? null : { due: date }, add: date === null ? null : { due: date }, cls: k === 'overdue' ? 'overdue' : '' }));
+    const dates = { overdue: null, today: td, tomorrow: addDays(td, 1), week: null, nextweek: null, later: null, none: '' };
+    return Object.entries(dates).map(([k, date]) => ({ key: k, name: L.dueGroups[k], match: t => dueGroup(t) === k, drop: date === null ? null : { due: date }, add: date === null ? null : { due: date }, cls: k === 'overdue' ? 'overdue' : '' }));
   }
   const ids = plan.buckets.map(b => b.id);
   return plan.buckets.map((b, i) => ({ key: b.id, name: b.name, match: t => t.bucketId === b.id || (i === 0 && !ids.includes(t.bucketId)), drop: { bucketId: b.id }, add: { bucketId: b.id } }));
 }
 
 function boardHTML(plan) {
-  const RO = state.readonly;
+  const RO = state.readonly, L = T();
   const tasks = applyFilter(tasksOf(plan.id));
-  const cols = boardColumns(plan);
-  return `<div class="board">${cols.map(c => {
+  return `<div class="board">${boardColumns(plan).map(c => {
     const list = tasks.filter(c.match).sort(cmpTasks);
     return `<section class="col" data-drop='${c.drop && !RO ? esc(JSON.stringify(c.drop)) : ''}'>
       <div class="col-head ${c.cls || ''}"><h3>${esc(c.name)}</h3><span class="count">${list.length}</span></div>
-      ${c.add && !RO ? `<input class="qa" id="qa-${esc(c.key)}" data-add='${esc(JSON.stringify(c.add))}' placeholder="+ 添加任务，回车保存" maxlength="200" autocomplete="off">` : ''}
-      ${list.map(t => cardHTML(t)).join('')}
-      ${!list.length ? '<div class="empty-col">暂无任务</div>' : ''}
+      ${c.add && !RO ? `<input class="qa" id="qa-${esc(c.key)}" data-add='${esc(JSON.stringify(c.add))}' placeholder="${esc(L.quickAdd)}" maxlength="200" autocomplete="off">` : ''}
+      ${list.map(cardHTML).join('')}
+      ${!list.length ? `<div class="empty-col">${esc(L.noTasks)}</div>` : ''}
     </section>`;
   }).join('')}
-  ${ui.groupBy === 'bucket' && !RO ? `<section class="add-col"><form id="add-bucket-form" style="display:flex;gap:6px"><input class="input" id="add-bucket-name" placeholder="添加存储桶" maxlength="40" style="flex:1;min-width:0" autocomplete="off"><button class="btn" type="submit">添加</button></form></section>` : ''}
+  ${ui.groupBy === 'bucket' && !RO ? `<section class="add-col"><form id="add-bucket-form" style="display:flex;gap:6px"><input class="input" id="add-bucket-name" placeholder="${esc(L.addBucket)}" maxlength="40" style="flex:1;min-width:0" autocomplete="off"><button class="btn" type="submit">${esc(L.add)}</button></form></section>` : ''}
   </div>`;
 }
 
 function gridHTML(plan) {
+  const L = T();
   const tasks = applyFilter(tasksOf(plan.id));
+  if (!tasks.length) return emptyFiltered();
   const bucketName = id => (plan.buckets.find(b => b.id === id) || plan.buckets[0] || {}).name || '';
   const s = ui.sort;
   const key = {
     title: t => t.title.toLowerCase(), bucket: t => bucketName(t.bucketId), progress: t => ['todo', 'doing', 'done'].indexOf(t.progress),
     priority: t => PRI_ORDER[t.priority] ?? 2, start: t => t.start || '9999', due: t => t.due || '9999', assignee: t => (t.assignee || '￿').toLowerCase()
   }[s.key] || (t => t.due || '9999');
-  tasks.sort((a, b) => { const x = key(a), y = key(b); return (x < y ? -1 : x > y ? 1 : cmpTasks(a, b)) * (x === y ? 1 : s.dir); });
-  const th = (k, label) => `<th data-sort="${k}">${label} ${s.key === k ? `<span class="arr">${s.dir > 0 ? '↑' : '↓'}</span>` : ''}</th>`;
-  if (!tasks.length) return emptyFiltered();
+  tasks.sort((a, b) => { const x = key(a), y = key(b); return x === y ? cmpTasks(a, b) : (x < y ? -1 : 1) * s.dir; });
+  const th = k => `<th data-sort="${k}">${esc(L.col[k])} ${s.key === k ? (s.dir > 0 ? '↑' : '↓') : ''}</th>`;
   return `<div class="table-wrap"><table class="grid">
-    <thead><tr><th style="width:40px"></th>${th('title', '任务名称')}${th('bucket', '存储桶')}${th('progress', '进度')}${th('priority', '优先级')}${th('start', '开始日期')}${th('due', '截止日期')}${th('assignee', '负责人')}</tr></thead>
+    <thead><tr><th style="width:40px"></th>${['title', 'bucket', 'progress', 'priority', 'start', 'due', 'assignee'].map(th).join('')}</tr></thead>
     <tbody>${tasks.map(t => `<tr class="${t.progress === 'done' ? 'is-done' : ''}" data-act="open-task" data-id="${t.id}">
-      <td><button class="check ${t.progress === 'done' ? 'on' : ''}" data-act="toggle-done" data-id="${t.id}" aria-label="切换完成" ${state.readonly ? 'disabled' : ''}>${ICON_CHECK}</button></td>
+      <td><button class="check ${t.progress === 'done' ? 'on' : ''}" data-act="toggle-done" data-id="${t.id}" aria-label="${esc(L.toggle)}" ${state.readonly ? 'disabled' : ''}>${ICON_CHECK}</button></td>
       <td class="title">${esc(t.title)}</td>
       <td>${esc(bucketName(t.bucketId))}</td>
-      <td><span class="chip ${t.progress === 'done' ? 'done' : t.progress === 'doing' ? 'doing' : ''}">${PROGRESS[t.progress] || '未开始'}</span></td>
-      <td><span class="chip pri-${t.priority}">${PRIORITY[t.priority] || '中等'}</span></td>
-      <td class="mono">${t.start ? esc(t.start) : '<span style="color:var(--muted)">·</span>'}</td>
-      <td>${t.due ? dueChip(t) : '<span style="color:var(--muted)">·</span>'}</td>
+      <td><span class="chip ${t.progress === 'done' ? 'done' : t.progress === 'doing' ? 'doing' : ''}">${esc(L.progress[t.progress] || L.progress.todo)}</span></td>
+      <td><span class="chip pri-${esc(t.priority)}">${esc(L.priority[t.priority] || L.priority.medium)}</span></td>
+      <td class="num">${t.start ? esc(fmtDate(t.start)) : '<span class="faint">·</span>'}</td>
+      <td>${t.due ? dueChip(t) : '<span class="faint">·</span>'}</td>
       <td>${t.assignee ? `<span style="display:inline-flex;gap:6px;align-items:center">${avatar(t.assignee)}${esc(t.assignee)}</span>` : ''}</td>
     </tr>`).join('')}</tbody></table></div>`;
 }
 
 function emptyFiltered() {
-  return `<div class="empty"><h2>没有符合条件的任务</h2><p>试试清除搜索词，或把截止日期和优先级筛选改回“所有”。</p><button class="btn" data-act="clear-filter">清除筛选</button></div>`;
+  const L = T();
+  return `<div class="empty"><h2>${esc(L.emptyFilterH)}</h2><p>${esc(L.emptyFilterP)}</p><button class="btn" data-act="clear-filter">${esc(L.clearFilter)}</button></div>`;
 }
 
 function scheduleHTML(plan) {
-  const RO = state.readonly;
+  const RO = state.readonly, L = T();
   const tasks = applyFilter(tasksOf(plan.id));
   const [y, m] = ui.calMonth.split('-').map(Number);
   const first = new Date(y, m - 1, 1);
@@ -719,123 +823,124 @@ function scheduleHTML(plan) {
   const unsched = tasks.filter(t => !t.due).sort(cmpTasks);
   return `<div style="display:flex;flex-direction:column;gap:12px">
     <div class="cal-bar">
-      <h2>${y}年${m}月</h2>
-      <button class="btn" data-act="cal-move" data-dir="-1" aria-label="上个月">‹</button>
-      <button class="btn" data-act="cal-move" data-dir="0">今天</button>
-      <button class="btn" data-act="cal-move" data-dir="1" aria-label="下个月">›</button>
-      <span class="sub" style="color:var(--muted);font-size:12px">按截止日期显示</span>
+      <h2>${esc(monthTitle(y, m))}</h2>
+      <button class="btn" data-act="cal-move" data-dir="-1" aria-label="${esc(L.prevMonth)}">‹</button>
+      <button class="btn" data-act="cal-move" data-dir="0">${esc(L.today)}</button>
+      <button class="btn" data-act="cal-move" data-dir="1" aria-label="${esc(L.nextMonth)}">›</button>
+      <span class="hint">${esc(L.byDue)}</span>
     </div>
     <div class="cal-wrap"><div class="cal">
-      ${WEEKDAYS.map(w => `<div class="dow">周${w}</div>`).join('')}
+      ${WEEKDAYS[ui.lang].map(w => `<div class="dow">${w}</div>`).join('')}
       ${cells.map((c, i) => {
         const list = (byDay[c] || []).sort(cmpTasks);
-        const inMonth = c.slice(0, 7) === ui.calMonth;
-        return `<div class="day ${inMonth ? '' : 'out'} ${c === td ? 'is-today' : ''} ${i % 7 >= 5 ? 'weekend' : ''}">
-          <div class="day-head"><span class="num">${parse(c).getDate()}</span>${!RO ? `<button class="icon-btn add" data-act="cal-add" data-date="${c}" aria-label="在 ${fmtDate(c)} 添加任务">${ICON_PLUS}</button>` : ''}</div>
+        return `<div class="day ${c.slice(0, 7) === ui.calMonth ? '' : 'out'} ${c === td ? 'is-today' : ''} ${i % 7 >= 5 ? 'weekend' : ''}">
+          <div class="day-head"><span class="n">${parse(c).getDate()}</span>${!RO ? `<button class="icon-btn add" data-act="cal-add" data-date="${c}" aria-label="${esc(L.addOn(fmtDate(c)))}">${ICON_PLUS}</button>` : ''}</div>
           ${list.map(t => `<button class="cal-task ${dueStatus(t)}" data-act="open-task" data-id="${t.id}" title="${esc(t.title)}">${esc(t.title)}</button>`).join('')}
         </div>`;
       }).join('')}
     </div></div>
-    ${unsched.length ? `<div class="unsched"><h3>没有截止日期（${unsched.length}）</h3><div class="list">${unsched.map(t => `<button class="cal-task ${t.progress === 'done' ? 'done' : ''}" data-act="open-task" data-id="${t.id}">${esc(t.title)}</button>`).join('')}</div></div>` : ''}
+    ${unsched.length ? `<div class="unsched"><h3>${esc(L.noDueN(unsched.length))}</h3><div class="list">${unsched.map(t => `<button class="cal-task ${t.progress === 'done' ? 'done' : ''}" data-act="open-task" data-id="${t.id}">${esc(t.title)}</button>`).join('')}</div></div>` : ''}
   </div>`;
 }
 
-function statusOf(t) { const s = dueStatus(t); if (s === 'overdue') return 'overdue'; return t.progress || 'todo'; }
-function stackBar(list, total) {
+const statusOf = t => dueStatus(t) === 'overdue' ? 'overdue' : (t.progress || 'todo');
+function stackBar(list, total, h) {
+  const L = T();
   const c = { todo: 0, doing: 0, done: 0, overdue: 0 };
   list.forEach(t => c[statusOf(t)]++);
   const w = n => total ? (n / total * 100).toFixed(2) + '%' : '0';
-  return `<div class="bar">${['done', 'doing', 'todo', 'overdue'].map(k => c[k] ? `<i class="s-${k}" style="width:${w(c[k])}" title="${k === 'overdue' ? '已逾期' : PROGRESS[k]} ${c[k]}"></i>` : '').join('')}</div>`;
+  const name = k => k === 'overdue' ? L.overdue : L.progress[k];
+  return `<div class="bar" ${h ? `style="height:${h}px"` : ''}>${['done', 'doing', 'todo', 'overdue'].map(k => c[k] ? `<i class="s-${k}" style="width:${w(c[k])}" title="${esc(name(k))} ${c[k]}"></i>` : '').join('')}</div>`;
 }
 
 function chartsHTML(plan) {
+  const L = T();
   const tasks = tasksOf(plan.id);
-  if (!tasks.length) return `<div class="empty"><h2>还没有任务</h2><p>添加任务之后，这里会显示进度、逾期情况和每个人的工作量。</p></div>`;
+  if (!tasks.length) return `<div class="empty"><h2>${esc(L.noTasksH)}</h2><p>${esc(L.noTasksP)}</p></div>`;
   const cnt = { todo: 0, doing: 0, done: 0, overdue: 0 };
   tasks.forEach(t => cnt[statusOf(t)]++);
-  const legend = `<div class="legend"><span><i class="s-done"></i>已完成</span><span><i class="s-doing"></i>进行中</span><span><i class="s-todo"></i>未开始</span><span><i class="s-overdue"></i>已逾期</span></div>`;
-  const rows = (groups) => {
+  const legend = `<div class="legend"><span><i class="s-done"></i>${esc(L.progress.done)}</span><span><i class="s-doing"></i>${esc(L.progress.doing)}</span><span><i class="s-todo"></i>${esc(L.progress.todo)}</span><span><i class="s-overdue"></i>${esc(L.overdue)}</span></div>`;
+  const rows = groups => {
     const max = Math.max(1, ...groups.map(g => g.list.length));
     return `<div class="hbars">${groups.map(g => `<div class="hbar"><span class="n" title="${esc(g.name)}">${esc(g.name)}</span><div style="width:${(g.list.length / max * 100).toFixed(2)}%;min-width:${g.list.length ? '4px' : '0'}">${stackBar(g.list, g.list.length)}</div><span class="v">${g.list.length}</span></div>`).join('')}</div>`;
   };
   const ids = plan.buckets.map(b => b.id);
   const byBucket = plan.buckets.map((b, i) => ({ name: b.name, list: tasks.filter(t => t.bucketId === b.id || (i === 0 && !ids.includes(t.bucketId))) }));
-  const byPri = Object.entries(PRIORITY).map(([k, v]) => ({ name: v, list: tasks.filter(t => (t.priority || 'medium') === k) }));
+  const byPri = Object.entries(L.priority).map(([k, v]) => ({ name: v, list: tasks.filter(t => (t.priority || 'medium') === k) }));
   const people = {};
-  tasks.filter(t => t.progress !== 'done').forEach(t => { const n = t.assignee?.trim() || '未分配'; (people[n] = people[n] || []).push(t); });
+  tasks.filter(t => t.progress !== 'done').forEach(t => { const n = t.assignee?.trim() || L.unassigned; (people[n] = people[n] || []).push(t); });
   const byPerson = Object.entries(people).map(([name, list]) => ({ name, list })).sort((a, b) => b.list.length - a.list.length);
   return `<div style="display:flex;flex-direction:column;gap:16px">
     <div class="stats">
-      <div class="stat"><span class="k">未开始</span><span class="v">${cnt.todo}</span></div>
-      <div class="stat info"><span class="k">进行中</span><span class="v">${cnt.doing}</span></div>
-      <div class="stat ok"><span class="k">已完成</span><span class="v">${cnt.done}</span></div>
-      <div class="stat danger"><span class="k">已逾期</span><span class="v">${cnt.overdue}</span></div>
+      <div class="stat"><span class="k">${esc(L.progress.todo)}</span><span class="v">${cnt.todo}</span></div>
+      <div class="stat info"><span class="k">${esc(L.progress.doing)}</span><span class="v">${cnt.doing}</span></div>
+      <div class="stat ok"><span class="k">${esc(L.progress.done)}</span><span class="v">${cnt.done}</span></div>
+      <div class="stat danger"><span class="k">${esc(L.overdue)}</span><span class="v">${cnt.overdue}</span></div>
     </div>
     <div class="charts">
-      <div class="panel"><h2>按存储桶</h2>${legend}${rows(byBucket)}</div>
-      <div class="panel"><h2>按优先级</h2>${legend}${rows(byPri)}</div>
-      <div class="panel"><h2>按负责人 <small>未完成的任务</small></h2>${legend}${byPerson.length ? rows(byPerson) : '<p style="color:var(--muted);margin:0">所有任务都完成了。</p>'}</div>
-      <div class="panel"><h2>整体进度</h2>
-        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px"><span class="mono" style="font-size:32px">${Math.round(cnt.done / tasks.length * 100)}%</span><span style="color:var(--muted)">已完成 ${cnt.done} / ${tasks.length}</span></div>
-        <div style="--h:1">${stackBar(tasks, tasks.length).replace('class="bar"', 'class="bar" style="height:14px"')}</div>
+      <div class="panel"><h2>${esc(L.byBucket)}</h2>${legend}${rows(byBucket)}</div>
+      <div class="panel"><h2>${esc(L.byPriority)}</h2>${legend}${rows(byPri)}</div>
+      <div class="panel"><h2>${esc(L.byPerson)} <small>${esc(L.openOnly)}</small></h2>${legend}${byPerson.length ? rows(byPerson) : `<p class="faint" style="margin:0">${esc(L.allDone)}</p>`}</div>
+      <div class="panel"><h2>${esc(L.overall)}</h2>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap"><span class="big-pct">${Math.round(cnt.done / tasks.length * 100)}%</span><span class="faint">${esc(L.doneOf(cnt.done, tasks.length))}</span></div>
+        ${stackBar(tasks, tasks.length, 14)}
       </div>
     </div>
   </div>`;
 }
 
 function hubHTML() {
-  const RO = state.readonly;
+  const RO = state.readonly, L = T();
   const plans = plansList();
   const td = today();
+  const dayLine = `${fmtDate(td)} ${weekday(td)}`;
   if (!plans.length) {
-    return `<div class="head"><h1>概览</h1></div>
-      <div class="empty"><h2>还没有任何计划</h2><p>为每个客户项目建一个计划，把任务、负责人和截止日期放进去。逾期和即将到期的任务会集中显示在这里。</p>${!RO ? '<button class="btn primary" data-act="new-plan-show">新建第一个计划</button>' : ''}</div>`;
+    return `<div class="head"><h1>${esc(L.overview)}</h1><span class="sub">${esc(L.todayIs(dayLine))}</span></div>
+      <div class="empty"><h2>${esc(L.noPlansH)}</h2><p>${esc(L.noPlansP)}</p>${!RO ? `<button class="btn primary" data-act="new-plan-show">${esc(L.firstPlan)}</button>` : ''}</div>`;
   }
-  const tasks = allTasks();
-  const open = tasks.filter(t => t.progress !== 'done');
+  const open = allTasks().filter(t => t.progress !== 'done');
+  const eow = endOfWeek(td);
   const overdue = open.filter(t => t.due && t.due < td);
   const dueToday = open.filter(t => t.due === td);
-  const dueWeek = open.filter(t => t.due && t.due >= td && t.due <= endOfWeek(td));
+  const dueWeek = open.filter(t => t.due && t.due >= td && t.due <= eow);
   const doing = open.filter(t => t.progress === 'doing');
-  const horizon = addDays(td, 14);
-  const soon = open.filter(t => t.due && t.due <= horizon).sort(cmpTasks);
+  const soon = open.filter(t => t.due && t.due <= addDays(td, 14)).sort(cmpTasks);
   const groups = [
-    ['overdue', '已逾期', soon.filter(t => t.due < td)],
-    ['today', '今天', soon.filter(t => t.due === td)],
-    ['week', '本周剩余', soon.filter(t => t.due > td && t.due <= endOfWeek(td))],
-    ['next', '未来 14 天', soon.filter(t => t.due > endOfWeek(td))]
+    ['overdue', L.dueGroups.overdue, soon.filter(t => t.due < td)],
+    ['today', L.dueGroups.today, soon.filter(t => t.due === td)],
+    ['week', L.restOfWeek, soon.filter(t => t.due > td && t.due <= eow)],
+    ['next', L.next14, soon.filter(t => t.due > eow)]
   ].filter(g => g[2].length);
-  const d = new Date();
   return `
-    <div class="head"><h1>概览</h1><span class="sub">今天是 ${d.getMonth() + 1}月${d.getDate()}日 ${fmtWeekday(td)}</span></div>
+    <div class="head"><h1>${esc(L.overview)}</h1><span class="sub">${esc(L.todayIs(dayLine))}</span></div>
     <div class="stats">
-      <button class="stat danger" data-act="hub-filter" data-due="overdue"><span class="k">已逾期</span><span class="v">${overdue.length}</span></button>
-      <button class="stat warn" data-act="hub-filter" data-due="today"><span class="k">今天到期</span><span class="v">${dueToday.length}</span></button>
-      <button class="stat info" data-act="hub-filter" data-due="week"><span class="k">本周内到期</span><span class="v">${dueWeek.length}</span></button>
-      <div class="stat"><span class="k">进行中</span><span class="v">${doing.length}</span></div>
+      <button class="stat danger" data-act="hub-filter" data-due="overdue"><span class="k">${esc(L.statOverdue)}</span><span class="v">${overdue.length}</span></button>
+      <button class="stat warn" data-act="hub-filter" data-due="today"><span class="k">${esc(L.statToday)}</span><span class="v">${dueToday.length}</span></button>
+      <button class="stat info" data-act="hub-filter" data-due="week"><span class="k">${esc(L.statWeek)}</span><span class="v">${dueWeek.length}</span></button>
+      <div class="stat"><span class="k">${esc(L.statDoing)}</span><span class="v">${doing.length}</span></div>
     </div>
     <div class="hub">
-      <section class="panel"><h2>需要关注 <small>逾期及 14 天内到期的未完成任务</small></h2>
-        ${groups.length ? `<div class="due-list">${groups.map(([k, name, list]) => `<div class="due-group ${k === 'overdue' ? 'overdue' : ''}">${name} · ${list.length}</div>${list.map(t => {
+      <section class="panel"><h2>${esc(L.attention)} <small>${esc(L.attentionSub)}</small></h2>
+        ${groups.length ? `<div class="due-list">${groups.map(([k, name, list]) => `<div class="due-group ${k === 'overdue' ? 'overdue' : ''}">${esc(name)} · ${list.length}</div>${list.map(t => {
           const p = state.plans[t.planId];
           return `<div class="due-row" data-act="open-task" data-id="${t.id}" tabindex="0">
-            <button class="check" data-act="toggle-done" data-id="${t.id}" aria-label="标记为已完成" ${RO ? 'disabled' : ''}>${ICON_CHECK}</button>
+            <button class="check" data-act="toggle-done" data-id="${t.id}" aria-label="${esc(L.markDone)}" ${RO ? 'disabled' : ''}>${ICON_CHECK}</button>
             <div style="min-width:0"><div class="t">${esc(t.title)}</div><div class="p"><span class="dot bg-${esc(p.color)}" style="width:8px;height:8px"></span>${esc(p.name)}${t.assignee ? ' · ' + esc(t.assignee) : ''}</div></div>
             ${dueChip(t)}
           </div>`;
-        }).join('')}`).join('')}</div>` : '<p style="color:var(--muted);margin:0">未来两周没有到期的任务。</p>'}
+        }).join('')}`).join('')}</div>` : `<p class="faint" style="margin:0">${esc(L.nothingSoon)}</p>`}
       </section>
-      <section class="panel"><h2>所有计划 <small>${plans.length} 个</small></h2>
+      <section class="panel"><h2>${esc(L.allPlans)} <small>${esc(L.plansN(plans.length))}</small></h2>
         <div class="plan-cards">${plans.map(p => {
           const ts = tasksOf(p.id);
           const done = ts.filter(t => t.progress === 'done').length;
           const od = ts.filter(t => dueStatus(t) === 'overdue').length;
-          const wk = ts.filter(t => t.progress !== 'done' && t.due && t.due >= td && t.due <= endOfWeek(td)).length;
+          const wk = ts.filter(t => t.progress !== 'done' && t.due && t.due >= td && t.due <= eow).length;
           const next = ts.filter(t => t.progress !== 'done' && t.due && t.due >= td).sort(cmpTasks)[0];
           return `<button class="plan-card" data-act="goto" data-plan="${p.id}">
-            <div class="row"><span class="dot bg-${esc(p.color)}"></span><b>${esc(p.name)}</b><span class="mono" style="color:var(--muted);font-size:12px">${done}/${ts.length}</span></div>
+            <div class="row"><span class="dot bg-${esc(p.color)}"></span><b>${esc(p.name)}</b><span class="faint num" style="font-size:12px;font-weight:700">${done}/${ts.length}</span></div>
             ${stackBar(ts, ts.length)}
-            <div class="nums"><span class="${od ? 'od' : ''}">逾期 <span class="mono">${od}</span></span><span>本周到期 <span class="mono">${wk}</span></span>${next ? `<span>下一个：${esc(fmtDate(next.due))}</span>` : ''}</div>
+            <div class="nums"><span class="${od ? 'od' : ''}">${esc(L.overdueLbl)} <b>${od}</b></span><span>${esc(L.weekLbl)} <b>${wk}</b></span>${next ? `<span>${esc(L.nextDue(fmtDate(next.due)))}</span>` : ''}</div>
           </button>`;
         }).join('')}</div>
       </section>
@@ -864,48 +969,50 @@ function flushTaskDialog() {
 function openTask(id, focusTitle) {
   const t = state.tasks[id]; if (!t) return;
   const plan = state.plans[t.planId]; if (!plan) return;
+  const L = T();
   openPlanSettingsId = null;
   openTaskId = id;
   const RO = state.readonly;
   const dis = RO ? 'disabled' : '';
-  const sel = (id2, obj, cur) => `<select class="input" id="${id2}" ${dis}>${Object.entries(obj).map(([k, v]) => `<option value="${esc(k)}" ${cur === k ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>`;
+  const sel = (sid, obj, cur) => `<select class="input" id="${sid}" ${dis}>${Object.entries(obj).map(([k, v]) => `<option value="${esc(k)}" ${cur === k ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>`;
   const buckets = Object.fromEntries(plan.buckets.map(b => [b.id, b.name]));
   const bucketCur = buckets[t.bucketId] ? t.bucketId : plan.buckets[0]?.id;
-  $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="任务详情">
-    <div class="sheet-head"><span class="dot bg-${esc(plan.color)}"></span><span>${esc(plan.name)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="关闭">${ICON_X}</button></div>
-    <input class="title-input" id="t-title" value="${esc(t.title)}" maxlength="200" ${dis} aria-label="任务名称">
+  $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.taskDetails)}">
+    <div class="sheet-head"><span class="dot bg-${esc(plan.color)}"></span><span>${esc(plan.name)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
+    <input class="title-input" id="t-title" value="${esc(t.title)}" maxlength="200" ${dis} aria-label="${esc(L.taskName)}">
     <div class="fields">
-      <label class="field"><span>存储桶</span>${sel('t-bucket', buckets, bucketCur)}</label>
-      <label class="field"><span>进度</span>${sel('t-progress', PROGRESS, t.progress || 'todo')}</label>
-      <label class="field"><span>优先级</span>${sel('t-priority', PRIORITY, t.priority || 'medium')}</label>
-      <label class="field"><span>开始日期</span><input class="input" type="date" id="t-start" value="${esc(t.start || '')}" ${dis}></label>
-      <label class="field"><span>截止日期</span><input class="input" type="date" id="t-due" value="${esc(t.due || '')}" ${dis}></label>
-      <label class="field"><span>负责人</span><input class="input" id="t-assignee" value="${esc(t.assignee || '')}" placeholder="姓名" maxlength="40" list="people" ${dis}></label>
+      <label class="field"><span>${esc(L.col.bucket)}</span>${sel('t-bucket', buckets, bucketCur)}</label>
+      <label class="field"><span>${esc(L.col.progress)}</span>${sel('t-progress', L.progress, t.progress || 'todo')}</label>
+      <label class="field"><span>${esc(L.col.priority)}</span>${sel('t-priority', L.priority, t.priority || 'medium')}</label>
+      <label class="field"><span>${esc(L.start)}</span><input class="input" type="date" id="t-start" value="${esc(t.start || '')}" ${dis}></label>
+      <label class="field"><span>${esc(L.due)}</span><input class="input" type="date" id="t-due" value="${esc(t.due || '')}" ${dis}></label>
+      <label class="field"><span>${esc(L.assignee)}</span><input class="input" id="t-assignee" value="${esc(t.assignee || '')}" placeholder="${esc(L.personPh)}" maxlength="40" list="people" ${dis}></label>
     </div>
     <datalist id="people">${[...new Set(allTasks().map(x => x.assignee).filter(Boolean))].map(n => `<option value="${esc(n)}">`).join('')}</datalist>
     ${t.due ? `<div>${dueChip(t)}</div>` : ''}
-    <div><span class="section-label">标签</span><div class="label-picks">${LABEL_KEYS.map(k => `<button class="label-pick lbl-${k} ${(t.labels || []).includes(k) ? 'on' : ''}" data-act="toggle-label" data-label="${k}" ${dis}><i></i>${esc(plan.labels?.[k] || DEFAULT_LABELS[k])}</button>`).join('')}</div></div>
-    <div><label class="section-label" for="t-notes">备注</label><textarea class="input" id="t-notes" placeholder="客户联系人、工单号、现场情况等" ${dis}>${esc(t.notes || '')}</textarea></div>
-    <div><span class="section-label">清单</span><div id="t-checklist">${checklistHTML(t)}</div></div>
+    <div><span class="section-label">${esc(L.labelsH)}</span><div class="label-picks">${LABEL_KEYS.map(k => `<button class="label-pick lbl-${k} ${(t.labels || []).includes(k) ? 'on' : ''}" data-act="toggle-label" data-label="${k}" ${dis}><i></i>${esc(labelName(plan, k))}</button>`).join('')}</div></div>
+    <div><label class="section-label" for="t-notes">${esc(L.notesH)}</label><textarea class="input" id="t-notes" placeholder="${esc(L.notesPh)}" ${dis}>${esc(t.notes || '')}</textarea></div>
+    <div><span class="section-label">${esc(L.checklistH)}</span><div id="t-checklist">${checklistHTML(t)}</div></div>
     <div class="sheet-foot" id="t-foot">${taskFootHTML(t)}</div>
   </div></div>`;
   const ti = $('#t-title');
   if (focusTitle && ti && !RO) { ti.focus(); ti.select(); } else $('.sheet [data-act="close"]').focus();
 }
 function taskFootHTML(t) {
-  const created = t.createdAt ? new Date(t.createdAt) : null;
-  const done = t.completedAt ? new Date(t.completedAt) : null;
-  return `<span>${created ? `创建于 ${fmtDate(ymd(created))}` : ''}${done && t.progress === 'done' ? ` · 完成于 ${fmtDate(ymd(done))}` : ''}</span><span class="grow"></span>${!state.readonly ? '<button class="btn danger" data-act="delete-task-ask">删除任务</button>' : ''}`;
+  const L = T();
+  const created = t.createdAt ? ymd(new Date(t.createdAt)) : null;
+  const done = t.completedAt && t.progress === 'done' ? ymd(new Date(t.completedAt)) : null;
+  return `<span>${created ? esc(L.createdOn(fmtDate(created))) : ''}${done ? esc(L.doneOn(fmtDate(done))) : ''}</span><span class="grow"></span>${!state.readonly ? `<button class="btn danger" data-act="delete-task-ask">${esc(L.deleteTask)}</button>` : ''}`;
 }
 function checklistHTML(t) {
-  const RO = state.readonly;
+  const RO = state.readonly, L = T();
   const cl = t.checklist || [];
   return `<div class="checklist">${cl.map(c => `<div class="cl-item ${c.done ? 'done' : ''}">
-      <button class="check ${c.done ? 'on' : ''}" data-act="cl-toggle" data-cl="${esc(c.id)}" aria-label="切换" ${RO ? 'disabled' : ''}>${ICON_CHECK}</button>
+      <button class="check ${c.done ? 'on' : ''}" data-act="cl-toggle" data-cl="${esc(c.id)}" aria-label="${esc(L.toggle)}" ${RO ? 'disabled' : ''}>${ICON_CHECK}</button>
       <input type="text" id="cl-${esc(c.id)}" data-cl="${esc(c.id)}" value="${esc(c.text)}" maxlength="200" ${RO ? 'disabled' : ''}>
-      ${!RO ? `<button class="icon-btn" data-act="cl-del" data-cl="${esc(c.id)}" aria-label="删除清单项">${ICON_X}</button>` : ''}
+      ${!RO ? `<button class="icon-btn" data-act="cl-del" data-cl="${esc(c.id)}" aria-label="${esc(L.deleteItem)}">${ICON_X}</button>` : ''}
     </div>`).join('')}
-    ${!RO ? `<form id="cl-add" style="display:flex;gap:6px;margin-top:4px"><input class="input" id="cl-new" placeholder="添加清单项" maxlength="200" style="flex:1;min-width:0" autocomplete="off"><button class="btn" type="submit">添加</button></form>` : ''}
+    ${!RO ? `<form id="cl-add" style="display:flex;gap:6px;margin-top:4px"><input class="input" id="cl-new" placeholder="${esc(L.addItem)}" maxlength="200" style="flex:1;min-width:0" autocomplete="off"><button class="btn" type="submit">${esc(L.add)}</button></form>` : ''}
   </div>`;
 }
 function refreshChecklist() {
@@ -914,36 +1021,36 @@ function refreshChecklist() {
 }
 
 /* ---------- plan settings dialog ---------- */
-function openPlanSettings(id, keepConfirm) {
+function openPlanSettings(id) {
   const p = state.plans[id]; if (!p) return;
+  const L = T();
   openTaskId = null; openPlanSettingsId = id;
   const n = tasksOf(id).length;
-  $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="计划设置">
-    <div class="sheet-head"><span>计划设置</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="关闭">${ICON_X}</button></div>
-    <label class="field"><span>计划名称</span><input class="input" id="p-name" value="${esc(p.name)}" maxlength="80"></label>
-    <div><span class="section-label">颜色</span><div class="swatches">${LABEL_KEYS.map(c => `<button class="swatch bg-${c} ${p.color === c ? 'on' : ''}" data-act="plan-color" data-color="${c}" aria-label="颜色 ${c}"></button>`).join('')}</div></div>
-    <div><span class="section-label">存储桶（看板上的列）</span><div class="bucket-rows">
-      ${p.buckets.map(b => `<div class="r"><input class="input" id="b-${esc(b.id)}" data-bucket="${esc(b.id)}" value="${esc(b.name)}" maxlength="40">${p.buckets.length > 1 ? `<button class="icon-btn" data-act="bucket-del" data-bucket="${esc(b.id)}" aria-label="删除存储桶" title="删除后，里面的任务会移到第一个存储桶">${ICON_X}</button>` : ''}</div>`).join('')}
-      <form id="p-bucket-add" class="r"><input class="input" id="p-bucket-new" placeholder="新存储桶名称" maxlength="40" autocomplete="off"><button class="btn" type="submit">添加</button></form>
+  $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.planSettings)}">
+    <div class="sheet-head"><span>${esc(L.planSettings)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
+    <label class="field"><span>${esc(L.planName)}</span><input class="input" id="p-name" value="${esc(p.name)}" maxlength="80"></label>
+    <div><span class="section-label">${esc(L.color)}</span><div class="swatches">${LABEL_KEYS.map(c => `<button class="swatch bg-${c} ${p.color === c ? 'on' : ''}" data-act="plan-color" data-color="${c}" aria-label="${esc(L.color)} ${c}"></button>`).join('')}</div></div>
+    <div><span class="section-label">${esc(L.bucketsH)}</span><div class="bucket-rows">
+      ${p.buckets.map(b => `<div class="r"><input class="input" id="b-${esc(b.id)}" data-bucket="${esc(b.id)}" value="${esc(b.name)}" maxlength="40">${p.buckets.length > 1 ? `<button class="icon-btn" data-act="bucket-del" data-bucket="${esc(b.id)}" aria-label="${esc(L.deleteBucket)}" title="${esc(L.bucketDelTitle)}">${ICON_X}</button>` : ''}</div>`).join('')}
+      <form id="p-bucket-add" class="r"><input class="input" id="p-bucket-new" placeholder="${esc(L.newBucketPh)}" maxlength="40" autocomplete="off"><button class="btn" type="submit">${esc(L.add)}</button></form>
     </div></div>
-    <div><span class="section-label">标签名称</span><div class="label-names">${LABEL_KEYS.map(k => `<label class="lbl-${k}"><i></i><input class="input" data-labelname="${k}" value="${esc(p.labels?.[k] ?? DEFAULT_LABELS[k])}" maxlength="24"></label>`).join('')}</div></div>
-    <div class="sheet-foot" id="p-foot">${keepConfirm ? planDeleteConfirm(n) : `<span>共 ${n} 项任务</span><span class="grow"></span><button class="btn danger" data-act="plan-delete-ask">删除计划</button>`}</div>
+    <div><span class="section-label">${esc(L.labelNames)}</span><div class="label-names">${LABEL_KEYS.map(k => `<label class="lbl-${k}"><i></i><input class="input" data-labelname="${k}" value="${esc(labelName(p, k))}" maxlength="24"></label>`).join('')}</div></div>
+    <div class="sheet-foot" id="p-foot"><span>${esc(L.totalN(n))}</span><span class="grow"></span><button class="btn danger" data-act="plan-delete-ask">${esc(L.deletePlan)}</button></div>
   </div></div>`;
 }
-const planDeleteConfirm = n => `<div class="confirm" style="width:100%"><span class="grow">删除这个计划和其中的 ${n} 项任务？此操作无法撤销。</span><button class="btn" data-act="plan-delete-cancel">取消</button><button class="btn danger solid" data-act="plan-delete">删除</button></div>`;
+const confirmHTML = (msg, cancelAct, okAct) => `<div class="confirm"><span class="grow">${esc(msg)}</span><button class="btn" data-act="${cancelAct}">${esc(T().cancel)}</button><button class="btn danger solid" data-act="${okAct}">${esc(T().del)}</button></div>`;
 
 /* ---------- events ---------- */
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]');
   if (!el) return;
   const act = el.dataset.act;
-  const RO = state.readonly;
+  const RO = state.readonly, L = T();
   switch (act) {
+    case 'lang': ui.lang = el.dataset.lang; savePrefs(); render(); break;
     case 'goto': ui.planId = el.dataset.plan; savePrefs(); render(); window.scrollTo(0, 0); break;
     case 'view': ui.view = el.dataset.view; savePrefs(); render(); break;
-    case 'new-plan-show': {
-      const f = $('#new-plan-form'); f.hidden = false; $('#new-plan-name').focus(); break;
-    }
+    case 'new-plan-show': $('#new-plan-form').hidden = false; $('#new-plan-name').focus(); break;
     case 'toggle-done': {
       e.stopPropagation(); if (RO) break;
       const t = state.tasks[el.dataset.id]; if (!t) break;
@@ -966,9 +1073,11 @@ document.addEventListener('click', e => {
     }
     case 'clear-filter': ui.filter = { q: '', due: 'all', pri: 'all', hideDone: false }; savePrefs(); render(); break;
     case 'hub-filter': {
-      const first = plansList().find(p => tasksOf(p.id).some(t => { const s = dueStatus(t); return el.dataset.due === 'overdue' ? s === 'overdue' : el.dataset.due === 'today' ? s === 'today' : (t.progress !== 'done' && t.due && t.due >= today() && t.due <= endOfWeek(today())); }));
-      if (!first) { toast('没有符合条件的任务。'); break; }
-      ui.planId = first.id; ui.view = 'grid'; ui.filter = { q: '', due: el.dataset.due, pri: 'all', hideDone: false }; savePrefs(); render();
+      const due = el.dataset.due, td = today();
+      const hit = t => due === 'overdue' ? dueStatus(t) === 'overdue' : due === 'today' ? dueStatus(t) === 'today' : (t.progress !== 'done' && t.due && t.due >= td && t.due <= endOfWeek(td));
+      const first = plansList().find(p => tasksOf(p.id).some(hit));
+      if (!first) { toast(L.noMatch); break; }
+      ui.planId = first.id; ui.view = 'grid'; ui.filter = { q: '', due, pri: 'all', hideDone: false }; savePrefs(); render();
       break;
     }
     case 'plan-settings': openPlanSettings(ui.planId); break;
@@ -992,11 +1101,9 @@ document.addEventListener('click', e => {
       patchTask(t.id, { checklist: (t.checklist || []).filter(c => c.id !== el.dataset.cl) });
       refreshChecklist(); break;
     }
-    case 'delete-task-ask':
-      $('#t-foot').innerHTML = `<div class="confirm" style="width:100%"><span class="grow">删除这个任务？此操作无法撤销。</span><button class="btn" data-act="delete-task-cancel">取消</button><button class="btn danger solid" data-act="delete-task">删除</button></div>`;
-      break;
+    case 'delete-task-ask': $('#t-foot').innerHTML = confirmHTML(L.deleteTaskQ, 'delete-task-cancel', 'delete-task'); break;
     case 'delete-task-cancel': { const t = state.tasks[openTaskId]; if (t) $('#t-foot').innerHTML = taskFootHTML(t); break; }
-    case 'delete-task': { const id = openTaskId; openTaskId = null; $('#dialog-root').innerHTML = ''; write('tasks', id, null); toast('任务已删除'); break; }
+    case 'delete-task': { const id = openTaskId; openTaskId = null; $('#dialog-root').innerHTML = ''; write('tasks', id, null); toast(L.taskDeleted); break; }
     case 'plan-color': patchPlan(openPlanSettingsId, { color: el.dataset.color }); openPlanSettings(openPlanSettingsId); break;
     case 'bucket-del': {
       const p = state.plans[openPlanSettingsId]; if (!p) break;
@@ -1005,7 +1112,7 @@ document.addEventListener('click', e => {
       patchPlan(p.id, { buckets: rest });
       openPlanSettings(p.id); break;
     }
-    case 'plan-delete-ask': $('#p-foot').innerHTML = planDeleteConfirm(tasksOf(openPlanSettingsId).length); break;
+    case 'plan-delete-ask': $('#p-foot').innerHTML = confirmHTML(L.deletePlanQ(tasksOf(openPlanSettingsId).length), 'plan-delete-cancel', 'plan-delete'); break;
     case 'plan-delete-cancel': openPlanSettings(openPlanSettingsId); break;
     case 'plan-delete': {
       const id = openPlanSettingsId;
@@ -1013,10 +1120,18 @@ document.addEventListener('click', e => {
       tasksOf(id).forEach(t => write('tasks', t.id, null));
       write('plans', id, null);
       ui.planId = 'hub'; savePrefs(); render();
-      toast('计划已删除');
+      toast(L.planDeleted);
       break;
     }
   }
+});
+
+document.addEventListener('click', e => {
+  const th = e.target.closest('th[data-sort]');
+  if (!th) return;
+  const k = th.dataset.sort;
+  ui.sort = ui.sort.key === k ? { key: k, dir: -ui.sort.dir } : { key: k, dir: 1 };
+  savePrefs(); render();
 });
 
 document.addEventListener('keydown', e => {
@@ -1069,8 +1184,18 @@ document.addEventListener('change', e => {
   const p = state.plans[openPlanSettingsId];
   if (p) {
     if (id === 'p-name') { const v = el.value.trim(); if (v && v !== p.name) patchPlan(p.id, { name: v }); else el.value = p.name; }
-    else if (el.dataset.bucket) { const v = el.value.trim(); if (v) patchPlan(p.id, { buckets: p.buckets.map(b => b.id === el.dataset.bucket ? { id: b.id, name: v } : b) }); else el.value = p.buckets.find(b => b.id === el.dataset.bucket)?.name || ''; }
-    else if (el.dataset.labelname) { patchPlan(p.id, { labels: Object.assign({}, DEFAULT_LABELS, p.labels, { [el.dataset.labelname]: el.value.trim() || DEFAULT_LABELS[el.dataset.labelname] }) }); }
+    else if (el.dataset.bucket) {
+      const v = el.value.trim();
+      if (v) patchPlan(p.id, { buckets: p.buckets.map(b => b.id === el.dataset.bucket ? { id: b.id, name: v } : b) });
+      else el.value = p.buckets.find(b => b.id === el.dataset.bucket)?.name || '';
+    } else if (el.dataset.labelname) {
+      // store only custom names so default labels follow the language setting
+      const k = el.dataset.labelname, v = el.value.trim();
+      const labels = Object.assign({}, p.labels);
+      if (!v || v === I18N.en.labels[k] || v === I18N.zh.labels[k]) delete labels[k]; else labels[k] = v;
+      patchPlan(p.id, { labels });
+      if (!v) el.value = T().labels[k];
+    }
   }
 });
 
@@ -1125,9 +1250,8 @@ document.addEventListener('drop', e => {
   const col = e.target.closest && e.target.closest('.col');
   if (!dragId || !col || !col.dataset.drop) return;
   e.preventDefault();
-  const patch = JSON.parse(col.dataset.drop);
   const id = dragId; dragId = null;
-  patchTask(id, patch);
+  patchTask(id, JSON.parse(col.dataset.drop));
 });
 
 /* refresh "today" math when the date rolls over */

@@ -1,6 +1,6 @@
 # Planner
 
-A lightweight project planner, similar to Microsoft Teams Planner, for tracking tasks and due dates across projects.
+A lightweight planner, similar to Microsoft Teams Planner, for keeping track of homework, projects and due dates. Built for school now and work later.
 
 Single HTML file. No build step, no server, no dependencies to install.
 
@@ -10,16 +10,17 @@ Single HTML file. No build step, no server, no dependencies to install.
 - **Board**: columns by bucket, with drag and drop. Can also group by due date, progress or priority. Quick add at the top of each column.
 - **Grid**: sortable table of all tasks.
 - **Schedule**: month calendar by due date.
-- **Charts**: progress by bucket, priority and assignee.
-- **Task details**: bucket, progress, priority, start and due date, assignee, labels, notes, checklist.
+- **Charts**: progress by bucket, priority and person.
+- **Task details**: bucket, progress, priority, start and due date, assigned person, labels, notes, checklist.
 - Search and filters (due date, priority, hide completed).
-- Light and dark theme, works on phone width.
+- English and Chinese, switch with the EN / 中 button. English by default.
+- Light theme in white, pale pink and pale blue, with a matching dark theme. Works on phone width.
 
 ## Usage
 
-Open `index.html` in a browser.
+Open `index.html` in a browser, or turn on GitHub Pages for this repository and open the Pages link.
 
 ## Data storage
 
 - Opened directly from a file or any normal web host, data is saved in the browser's `localStorage`. It stays on that browser and device only, and is lost if browser data is cleared.
-- When published as a Claude artifact, the page uses the artifact's shared database instead, so data syncs across devices and can be shared with teammates.
+- When published as a Claude artifact, the page uses the artifact's shared database instead, so data syncs across devices.
