@@ -355,6 +355,13 @@ table.grades { min-width: 760px; }
 .mk { font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--warn); background: var(--warn-soft); border-radius: 999px; padding: 0 6px; align-self: flex-start; }
 .tt-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .tt-bar b { font-family: var(--font-display); min-width: 160px; }
+.tt-block.cancelled { opacity: .55; background: repeating-linear-gradient(135deg, var(--surface-2) 0 6px, var(--surface-solid) 6px 12px); border-left-color: var(--muted); box-shadow: none; }
+.tt-block.cancelled b, .class-row.cancelled .ttl { text-decoration: line-through; }
+.class-row.cancelled { opacity: .6; }
+.mk.moved { color: var(--info); background: var(--info-soft); }
+.mk.cx { color: var(--danger); background: var(--danger-soft); }
+.occ { background: var(--blue-soft); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.occ .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .unsched { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
 .unsched h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 800; }
 .unsched .list { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -540,7 +547,10 @@ const I18N = {
     typeOpts: ['Lecture', 'Tutorial', 'Lab', 'Practical'], dayNames: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     makeup: 'Make-up', addMakeup: 'Add make-up class', cDate: 'Date (one time only)', cDateHint: 'Leave the date empty for a class that repeats every week.',
     upcomingMakeups: 'Upcoming one-time classes', thisWeek: 'This week', prevWeek: 'Previous week', nextWeek: 'Next week',
-    remindMakeup: n => `${n} make-up class${n === 1 ? '' : 'es'} today`, makeupToday: 'Make-up classes today',
+    remindMakeup: n => `${n} extra or moved class${n === 1 ? '' : 'es'} today`, makeupToday: 'Changes to today\'s classes',
+    moved: 'Moved', cancelled: 'Cancelled', occH: d => `This time only: ${d}`, occMove: 'Change the time for this day only', occCancel: 'Cancel this day only', occRestore: 'Undo: class happens as usual',
+    movedFrom: (d, t) => `Moved from ${d}${t ? ' ' + t : ''}`, weeklyHint: 'Changes in the fields below apply to every week.', occMovedToast: 'Set the new date and time for this one.', occCancelToast: 'Cancelled for that day', occRestoreToast: 'Back to the usual time',
+    remindCancelled: n => `${n} class${n === 1 ? '' : 'es'} cancelled today`,
     select: 'Select', selCancel: 'Cancel', selN: n => `${n} selected`, selAll: 'Select all', selClear: 'Clear', selHint: 'Click tasks to select them', markDoneSel: 'Mark complete', deleteSelQ: n => `Delete ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`, deletedN: n => `${n} task${n === 1 ? '' : 's'} deleted`, doneN: n => `${n} task${n === 1 ? '' : 's'} marked complete`, moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
     dueOverdue: (d, n) => `${d} · ${n} day${n === 1 ? '' : 's'} late`, dueToday: 'Due today', dueTomorrow: 'Due tomorrow',
     markDone: 'Mark complete', markUndone: 'Mark not complete',
@@ -612,7 +622,10 @@ const I18N = {
     typeOpts: ['讲课', '辅导', '实验', '实践'], dayNames: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
     makeup: '补课', addMakeup: '添加补课', cDate: '日期（只上一次）', cDateHint: '日期留空 = 每周都上的课。',
     upcomingMakeups: '接下来的补课', thisWeek: '本周', prevWeek: '上一周', nextWeek: '下一周',
-    remindMakeup: n => `今天有 ${n} 节补课`, makeupToday: '今天的补课',
+    remindMakeup: n => `今天有 ${n} 节补课或改时间的课`, makeupToday: '今天的课有变动',
+    moved: '改时间', cancelled: '已取消', occH: d => `只针对这一次：${d}`, occMove: '只改这一次的时间', occCancel: '这一次取消', occRestore: '恢复，这一次照常上课',
+    movedFrom: (d, t) => `原本：${d}${t ? ' ' + t : ''}`, weeklyHint: '下面栏位的修改会套用到每一周。', occMovedToast: '请设定这一次的新日期和时间。', occCancelToast: '这一天的课已取消', occRestoreToast: '已恢复原本的上课时间',
+    remindCancelled: n => `今天有 ${n} 节课取消`,
     select: '多选', selCancel: '取消', selN: n => `已选 ${n} 项`, selAll: '全选', selClear: '清空', selHint: '点任务即可选择', markDoneSel: '标记完成', deleteSelQ: n => `删除这 ${n} 项任务？此操作无法撤销。`, deletedN: n => `已删除 ${n} 项任务`, doneN: n => `${n} 项任务已标记完成`, moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
     dueOverdue: (d, n) => `${d} · 逾期 ${n} 天`, dueToday: '今天到期', dueTomorrow: '明天到期',
     markDone: '标记为已完成', markUndone: '标记为未完成',
@@ -814,25 +827,25 @@ function maybeRemind() {
   let last = null; try { last = localStorage.getItem(REMIND_KEY); } catch (e) {}
   if (last === td) { remindedThisLoad = true; return; }
   const list = dueNow();
-  const mk = classesOn(td).filter(c => c.date);
-  if ((!list.length && !mk.length) || $('#dialog-root').firstChild) return;
+  const mk = classesOn(td).filter(c => c.date), cx = cancelledOn(td);
+  if ((!list.length && !mk.length && !cx.length) || $('#dialog-root').firstChild) return;
   remindedThisLoad = true;
   try { localStorage.setItem(REMIND_KEY, td); } catch (e) {}
   const L = T(), od = list.filter(t => t.due < td).length, dt = list.length - od;
   if (document.visibilityState === 'hidden' && !window.claude && 'Notification' in window && Notification.permission === 'granted') {
-    try { const n = new Notification('Planner', { body: [list.length ? L.remindSub(od, dt) : '', mk.length ? L.remindMakeup(mk.length) : ''].filter(Boolean).join(' · '), icon: 'icons/icon-192.png', tag: 'planner-' + td }); n.onclick = () => { window.focus(); n.close(); }; } catch (e) {}
+    try { const n = new Notification('Planner', { body: [list.length ? L.remindSub(od, dt) : '', mk.length ? L.remindMakeup(mk.length) : '', cx.length ? L.remindCancelled(cx.length) : ''].filter(Boolean).join(' · '), icon: 'icons/icon-192.png', tag: 'planner-' + td }); n.onclick = () => { window.focus(); n.close(); }; } catch (e) {}
   }
-  openReminder(list, mk);
+  openReminder(list, mk, cx);
 }
-function openReminder(list, mk = []) {
+function openReminder(list, mk = [], cx = []) {
   const L = T(), td = today();
   const od = list.filter(t => t.due < td).sort(cmpTasks), dt = list.filter(t => t.due === td).sort(cmpTasks);
   const canAsk = !window.claude && 'Notification' in window && Notification.permission === 'default';
   openTaskId = null; openPlanSettingsId = null;
   $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.remindH)}">
     <div class="sheet-head"><span>${esc(L.remindH)} · ${esc(fmtDate(td))}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
-    <h2 style="margin:0;font-family:var(--font-display)">${esc([list.length ? L.remindSub(od.length, dt.length) : '', mk.length ? L.remindMakeup(mk.length) : ''].filter(Boolean).join(' · '))}</h2>
-    ${mk.length ? `<div><div class="remind-group">${esc(L.makeupToday)}</div>${mk.sort((a, b) => toMin(a.start) - toMin(b.start)).map(c => classRowHTML(c, false)).join('')}</div>` : ''}
+    <h2 style="margin:0;font-family:var(--font-display)">${esc([list.length ? L.remindSub(od.length, dt.length) : '', mk.length ? L.remindMakeup(mk.length) : '', cx.length ? L.remindCancelled(cx.length) : ''].filter(Boolean).join(' · '))}</h2>
+    ${mk.length || cx.length ? `<div><div class="remind-group">${esc(L.makeupToday)}</div>${mk.concat(cx).sort((a, b) => toMin(a.start) - toMin(b.start)).map(c => classRowHTML(c, false, cx.includes(c))).join('')}</div>` : ''}
     <div>
       ${od.length ? `<div class="remind-group overdue">${esc(L.dueGroups.overdue)}</div>${od.map(t => dayRowHTML(t, null)).join('')}` : ''}
       ${dt.length ? `<div class="remind-group">${esc(L.dueGroups.today)}</div>${dt.map(t => dayRowHTML(t, null)).join('')}` : ''}
@@ -863,7 +876,15 @@ const isDate = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
 const dowOf = d => (parse(d).getDay() + 6) % 7 + 1;
 // a class either repeats weekly (day 1-7) or happens once (date)
 const classesList = () => Object.values(state.classes || {}).filter(c => c && validTime(c.start) && validTime(c.end) && toMin(c.end) > toMin(c.start) && (c.date ? isDate(c.date) : c.day >= 1 && c.day <= 7));
-const classesOn = d => classesList().filter(c => c.date ? c.date === d : c.day === dowOf(d));
+const skipped = (c, d) => Array.isArray(c.skip) && c.skip.includes(d);
+const classesOn = d => classesList().filter(c => c.date ? c.date === d : c.day === dowOf(d) && !skipped(c, d));
+const cancelledOn = d => classesList().filter(c => !c.date && c.day === dowOf(d) && skipped(c, d));
+function classTag(c, isCancelled) {
+  const L = T();
+  if (isCancelled) return `<em class="mk cx">${esc(L.cancelled)}</em>`;
+  if (c.date) return c.replaces ? `<em class="mk moved">${esc(L.moved)}</em>` : `<em class="mk">${esc(L.makeup)}</em>`;
+  return '';
+}
 let ttAnchor = null; // any date in the week shown on the timetable; null = this week
 const classColor = c => LABEL_KEYS.includes(c.color) ? c.color : 'c5';
 const classLine = c => [c.code, c.type, c.room].filter(Boolean).join(' · ');
@@ -890,9 +911,9 @@ function timetableHTML() {
   if (!all.length) return head + `<div class="empty"><h2>${esc(L.ttEmptyH)}</h2><p>${esc(L.ttEmptyP)}</p>${!RO ? `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn primary" data-act="class-new">${ICON_PLUS}${esc(L.addClass)}</button><button class="btn" data-act="backup">${ICON_BACKUP}${esc(L.orImport)}</button></div>` : ''}</div>`;
   const td = today();
   const week = weekCells(ttAnchor || td);
-  const shown = week.map(d => ({ d, list: classesOn(d) }));
-  const cols = shown.filter((x, i) => i < 5 || x.list.length);
-  const inWeek = shown.flatMap(x => x.list);
+  const shown = week.map(d => ({ d, list: classesOn(d), cx: cancelledOn(d) }));
+  const cols = shown.filter((x, i) => i < 5 || x.list.length || x.cx.length);
+  const inWeek = shown.flatMap(x => x.list.concat(x.cx));
   const span = inWeek.length ? inWeek : all;
   const startH = Math.min(8, Math.floor(Math.min(...span.map(c => toMin(c.start))) / 60));
   const endH = Math.max(17, Math.ceil(Math.max(...span.map(c => toMin(c.end))) / 60));
@@ -910,33 +931,34 @@ function timetableHTML() {
     <div class="tt-dow"></div>
     ${cols.map(({ d }) => `<div class="tt-dow ${d === td ? 'is-today' : ''}">${esc(WEEKDAYS[ui.lang][dowOf(d) - 1])} ${parse(d).getDate()}</div>`).join('')}
     <div class="tt-gutter" style="height:${H}px">${hours.map(h => `<span style="top:${(h - startH) * 60}px">${h === startH ? '' : pad(h) + ':00'}</span>`).join('')}</div>
-    ${cols.map(({ d, list }) => `<div class="tt-col ${d === td ? 'is-today' : ''}" style="height:${H}px">
+    ${cols.map(({ d, list, cx }) => `<div class="tt-col ${d === td ? 'is-today' : ''}" style="height:${H}px">
       ${d === td && nowM > base && nowM < base + H ? `<div class="tt-now" style="top:${nowM - base}px"></div>` : ''}
-      ${layoutDay(list).map(({ c, lane, lanes }) => {
-        const st = toMin(c.start), en = toMin(c.end);
-        return `<button class="tt-block lbl-${classColor(c)} ${c.date ? 'oneoff' : ''}" data-act="class-open" data-id="${esc(c.id)}" style="top:${st - base + 1}px;height:${en - st - 2}px;left:calc(${(lane / lanes * 100).toFixed(3)}% + 3px);width:calc(${(100 / lanes).toFixed(3)}% - 6px)" title="${esc(c.title)} ${esc(c.start)} - ${esc(c.end)}">
-          ${c.date ? `<em class="mk">${esc(L.makeup)}</em>` : ''}<b>${esc(c.title)}</b><span>${esc(c.start)} - ${esc(c.end)}</span>${classLine(c) ? `<span>${esc(classLine(c))}</span>` : ''}${c.lecturer ? `<span>${esc(c.lecturer)}</span>` : ''}
+      ${layoutDay(list.concat(cx)).map(({ c, lane, lanes }) => {
+        const st = toMin(c.start), en = toMin(c.end), isCx = cx.includes(c);
+        return `<button class="tt-block lbl-${classColor(c)} ${c.date ? 'oneoff' : ''} ${isCx ? 'cancelled' : ''}" data-act="class-open" data-id="${esc(c.id)}" data-date="${d}" style="top:${st - base + 1}px;height:${en - st - 2}px;left:calc(${(lane / lanes * 100).toFixed(3)}% + 3px);width:calc(${(100 / lanes).toFixed(3)}% - 6px)" title="${esc(c.title)} ${esc(c.start)} - ${esc(c.end)}">
+          ${classTag(c, isCx)}<b>${esc(c.title)}</b><span>${esc(c.start)} - ${esc(c.end)}</span>${classLine(c) ? `<span>${esc(classLine(c))}</span>` : ''}${c.lecturer ? `<span>${esc(c.lecturer)}</span>` : ''}
         </button>`;
       }).join('')}
     </div>`).join('')}
   </div></div>
   ${upcoming.length ? `<section class="panel"><h2>${esc(L.upcomingMakeups)} <small>${esc(L.classesN(upcoming.length))}</small></h2>${upcoming.map(c => classRowHTML(c, true)).join('')}</section>` : ''}`;
 }
-function classRowHTML(c, withDate) {
+function classRowHTML(c, withDate, isCancelled) {
   const L = T(), now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
-  const past = !withDate && toMin(c.end) <= nowM;
-  return `<div class="class-row lbl-${classColor(c)} ${past ? 'past' : ''}" data-act="class-open" data-id="${esc(c.id)}" tabindex="0">
+  const past = !withDate && !isCancelled && toMin(c.end) <= nowM;
+  return `<div class="class-row lbl-${classColor(c)} ${past ? 'past' : ''} ${isCancelled ? 'cancelled' : ''}" data-act="class-open" data-id="${esc(c.id)}" data-date="${withDate ? esc(c.date) : today()}" tabindex="0">
       <span class="tm">${withDate ? esc(fmtDate(c.date)) + ' ' + esc(weekday(c.date)) + '<br>' : ''}${esc(c.start)} - ${esc(c.end)}</span>
-      <div style="min-width:0"><div style="font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${c.date ? `<em class="mk">${esc(L.makeup)}</em>` : ''}${esc(c.title)}</div>${classLine(c) || c.lecturer ? `<div class="p">${esc([classLine(c), c.lecturer].filter(Boolean).join(' · '))}</div>` : ''}</div>
+      <div style="min-width:0"><div style="font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${classTag(c, isCancelled)}<span class="ttl">${esc(c.title)}</span></div>${classLine(c) || c.lecturer ? `<div class="p">${esc([classLine(c), c.lecturer].filter(Boolean).join(' · '))}</div>` : ''}</div>
       <span></span>
     </div>`;
 }
 function todayClassesHTML() {
   const L = T();
   if (!classesList().length) return '';
-  const list = classesOn(today()).sort((a, b) => toMin(a.start) - toMin(b.start));
+  const list = classesOn(today()), cx = cancelledOn(today());
+  const all = list.concat(cx).sort((a, b) => toMin(a.start) - toMin(b.start));
   return `<section class="panel"><h2>${esc(L.todayClasses)} <small>${esc(L.classesN(list.length))}</small></h2>
-    ${list.length ? list.map(c => classRowHTML(c, false)).join('') : `<p class="faint" style="margin:0">${esc(L.noClassesToday)}</p>`}
+    ${all.length ? all.map(c => classRowHTML(c, false, cx.includes(c))).join('') : `<p class="faint" style="margin:0">${esc(L.noClassesToday)}</p>`}
   </section>`;
 }
 function createClass(fields) {
@@ -952,14 +974,21 @@ function patchClass(id, patch) {
   const c = state.classes[id]; if (!c) return;
   write('classes', id, Object.assign(clone(c), patch));
 }
-let openClassId = null;
-function openClass(id, focusTitle) {
+let openClassId = null, openClassDate = null;
+function openClass(id, focusTitle, occDate) {
+  // reopening the same class keeps the day it was opened for
+  if (occDate === undefined) occDate = id === openClassId ? openClassDate : null;
   const c = state.classes[id]; if (!c) return;
   const L = T(), RO = state.readonly, dis = RO ? 'disabled' : '';
-  openTaskId = null; openPlanSettingsId = null; openClassId = id;
+  openTaskId = null; openPlanSettingsId = null; openClassId = id; openClassDate = occDate || null;
+  const orig = c.replaces ? state.classes[c.replaces.id] : null;
   const plans = activePlans();
   $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.classDetails)}">
     <div class="sheet-head"><span class="dot bg-${classColor(c)}"></span><span>${esc(L.timetable)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
+    ${!c.date && occDate && !RO ? `<div class="occ"><b>${esc(L.occH(fmtDate(occDate) + ' ' + weekday(occDate)))}</b>
+      <div class="row">${skipped(c, occDate) ? `<em class="mk cx">${esc(L.cancelled)}</em><button class="btn" data-act="occ-restore">${esc(L.occRestore)}</button>` : `<button class="btn primary" data-act="occ-move">${esc(L.occMove)}</button><button class="btn" data-act="occ-cancel">${esc(L.occCancel)}</button>`}</div>
+      <span class="faint" style="font-size:12px">${esc(L.weeklyHint)}</span></div>` : ''}
+    ${c.replaces ? `<div class="occ"><span>${classTag(c, false)} ${esc(L.movedFrom(fmtDate(c.replaces.date) + ' ' + weekday(c.replaces.date), orig ? orig.start + ' - ' + orig.end : ''))}</span></div>` : ''}
     <input class="title-input" id="c-title" value="${esc(c.title)}" maxlength="120" ${dis} aria-label="${esc(L.cTitle)}">
     <div class="fields">
       <label class="field"><span>${esc(L.cDate)}</span><input class="input" type="date" id="c-date" value="${esc(c.date || '')}" ${dis}></label>
@@ -1187,7 +1216,13 @@ async function initStore() {
 
 /* ---------- local mode ---------- */
 function readLocal() {
-  try { const saved = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null'); return saved && saved.plans ? { plans: saved.plans, tasks: saved.tasks || {}, classes: saved.classes || {} } : null; } catch (e) { return null; }
+  try {
+    const saved = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null');
+    if (!saved || !saved.plans) return null;
+    // every record carries its own id, matching its key
+    const withIds = m => Object.fromEntries(Object.entries(m || {}).map(([id, v]) => [id, Object.assign({}, v, { id })]));
+    return { plans: withIds(saved.plans), tasks: withIds(saved.tasks), classes: withIds(saved.classes) };
+  } catch (e) { return null; }
 }
 function startLocal() {
   state.mode = 'local';
@@ -1930,7 +1965,9 @@ function parseBackup(text) {
       classes[validId(rid) ? rid : uid()] = {
         title: str(c.title, 120) || 'Class', code: str(c.code, 40), type: str(c.type, 40), date, day, start: c.start, end: c.end,
         room: str(c.room, 80), lecturer: str(c.lecturer, 80), color: LABEL_KEYS.includes(c.color) ? c.color : 'c5',
-        planId: c.planId && idMap[c.planId] ? idMap[c.planId] : '', createdAt: +c.createdAt || Date.now()
+        planId: c.planId && idMap[c.planId] ? idMap[c.planId] : '', createdAt: +c.createdAt || Date.now(),
+        skip: Array.isArray(c.skip) ? c.skip.filter(isDate).slice(0, 300) : [],
+        replaces: c.replaces && validId(c.replaces.id) && isDate(c.replaces.date) ? { id: c.replaces.id, date: c.replaces.date } : null
       };
     }
   }
@@ -2005,7 +2042,25 @@ document.addEventListener('click', e => {
     case 'class-new': if (!RO) { const id = createClass({}); openClass(id, true); } break;
     case 'makeup-new': if (!RO) { const d = ttAnchor && ttAnchor > today() ? ttAnchor : today(); const id = createClass({ date: d, day: dowOf(d) }); openClass(id, true); } break;
     case 'tt-move': { const dir = +el.dataset.dir; ttAnchor = dir === 0 ? null : addDays(weekCells(ttAnchor || today())[0], 7 * dir); render(); break; }
-    case 'class-open': openClass(el.dataset.id); break;
+    case 'class-open': openClass(el.dataset.id, false, el.dataset.date || null); break;
+    case 'occ-cancel': {
+      const c = state.classes[openClassId], d = openClassDate; if (!c || !d || RO) break;
+      patchClass(c.id, { skip: [...new Set([...(c.skip || []), d])] });
+      openClass(c.id, false, d); toast(L.occCancelToast); break;
+    }
+    case 'occ-restore': {
+      const c = state.classes[openClassId], d = openClassDate; if (!c || !d || RO) break;
+      patchClass(c.id, { skip: (c.skip || []).filter(x => x !== d) });
+      Object.values(state.classes).filter(x => x.replaces && x.replaces.id === c.id && x.replaces.date === d).forEach(x => write('classes', x.id, null, true));
+      render(); openClass(c.id, false, d); toast(L.occRestoreToast); break;
+    }
+    case 'occ-move': {
+      const c = state.classes[openClassId], d = openClassDate; if (!c || !d || RO) break;
+      patchClass(c.id, { skip: [...new Set([...(c.skip || []), d])] });
+      const nid = createClass({ title: c.title, code: c.code || '', type: c.type || '', room: c.room || '', lecturer: c.lecturer || '', color: c.color, planId: c.planId || '', start: c.start, end: c.end, date: d, day: dowOf(d), replaces: { id: c.id, date: d } });
+      openClass(nid, false, null); toast(L.occMovedToast);
+      setTimeout(() => $('#c-date')?.focus(), 0); break;
+    }
     case 'class-color': if (!RO && openClassId) { patchClass(openClassId, { color: el.dataset.color }); openClass(openClassId); } break;
     case 'class-delete': if (!RO && openClassId) { const id = openClassId; openClassId = null; $('#dialog-root').innerHTML = ''; deleteWithUndo([], [], L.classDeleted, [id]); } break;
     case 'goto-plan': closeDialog(); ui.planId = el.dataset.plan; savePrefs(); render(); break;
@@ -2167,7 +2222,7 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z') && undoState && !(e.target.closest && e.target.closest('input, textarea'))) { e.preventDefault(); undoDelete(); return; }
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-act="sel-card"]')) { e.preventDefault(); e.target.click(); return; }
   if (e.key === 'Enter' && e.target.matches('[data-act="open-task"]') && !e.target.matches('button')) { openTask(e.target.dataset.id); return; }
-  if (e.key === 'Enter' && e.target.matches('.class-row')) { openClass(e.target.dataset.id); return; }
+  if (e.key === 'Enter' && e.target.matches('.class-row')) { openClass(e.target.dataset.id, false, e.target.dataset.date || null); return; }
   if (e.key === 'Enter' && e.target.classList.contains('qa')) {
     e.preventDefault();
     const title = e.target.value.trim(); if (!title) return;
