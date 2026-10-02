@@ -2387,7 +2387,12 @@ document.addEventListener('drop', e => {
 
 /* refresh "today" math when the date rolls over */
 let lastDay = today();
-setInterval(() => { if (today() !== lastDay) { lastDay = today(); remindedThisLoad = false; render(); } else maybeRemind(); }, 60000);
+setInterval(() => {
+  if (today() !== lastDay) { lastDay = today(); remindedThisLoad = false; render(); return; }
+  maybeRemind();
+  // move the timetable's current-time line, unless a window is open
+  if (ui.planId === 'timetable' && !$('#dialog-root').firstChild && document.visibilityState === 'visible') render();
+}, 60000);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { lastBadge = -1; render(); } });
 
 render();
