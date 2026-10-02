@@ -311,6 +311,25 @@ kbd { font-family: var(--font-body); font-weight: 800; font-size: 12px; backgrou
 .btn.sun.on { background: var(--warn-soft); border-color: transparent; color: var(--warn); }
 .remind-group { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; font-weight: 800; color: var(--muted); padding: 8px 0 2px; }
 .remind-group.overdue { color: var(--danger); }
+.due-row.cd-row { grid-template-columns: auto minmax(0, 1fr) auto auto; }
+.cd { font-size: 12px; font-weight: 800; border-radius: 999px; padding: 2px 10px; min-width: 76px; text-align: center; white-space: nowrap; background: var(--surface-2); color: var(--muted); font-variant-numeric: tabular-nums; }
+.cd.late { background: var(--danger); color: var(--surface-solid); }
+.cd.now { background: var(--warn-soft); color: var(--warn); }
+.cd.near { background: var(--info-soft); color: var(--info); }
+.grade-target { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.grade-target .input { width: 90px; }
+.grade-target .msg { font-weight: 700; }
+.grade-target .msg.ok { color: var(--ok); }
+.grade-target .msg.bad { color: var(--danger); }
+.warn-line { color: var(--warn); font-weight: 700; font-size: 13px; }
+table.grades { min-width: 760px; }
+.grades td .input { width: 84px; min-height: 30px; padding: 3px 8px; }
+.grades td.num, .grades th.num { text-align: right; }
+.grades tbody tr { cursor: default; }
+.grades .tlink { border: 0; background: none; padding: 0; font-weight: 700; text-align: left; cursor: pointer; color: var(--ink); }
+.grades .tlink:hover { text-decoration: underline; }
+.grade-add { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.grade-add .input { flex: 1 1 220px; min-width: 0; }
 .unsched { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
 .unsched h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 800; }
 .unsched .list { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -448,7 +467,7 @@ const I18N = {
     appSub: 'Tasks and due dates', theme: 'Theme', light: 'Light', dark: 'Dark', overview: 'Overview', plans: 'Plans', newPlan: 'New plan', planNamePh: 'Plan name, e.g. Data Structures', create: 'Create',
     syncOn: 'Synced to the cloud. Share this page to plan together.', syncRO: 'Read only. You can view but not edit.', syncLocal: 'Saved in this browser only.',
     loading: 'Loading your plans…', openN: n => `${n} open`, newTask: 'New task', planSettings: 'Plan settings',
-    views: { board: 'Board', grid: 'Grid', schedule: 'Schedule', charts: 'Charts' },
+    views: { board: 'Board', grid: 'Grid', schedule: 'Schedule', charts: 'Charts', grades: 'Grades' },
     searchPh: 'Search tasks, people, notes',
     dueOpts: { all: 'Any due date', overdue: 'Overdue', today: 'Due today', week: 'Due this week', next14: 'Due in 14 days', none: 'No due date' },
     priAll: 'Any priority', hideDone: 'Hide completed', groupBy: 'Group by',
@@ -471,13 +490,24 @@ const I18N = {
     linksH: 'Links', linkUrlPh: 'Paste a link, e.g. https://drive.google.com/...', linkNamePh: 'Name (optional)', badLink: 'That does not look like a web link. It should start with https://', deleteLink: 'Remove link', linksN: n => `${n} link${n === 1 ? '' : 's'}`,
     archive: 'Archive plan', unarchive: 'Restore plan', archivedN: n => `Archived (${n})`, archivedNote: 'This plan is archived. It is hidden from the sidebar list and the overview.', archivedToast: 'Plan archived. Find it under Archived in the sidebar.', unarchivedToast: 'Plan restored',
     sortBy: 'Sort', sortOpts: { due: 'By due date', manual: 'Custom (drag)' }, sortSwitched: 'Switched to custom order. Drag cards to arrange them.',
-    shortcuts: 'Keyboard shortcuts', scList: [['N', 'New task (on Overview: new plan)'], ['/', 'Search'], ['1  2  3  4', 'Board, Grid, Schedule, Charts'], ['Esc', 'Close a window, or leave Select'], ['Ctrl + Z', 'Undo a delete'], ['?', 'Show this list']],
+    shortcuts: 'Keyboard shortcuts', scList: [['N', 'New task (on Overview: new plan)'], ['/', 'Search'], ['1  2  3  4  5', 'Board, Grid, Schedule, Charts, Grades'], ['Esc', 'Close a window, or leave Select'], ['Ctrl + Z', 'Undo a delete'], ['?', 'Show this list']],
     undo: 'Undo', restored: 'Restored',
     myDay: 'My Day', myDaySub: 'Clears itself every night', addMyDay: 'Add to My Day', inMyDay: 'In My Day', removeMyDay: 'Remove from My Day', addShort: 'Add',
     myDayEmpty: 'Nothing picked for today yet. Add tasks from the suggestions below, or open any task and click Add to My Day.',
     suggestions: 'Suggestions', suggestionsSub: 'Late, due today or due tomorrow', myDayDone: (a, b) => `${a} of ${b} done`,
     searchAll: 'Search all plans', resultsN: n => `${n} result${n === 1 ? '' : 's'}`, noResults: 'No tasks match. Try another word.', archivedTag: 'archived',
     remindH: 'Today', remindSub: (o, d) => `${o} overdue, ${d} due today`, gotIt: 'Got it', enableNotif: 'Turn on desktop notifications', notifOn: 'Desktop notifications are on', notifOff: 'Notifications are blocked. You can allow them in the browser settings.',
+    deadlines: 'Deadlines', deadlinesSub: 'Every open task with a due date', noDeadlines: 'No open tasks with a due date.',
+    cd: n => n < 0 ? `${-n} day${n === -1 ? '' : 's'} late` : n === 0 ? 'Today' : n === 1 ? 'Tomorrow' : `in ${n} days`,
+    nextDueIn: (d, c) => `Next: ${d} (${c})`,
+    gradeCurrent: 'Current grade', gradeCurrentSub: 'Average of graded work', gradeEarned: 'Earned so far', gradeEarnedSub: g => `of ${g}% graded`, gradeRemaining: 'Not graded yet', gradeTotal: 'Total weight',
+    weightWarn: n => `Weights add up to ${n}%. They usually add up to 100%.`, target: 'Target grade',
+    needAvg: (need, rem, target) => `To reach ${target}%, you need an average of ${need}% on the remaining ${rem}%.`,
+    targetSafe: t => `You already have ${t}% or more, even with zero on the rest.`, targetOut: t => `${t}% is out of reach, even with full marks on the rest.`, finalGrade: g => `All graded. Final grade: ${g}%`,
+    gcol: { item: 'Item', due: 'Due', weight: 'Weight %', score: 'Score', outOf: 'Out of', pct: 'Result', contrib: 'Counts for' },
+    addGradeItem: 'Add an existing task…', newGradePh: 'New graded item, e.g. Midterm exam', removeFromGrades: 'Remove from grades',
+    gradesEmptyH: 'No graded work yet', gradesEmptyP: 'Add assignments, quizzes and exams with their weight. When a score comes back, fill it in to see your current grade.',
+    gradeShort: g => `Grade ${g}%`, weightL: 'Weight %', scoreL: 'Score', outOfL: 'Out of',
     select: 'Select', selCancel: 'Cancel', selN: n => `${n} selected`, selAll: 'Select all', selClear: 'Clear', selHint: 'Click tasks to select them', markDoneSel: 'Mark complete', deleteSelQ: n => `Delete ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`, deletedN: n => `${n} task${n === 1 ? '' : 's'} deleted`, doneN: n => `${n} task${n === 1 ? '' : 's'} marked complete`, moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
     dueOverdue: (d, n) => `${d} · ${n} day${n === 1 ? '' : 's'} late`, dueToday: 'Due today', dueTomorrow: 'Due tomorrow',
     markDone: 'Mark complete', markUndone: 'Mark not complete',
@@ -501,7 +531,7 @@ const I18N = {
     appSub: '任务与截止日期', theme: '主题', light: '浅色', dark: '深色', overview: '概览', plans: '计划', newPlan: '新建计划', planNamePh: '计划名称，例如：数据结构', create: '创建',
     syncOn: '已云端同步。分享这个页面就能一起规划。', syncRO: '只读模式。你可以查看，但不能修改。', syncLocal: '数据只保存在这个浏览器里。',
     loading: '正在加载计划…', openN: n => `${n} 项未完成`, newTask: '新建任务', planSettings: '计划设置',
-    views: { board: '看板', grid: '表格', schedule: '日程', charts: '图表' },
+    views: { board: '看板', grid: '表格', schedule: '日程', charts: '图表', grades: '成绩' },
     searchPh: '搜索任务、负责人、备注',
     dueOpts: { all: '所有截止日期', overdue: '已逾期', today: '今天到期', week: '本周内到期', next14: '14 天内到期', none: '没有截止日期' },
     priAll: '所有优先级', hideDone: '隐藏已完成', groupBy: '分组',
@@ -524,13 +554,24 @@ const I18N = {
     linksH: '链接', linkUrlPh: '贴上链接，例如 https://drive.google.com/...', linkNamePh: '名称（可选）', badLink: '这看起来不是网址，应以 https:// 开头。', deleteLink: '删除链接', linksN: n => `${n} 个链接`,
     archive: '归档计划', unarchive: '取消归档', archivedN: n => `已归档（${n}）`, archivedNote: '这个计划已归档，不会显示在左边栏的计划列表和概览里。', archivedToast: '计划已归档，可以在左边栏的“已归档”里找到。', unarchivedToast: '计划已恢复',
     sortBy: '排序', sortOpts: { due: '按截止日期', manual: '自定义（拖动）' }, sortSwitched: '已切换为自定义排序，可以拖动卡片调整顺序。',
-    shortcuts: '键盘快捷键', scList: [['N', '新建任务（在概览页：新建计划）'], ['/', '搜索'], ['1  2  3  4', '看板、表格、日程、图表'], ['Esc', '关闭窗口，或退出多选'], ['Ctrl + Z', '撤销删除'], ['?', '显示这个列表']],
+    shortcuts: '键盘快捷键', scList: [['N', '新建任务（在概览页：新建计划）'], ['/', '搜索'], ['1  2  3  4  5', '看板、表格、日程、图表、成绩'], ['Esc', '关闭窗口，或退出多选'], ['Ctrl + Z', '撤销删除'], ['?', '显示这个列表']],
     undo: '撤销', restored: '已恢复',
     myDay: '我的一天', myDaySub: '每天晚上自动清空', addMyDay: '加入我的一天', inMyDay: '已在我的一天', removeMyDay: '移出我的一天', addShort: '加入',
     myDayEmpty: '今天还没有挑任务。可以从下面的建议加入，或打开任意任务点“加入我的一天”。',
     suggestions: '建议', suggestionsSub: '已逾期、今天或明天到期', myDayDone: (a, b) => `已完成 ${a} / ${b}`,
     searchAll: '搜索所有计划', resultsN: n => `${n} 个结果`, noResults: '没有符合的任务，换个关键词试试。', archivedTag: '已归档',
     remindH: '今天要注意', remindSub: (o, d) => `${o} 项逾期，${d} 项今天到期`, gotIt: '知道了', enableNotif: '开启桌面通知', notifOn: '桌面通知已开启', notifOff: '通知被浏览器阻止了，可以在浏览器设置里允许。',
+    deadlines: '截止日期倒计时', deadlinesSub: '所有未完成、有截止日期的任务', noDeadlines: '没有带截止日期的未完成任务。',
+    cd: n => n < 0 ? `逾期 ${-n} 天` : n === 0 ? '今天' : n === 1 ? '明天' : `还有 ${n} 天`,
+    nextDueIn: (d, c) => `下一个：${d}（${c}）`,
+    gradeCurrent: '目前成绩', gradeCurrentSub: '已评分项目的平均', gradeEarned: '已拿到', gradeEarnedSub: g => `已评分占比 ${g}%`, gradeRemaining: '还没评分', gradeTotal: '总占比',
+    weightWarn: n => `占比加起来是 ${n}%，通常应为 100%。`, target: '目标成绩',
+    needAvg: (need, rem, target) => `要达到 ${target}%，剩下的 ${rem}% 平均要拿到 ${need}%。`,
+    targetSafe: t => `就算剩下的全拿 0 分，也已经达到 ${t}%。`, targetOut: t => `就算剩下的全拿满分，也达不到 ${t}%。`, finalGrade: g => `全部评分完毕，最终成绩：${g}%`,
+    gcol: { item: '项目', due: '截止日期', weight: '占比 %', score: '得分', outOf: '满分', pct: '百分比', contrib: '计入总分' },
+    addGradeItem: '把现有任务加进来…', newGradePh: '新评分项，例如：期中考试', removeFromGrades: '从成绩表移除',
+    gradesEmptyH: '还没有评分项', gradesEmptyP: '把作业、小测和考试加进来并填上占比。拿到分数后填进去，就能看到目前的成绩。',
+    gradeShort: g => `成绩 ${g}%`, weightL: '占比 %', scoreL: '得分', outOfL: '满分',
     select: '多选', selCancel: '取消', selN: n => `已选 ${n} 项`, selAll: '全选', selClear: '清空', selHint: '点任务即可选择', markDoneSel: '标记完成', deleteSelQ: n => `删除这 ${n} 项任务？此操作无法撤销。`, deletedN: n => `已删除 ${n} 项任务`, doneN: n => `${n} 项任务已标记完成`, moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
     dueOverdue: (d, n) => `${d} · 逾期 ${n} 天`, dueToday: '今天到期', dueTomorrow: '明天到期',
     markDone: '标记为已完成', markUndone: '标记为未完成',
@@ -787,6 +828,36 @@ function searchResultsHTML() {
     [t.title, t.notes, t.assignee, state.plans[t.planId].name, ...(t.checklist || []).map(c => c.text), ...(t.links || []).map(l => (l.title || '') + ' ' + l.url)].join(' ').toLowerCase().includes(q)
   ).sort(cmpTasks).slice(0, 200);
   return `<section class="panel"><h2>${esc(L.resultsN(hits.length))}</h2>${hits.length ? hits.map(t => dayRowHTML(t, null)).join('') : `<p class="faint" style="margin:0">${esc(L.noResults)}</p>`}</section>`;
+}
+
+/* ---------- countdown ---------- */
+function countdownHTML(t) {
+  if (!t.due) return '';
+  const n = diffDays(today(), t.due);
+  const cls = n < 0 ? 'late' : n <= 1 ? 'now' : n <= 7 ? 'near' : '';
+  return `<span class="cd ${cls}">${esc(T().cd(n))}</span>`;
+}
+
+/* ---------- grades ---------- */
+const fmtNum = n => String(Math.round(n * 10) / 10);
+const isGradeItem = t => !!t.inGrades || t.weight > 0;
+const hasScore = t => typeof t.score === 'number' && isFinite(t.score) && t.outOf > 0;
+function gradeStats(tasks) {
+  const items = tasks.filter(isGradeItem);
+  const w = t => (t.weight > 0 ? t.weight : 0);
+  const graded = items.filter(hasScore);
+  const totalW = items.reduce((a, t) => a + w(t), 0);
+  const gradedW = graded.reduce((a, t) => a + w(t), 0);
+  const earned = graded.reduce((a, t) => a + w(t) * t.score / t.outOf, 0);
+  return { items, graded, totalW, gradedW, earned, current: gradedW ? earned / gradedW * 100 : null };
+}
+const numOrNull = v => { if (v === '' || v == null) return null; const n = Number(v); return isFinite(n) ? n : null; };
+function gradePatch(field, raw) {
+  const n = numOrNull(raw);
+  if (field === 'weight') return { weight: n == null ? null : Math.max(0, Math.min(100, n)), inGrades: true };
+  if (field === 'score') return { score: n == null ? null : Math.max(0, n) };
+  if (field === 'outOf') return { outOf: n == null || n <= 0 ? 100 : n };
+  return {};
 }
 
 function toast(msg) {
@@ -1114,8 +1185,8 @@ function renderMain() {
     </div>
     ${plan.archived ? `<div class="banner"><span class="grow">${esc(L.archivedNote)}</span>${!RO ? `<button class="btn" data-act="unarchive" data-plan="${plan.id}">${ICON_ARCHIVE}${esc(L.unarchive)}</button>` : ''}</div>` : ''}
     <div class="tabs" role="tablist">${Object.entries(L.views).map(([k, v]) => `<button class="tab ${ui.view === k ? 'active' : ''}" role="tab" aria-selected="${ui.view === k}" data-act="view" data-view="${k}">${esc(v)}</button>`).join('')}</div>
-    ${ui.view !== 'charts' ? toolbarHTML() : ''}
-    <div id="view">${ui.view === 'board' ? boardHTML(plan) : ui.view === 'grid' ? gridHTML(plan) : ui.view === 'schedule' ? scheduleHTML(plan) : chartsHTML(plan)}</div>
+    ${ui.view !== 'charts' && ui.view !== 'grades' ? toolbarHTML() : ''}
+    <div id="view">${ui.view === 'board' ? boardHTML(plan) : ui.view === 'grid' ? gridHTML(plan) : ui.view === 'schedule' ? scheduleHTML(plan) : ui.view === 'grades' ? gradesHTML(plan) : chartsHTML(plan)}</div>
     ${sel.on ? selbarHTML() : ''}`;
   main.classList.toggle('selecting', sel.on);
 }
@@ -1295,6 +1366,59 @@ function calGridHTML(cells, tasks, opts) {
   </div></div>`;
 }
 
+function gradesHTML(plan) {
+  const L = T(), RO = state.readonly, dis = RO ? 'disabled' : '';
+  const tasks = tasksOf(plan.id);
+  const g = gradeStats(tasks);
+  const items = g.items.slice().sort((a, b) => (a.due || '9999') < (b.due || '9999') ? -1 : (a.due || '9999') > (b.due || '9999') ? 1 : (a.createdAt || 0) - (b.createdAt || 0));
+  const others = tasks.filter(t => !isGradeItem(t)).sort(cmpTasks);
+  const remW = Math.max(0, 100 - g.gradedW);
+  const target = typeof plan.gradeTarget === 'number' ? plan.gradeTarget : '';
+  let msg = '', msgCls = '';
+  if (g.items.length && g.gradedW >= 100) { msg = L.finalGrade(fmtNum(g.earned)); msgCls = 'ok'; }
+  else if (target !== '' && g.items.length) {
+    const need = (target - g.earned) / remW * 100;
+    if (need <= 0) { msg = L.targetSafe(fmtNum(target)); msgCls = 'ok'; }
+    else if (need > 100) { msg = L.targetOut(fmtNum(target)); msgCls = 'bad'; }
+    else msg = L.needAvg(fmtNum(need), fmtNum(remW), fmtNum(target));
+  }
+  const addRow = RO ? '' : `<div class="grade-add">
+      <form id="grade-new" style="display:flex;gap:8px;flex:2 1 300px"><input class="input" id="grade-new-name" placeholder="${esc(L.newGradePh)}" maxlength="200" autocomplete="off"><button class="btn" type="submit">${esc(L.add)}</button></form>
+      ${others.length ? `<select class="input" id="grade-pick" style="flex:1 1 220px"><option value="">${esc(L.addGradeItem)}</option>${others.map(t => `<option value="${t.id}">${esc(t.title)}</option>`).join('')}</select>` : ''}
+    </div>`;
+  if (!g.items.length) return `<div class="empty"><h2>${esc(L.gradesEmptyH)}</h2><p>${esc(L.gradesEmptyP)}</p></div><div class="panel" style="margin-top:12px">${addRow}</div>`;
+  const num = (t, f, val) => `<input class="input" type="number" inputmode="decimal" min="0" step="any" id="g-${f}-${t.id}" data-gid="${t.id}" data-gf="${f}" value="${val == null ? '' : esc(fmtNum(val))}" ${dis}>`;
+  return `<div style="display:flex;flex-direction:column;gap:16px">
+    <div class="stats">
+      <div class="stat ok"><span class="k">${esc(L.gradeCurrent)}</span><span class="v">${g.current == null ? '·' : fmtNum(g.current) + '%'}</span><span class="k">${esc(L.gradeCurrentSub)}</span></div>
+      <div class="stat info"><span class="k">${esc(L.gradeEarned)}</span><span class="v">${fmtNum(g.earned)}%</span><span class="k">${esc(L.gradeEarnedSub(fmtNum(g.gradedW)))}</span></div>
+      <div class="stat warn"><span class="k">${esc(L.gradeRemaining)}</span><span class="v">${fmtNum(Math.max(0, g.totalW - g.gradedW))}%</span></div>
+      <div class="stat"><span class="k">${esc(L.gradeTotal)}</span><span class="v">${fmtNum(g.totalW)}%</span></div>
+    </div>
+    <div class="panel">
+      <div class="grade-target"><label for="grade-target" style="font-weight:800">${esc(L.target)}</label><input class="input" type="number" min="0" max="100" step="any" id="grade-target" value="${target === '' ? '' : esc(fmtNum(target))}" placeholder="80" ${dis}><span>%</span><span class="msg ${msgCls}">${esc(msg)}</span></div>
+      ${Math.abs(g.totalW - 100) > 0.05 ? `<p class="warn-line" style="margin:10px 0 0">${esc(L.weightWarn(fmtNum(g.totalW)))}</p>` : ''}
+    </div>
+    <div class="table-wrap"><table class="grid grades">
+      <thead><tr><th>${esc(L.gcol.item)}</th><th>${esc(L.gcol.due)}</th><th class="num">${esc(L.gcol.weight)}</th><th class="num">${esc(L.gcol.score)}</th><th class="num">${esc(L.gcol.outOf)}</th><th class="num">${esc(L.gcol.pct)}</th><th class="num">${esc(L.gcol.contrib)}</th><th></th></tr></thead>
+      <tbody>${items.map(t => {
+        const sc = hasScore(t), pct = sc ? t.score / t.outOf * 100 : null;
+        return `<tr>
+          <td><button class="tlink" data-act="open-task" data-id="${t.id}">${esc(t.title)}</button></td>
+          <td>${t.due ? dueChip(t) : '<span class="faint">·</span>'}</td>
+          <td class="num">${num(t, 'weight', t.weight > 0 ? t.weight : null)}</td>
+          <td class="num">${num(t, 'score', sc || typeof t.score === 'number' ? t.score : null)}</td>
+          <td class="num">${num(t, 'outOf', t.outOf > 0 ? t.outOf : 100)}</td>
+          <td class="num"><b>${pct == null ? '<span class="faint">·</span>' : fmtNum(pct) + '%'}</b></td>
+          <td class="num">${pct == null || !(t.weight > 0) ? '<span class="faint">·</span>' : fmtNum(t.weight * pct / 100) + ' / ' + fmtNum(t.weight)}</td>
+          <td>${!RO ? `<button class="icon-btn" data-act="grade-remove" data-id="${t.id}" aria-label="${esc(L.removeFromGrades)}" title="${esc(L.removeFromGrades)}">${ICON_X}</button>` : ''}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>
+    <div class="panel">${addRow}</div>
+  </div>`;
+}
+
 function scheduleHTML(plan) {
   const RO = state.readonly, L = T();
   const tasks = applyFilter(tasksOf(plan.id));
@@ -1401,12 +1525,13 @@ function hubHTML() {
   const dueToday = open.filter(t => t.due === td);
   const dueWeek = open.filter(t => t.due && t.due >= td && t.due <= eow);
   const doing = open.filter(t => t.progress === 'doing');
-  const soon = open.filter(t => t.due && t.due <= addDays(td, 14)).sort(cmpTasks);
+  const soon = open.filter(t => t.due).sort(cmpTasks);
   const groups = [
     ['overdue', L.dueGroups.overdue, soon.filter(t => t.due < td)],
     ['today', L.dueGroups.today, soon.filter(t => t.due === td)],
     ['week', L.restOfWeek, soon.filter(t => t.due > td && t.due <= eow)],
-    ['next', L.next14, soon.filter(t => t.due > eow)]
+    ['next', L.next14, soon.filter(t => t.due > eow && t.due <= addDays(td, 14))],
+    ['later', L.dueGroups.later, soon.filter(t => t.due > addDays(td, 14))]
   ].filter(g => g[2].length);
   return `
     ${hubHeadHTML()}
@@ -1418,15 +1543,16 @@ function hubHTML() {
     </div>
     ${hubCalendarHTML()}
     <div class="hub">
-      <section class="panel"><h2>${esc(L.attention)} <small>${esc(L.attentionSub)}</small></h2>
+      <section class="panel"><h2>${esc(L.deadlines)} <small>${esc(L.deadlinesSub)}</small></h2>
         ${groups.length ? `<div class="due-list">${groups.map(([k, name, list]) => `<div class="due-group ${k === 'overdue' ? 'overdue' : ''}">${esc(name)} · ${list.length}</div>${list.map(t => {
           const p = state.plans[t.planId];
-          return `<div class="due-row" data-act="open-task" data-id="${t.id}" tabindex="0">
+          return `<div class="due-row cd-row" data-act="open-task" data-id="${t.id}" tabindex="0">
             <button class="check" data-act="toggle-done" data-id="${t.id}" aria-label="${esc(L.markDone)}" ${RO ? 'disabled' : ''}>${ICON_CHECK}</button>
             <div style="min-width:0"><div class="t">${esc(t.title)}</div><div class="p"><span class="dot bg-${esc(p.color)}" style="width:8px;height:8px"></span>${esc(p.name)}${t.assignee ? ' · ' + esc(t.assignee) : ''}</div></div>
-            ${dueChip(t)}
+            <span class="faint" style="font-size:12px;font-weight:700">${esc(fmtDate(t.due))}</span>
+            ${countdownHTML(t)}
           </div>`;
-        }).join('')}`).join('')}</div>` : `<p class="faint" style="margin:0">${esc(L.nothingSoon)}</p>`}
+        }).join('')}`).join('')}</div>` : `<p class="faint" style="margin:0">${esc(L.noDeadlines)}</p>`}
       </section>
       <section class="panel"><h2>${esc(L.allPlans)} <small>${esc(L.plansN(plans.length))}</small></h2>
         <div class="plan-cards">${plans.map(p => {
@@ -1438,7 +1564,7 @@ function hubHTML() {
           return `<button class="plan-card" data-act="goto" data-plan="${p.id}">
             <div class="row"><span class="dot bg-${esc(p.color)}"></span><b>${esc(p.name)}</b><span class="faint num" style="font-size:12px;font-weight:700">${done}/${ts.length}</span></div>
             ${stackBar(ts, ts.length)}
-            <div class="nums"><span class="${od ? 'od' : ''}">${esc(L.overdueLbl)} <b>${od}</b></span><span>${esc(L.weekLbl)} <b>${wk}</b></span>${next ? `<span>${esc(L.nextDue(fmtDate(next.due)))}</span>` : ''}</div>
+            <div class="nums"><span class="${od ? 'od' : ''}">${esc(L.overdueLbl)} <b>${od}</b></span><span>${esc(L.weekLbl)} <b>${wk}</b></span>${next ? `<span>${esc(L.nextDueIn(fmtDate(next.due), L.cd(diffDays(td, next.due))))}</span>` : ''}${(() => { const g = gradeStats(ts); return g.current != null ? `<span>${esc(L.gradeShort(fmtNum(g.current)))}</span>` : ''; })()}</div>
           </button>`;
         }).join('')}</div>
       </section>
@@ -1486,6 +1612,9 @@ function openTask(id, focusTitle) {
       <label class="field"><span>${esc(L.start)}</span><input class="input" type="date" id="t-start" value="${esc(t.start || '')}" ${dis}></label>
       <label class="field"><span>${esc(L.due)}</span><input class="input" type="date" id="t-due" value="${esc(t.due || '')}" ${dis}></label>
       <label class="field"><span>${esc(L.repeat)}</span>${sel('t-repeat', L.repeatOpts, REPEATS.includes(t.repeat) ? t.repeat || '' : '')}</label>
+      <label class="field"><span>${esc(L.weightL)}</span><input class="input" type="number" inputmode="decimal" min="0" max="100" step="any" id="t-weight" value="${t.weight > 0 ? esc(fmtNum(t.weight)) : ''}" ${dis}></label>
+      <label class="field"><span>${esc(L.scoreL)}</span><input class="input" type="number" inputmode="decimal" min="0" step="any" id="t-score" value="${typeof t.score === 'number' ? esc(fmtNum(t.score)) : ''}" ${dis}></label>
+      <label class="field"><span>${esc(L.outOfL)}</span><input class="input" type="number" inputmode="decimal" min="0" step="any" id="t-outof" value="${t.outOf > 0 ? esc(fmtNum(t.outOf)) : '100'}" ${dis}></label>
       <label class="field"><span>${esc(L.assignee)}</span><input class="input" id="t-assignee" value="${esc(t.assignee || '')}" placeholder="${esc(L.personPh)}" maxlength="40" list="people" ${dis}></label>
     </div>
     <datalist id="people">${[...new Set(allTasks().map(x => x.assignee).filter(Boolean))].map(n => `<option value="${esc(n)}">`).join('')}</datalist>
@@ -1585,7 +1714,7 @@ function parseBackup(text) {
     const buckets = Array.isArray(p.buckets) ? p.buckets.filter(b => b && typeof b.name === 'string').slice(0, 50).map(b => ({ id: str(b.id, 60) || uid(), name: b.name.slice(0, 40) })) : [];
     const labels = {};
     if (p.labels && typeof p.labels === 'object') LABEL_KEYS.forEach(k => { if (typeof p.labels[k] === 'string' && p.labels[k]) labels[k] = p.labels[k].slice(0, 24); });
-    plans[id] = { name: str(p.name, 80) || 'Plan', color: LABEL_KEYS.includes(p.color) ? p.color : 'c1', createdAt: +p.createdAt || Date.now(), archived: !!p.archived, labels, buckets: buckets.length ? buckets : T().defaultBuckets.map(n => ({ id: uid(), name: n })) };
+    plans[id] = { name: str(p.name, 80) || 'Plan', color: LABEL_KEYS.includes(p.color) ? p.color : 'c1', createdAt: +p.createdAt || Date.now(), archived: !!p.archived, gradeTarget: typeof p.gradeTarget === 'number' ? p.gradeTarget : null, labels, buckets: buckets.length ? buckets : T().defaultBuckets.map(n => ({ id: uid(), name: n })) };
   }
   for (const [rid, t] of Object.entries(d.tasks)) {
     if (!t || typeof t !== 'object' || !idMap[t.planId]) continue;
@@ -1601,6 +1730,7 @@ function parseBackup(text) {
       repeat: REPEATS.includes(t.repeat) ? t.repeat : '', repeatSpawned: !!t.repeatSpawned,
       links: Array.isArray(t.links) ? t.links.slice(0, 50).map(l => l && normalizeUrl(l.url) ? { id: str(l.id, 60) || uid(), url: normalizeUrl(l.url), title: str(l.title, 80) } : null).filter(Boolean) : [],
       ...(typeof t.order === 'number' && isFinite(t.order) ? { order: t.order } : {}),
+      inGrades: !!t.inGrades, weight: typeof t.weight === 'number' && isFinite(t.weight) ? t.weight : null, score: typeof t.score === 'number' && isFinite(t.score) ? t.score : null, outOf: typeof t.outOf === 'number' && t.outOf > 0 ? t.outOf : 100,
       myDay: date(t.myDay), createdAt: +t.createdAt || Date.now(), updatedAt: Date.now(), completedAt: +t.completedAt || null
     };
   }
@@ -1670,6 +1800,7 @@ document.addEventListener('click', e => {
     case 'theme': ui.theme = el.dataset.themeVal; savePrefs(); render(); break;
     case 'backup': closeBackup(); openBackup(); break;
     case 'undo': undoDelete(); break;
+    case 'grade-remove': if (!RO) patchTask(el.dataset.id, { inGrades: false, weight: null, score: null }); break;
     case 'myday-add': if (!RO) patchTask(el.dataset.id, { myDay: today() }); break;
     case 'myday-remove': if (!RO) patchTask(el.dataset.id, { myDay: '' }); break;
     case 'myday-toggle': {
@@ -1850,8 +1981,8 @@ document.addEventListener('keydown', e => {
     if (inPlan) { const id = createTask(ui.planId, { bucketId: state.plans[ui.planId].buckets[0]?.id }); if (id) openTask(id, true); }
     else { const f = $('#new-plan-form'); if (f) { f.hidden = false; $('#new-plan-name').focus(); } }
   }
-  else if (inPlan && ['1', '2', '3', '4'].includes(k)) {
-    const v = ['board', 'grid', 'schedule', 'charts'][+k - 1];
+  else if (inPlan && ['1', '2', '3', '4', '5'].includes(k)) {
+    const v = ['board', 'grid', 'schedule', 'charts', 'grades'][+k - 1];
     if (v !== 'board' && v !== 'grid') exitSelect();
     ui.view = v; savePrefs(); render();
   }
@@ -1891,6 +2022,17 @@ document.addEventListener('change', e => {
   if (id === 'f-pri') { ui.filter.pri = el.value; savePrefs(); render(); return; }
   if (id === 'f-done') { ui.filter.hideDone = el.checked; savePrefs(); render(); return; }
   if (id === 'f-group') { ui.groupBy = el.value; savePrefs(); render(); return; }
+  if (el.dataset && el.dataset.gf && !state.readonly) {
+    const t2 = state.tasks[el.dataset.gid]; if (!t2) return;
+    const patch = gradePatch(el.dataset.gf, el.value);
+    if (el.dataset.gf === 'score' && !(t2.outOf > 0)) patch.outOf = 100;
+    patchTask(t2.id, patch, true); setTimeout(render, 0); return;
+  }
+  if (id === 'grade-target' && !state.readonly) {
+    const n = numOrNull(el.value);
+    patchPlan(ui.planId, { gradeTarget: n == null ? null : Math.max(0, Math.min(100, n)) }); return;
+  }
+  if (id === 'grade-pick' && el.value && !state.readonly) { patchTask(el.value, { inGrades: true }); return; }
   if (id === 'f-sort') { ui.boardSort = el.value === 'manual' ? 'manual' : 'due'; savePrefs(); render(); return; }
   if (state.readonly) return;
   const t = state.tasks[openTaskId];
@@ -1903,6 +2045,9 @@ document.addEventListener('change', e => {
     else if (id === 't-due') { patchTask(t.id, { due: el.value }); openTask(t.id); }
     else if (id === 't-assignee') patchTask(t.id, { assignee: el.value.trim() });
     else if (id === 't-repeat') patchTask(t.id, { repeat: el.value, repeatSpawned: false });
+    else if (id === 't-weight') patchTask(t.id, gradePatch('weight', el.value));
+    else if (id === 't-score') patchTask(t.id, Object.assign(gradePatch('score', el.value), t.outOf > 0 ? {} : { outOf: 100 }));
+    else if (id === 't-outof') patchTask(t.id, gradePatch('outOf', el.value));
     else if (id === 't-notes') patchTask(t.id, { notes: el.value });
     else if (el.dataset.cl && el.type === 'text') {
       const v = el.value.trim();
@@ -1948,6 +2093,11 @@ document.addEventListener('submit', e => {
     patchPlan(p.id, { buckets: [...p.buckets, { id: uid(), name }] });
     openPlanSettings(p.id);
     $('#p-bucket-new').focus();
+  } else if (f.id === 'grade-new') {
+    const name = $('#grade-new-name').value.trim(); if (!name) return;
+    $('#grade-new-name').value = '';
+    createTask(ui.planId, { title: name, inGrades: true });
+    setTimeout(() => $("#grade-new-name")?.focus(), 0);
   } else if (f.id === 'link-add') {
     const t = state.tasks[openTaskId]; if (!t) return;
     const url = normalizeUrl($('#link-url').value);

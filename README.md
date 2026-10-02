@@ -6,11 +6,12 @@ Single HTML file. No build step, no server, no dependencies to install.
 
 ## Features
 
-- **Overview**: counts of overdue, due today and due this week across all plans, a week or month calendar with due dates from every plan, and a list of tasks due in the next 14 days.
+- **Overview**: counts of overdue, due today and due this week across all plans, a week or month calendar with due dates from every plan, and a deadline list with a countdown (in 6 days, tomorrow, 2 days late) for every open task.
 - **Board**: columns by bucket, with drag and drop. Reorder buckets by dragging the column title or with the arrow buttons. Can also group by due date, progress or priority. Quick add at the top of each column.
 - **Grid**: sortable table of all tasks.
 - **Schedule**: month calendar by due date.
 - **Charts**: progress by bucket, priority and person.
+- **Grades**: give assignments, quizzes and exams a weight and a score to see your current grade, what you have earned so far, and the average you need on the rest to reach a target.
 - **Task details**: bucket, progress, priority, start and due date, assigned person, labels, notes, checklist.
 - **My Day**: pick tasks from any plan to work on today; the list clears itself every night.
 - **Search all plans** from the Overview.
