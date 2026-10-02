@@ -13,6 +13,7 @@ Single HTML file. No build step, no server, no dependencies to install.
 - **Charts**: progress by bucket, priority and person.
 - **Task details**: bucket, progress, priority, start and due date, assigned person, labels, notes, checklist.
 - Search and filters (due date, priority, hide completed).
+- Multi-select: select tasks one by one, a whole column, or everything shown, then delete or mark complete in one go.
 - English and Chinese, switch with the EN / 中 button. English by default.
 - White, pale pink and pale blue light theme by default, with an optional dark theme (sun / moon switch). Works on phone width.
 

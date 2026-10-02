@@ -177,6 +177,18 @@ main { min-width: 0; padding-inline: 28px; padding-block: 22px 44px; display: fl
 .col-move .icon-btn { width: 22px; height: 22px; font-size: 16px; line-height: 1; font-weight: 700; }
 .col-move .icon-btn:disabled { opacity: .25; cursor: default; background: transparent; }
 .col.bucket-dragging { opacity: .45; }
+.btn.mini { min-height: 24px; padding: 1px 10px; font-size: 12px; }
+.btn.on { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; color: var(--accent-ink); }
+.selbox { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--muted); flex: none; margin-top: 1px; display: grid; place-items: center; color: transparent; background: var(--surface-solid); }
+.selbox svg { width: 11px; height: 11px; }
+.selbox.on { background: var(--accent-deep); border-color: var(--accent-deep); color: #fff; }
+.card.selected { border-color: var(--accent-deep); box-shadow: 0 0 0 2px var(--accent-soft), var(--shadow); }
+.grid tr.selected td { background: var(--accent-soft); }
+.selbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 40; width: max-content; max-width: calc(100% - 32px); background: var(--surface-solid); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 10px 30px rgba(80, 50, 120, .18); padding: 8px 10px 8px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.selbar .n { font-weight: 800; margin-right: 6px; }
+.selbar .hint { color: var(--muted); font-size: 12px; font-weight: 600; }
+.selbar .q { font-weight: 700; color: var(--danger); }
+main.selecting { padding-bottom: 110px; }
 .col.drop-before { box-shadow: -5px 0 0 0 var(--accent-deep); }
 .col.drop-after { box-shadow: 5px 0 0 0 var(--accent-deep); }
 .qa { width: 100%; background: var(--surface); border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 10px; padding: 7px 10px; min-height: 36px; }
@@ -381,7 +393,7 @@ const I18N = {
     labels: { c1: 'Important', c2: 'Waiting on others', c3: 'Group', c4: 'Research', c5: 'Reading', c6: 'Personal' },
     dueGroups: { overdue: 'Overdue', today: 'Today', tomorrow: 'Tomorrow', week: 'This week', nextweek: 'Next week', later: 'Later', none: 'No due date' },
     defaultBuckets: ['To do', 'In progress', 'Waiting'], newTaskTitle: 'New task',
-    quickAdd: '+ Add task, press Enter', noTasks: 'No tasks yet', addBucket: 'Add bucket', add: 'Add', moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
+    quickAdd: '+ Add task, press Enter', noTasks: 'No tasks yet', addBucket: 'Add bucket', add: 'Add', select: 'Select', selCancel: 'Cancel', selN: n => `${n} selected`, selAll: 'Select all', selClear: 'Clear', selHint: 'Click tasks to select them', markDoneSel: 'Mark complete', deleteSelQ: n => `Delete ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`, deletedN: n => `${n} task${n === 1 ? '' : 's'} deleted`, doneN: n => `${n} task${n === 1 ? '' : 's'} marked complete`, moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
     dueOverdue: (d, n) => `${d} · ${n} day${n === 1 ? '' : 's'} late`, dueToday: 'Due today', dueTomorrow: 'Due tomorrow',
     markDone: 'Mark complete', markUndone: 'Mark not complete',
     col: { title: 'Task', bucket: 'Bucket', progress: 'Progress', priority: 'Priority', start: 'Start', due: 'Due', assignee: 'Assigned to' },
@@ -414,7 +426,7 @@ const I18N = {
     labels: { c1: '重要', c2: '等待他人', c3: '小组', c4: '调研', c5: '阅读', c6: '个人' },
     dueGroups: { overdue: '已逾期', today: '今天', tomorrow: '明天', week: '本周', nextweek: '下周', later: '以后', none: '没有截止日期' },
     defaultBuckets: ['待办', '进行中', '等待中'], newTaskTitle: '新任务',
-    quickAdd: '+ 添加任务，回车保存', noTasks: '暂无任务', addBucket: '添加存储桶', add: '添加', moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
+    quickAdd: '+ 添加任务，回车保存', noTasks: '暂无任务', addBucket: '添加存储桶', add: '添加', select: '多选', selCancel: '取消', selN: n => `已选 ${n} 项`, selAll: '全选', selClear: '清空', selHint: '点任务即可选择', markDoneSel: '标记完成', deleteSelQ: n => `删除这 ${n} 项任务？此操作无法撤销。`, deletedN: n => `已删除 ${n} 项任务`, doneN: n => `${n} 项任务已标记完成`, moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
     dueOverdue: (d, n) => `${d} · 逾期 ${n} 天`, dueToday: '今天到期', dueTomorrow: '明天到期',
     markDone: '标记为已完成', markUndone: '标记为未完成',
     col: { title: '任务名称', bucket: '存储桶', progress: '进度', priority: '优先级', start: '开始日期', due: '截止日期', assignee: '负责人' },
@@ -473,6 +485,9 @@ try { const p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null'); if (p) ui 
 if (!I18N[ui.lang]) ui.lang = 'en';
 const savePrefs = () => { try { localStorage.setItem(PREF_KEY, JSON.stringify(ui)); } catch (e) {} };
 const T = () => I18N[ui.lang];
+// multi-select mode, not saved
+const sel = { on: false, ids: new Set(), confirm: false };
+const exitSelect = () => { sel.on = false; sel.ids.clear(); sel.confirm = false; };
 
 const fmtDate = s => {
   if (!s) return '';
@@ -551,10 +566,10 @@ function handleErr(e) {
 function saveLocal() {
   try { localStorage.setItem(LOCAL_KEY, JSON.stringify({ plans: state.plans, tasks: state.tasks })); } catch (e) {}
 }
-function write(col, id, data) {
+function write(col, id, data, quiet) {
   const map = col === 'plans' ? state.plans : state.tasks;
   if (data === null) delete map[id]; else map[id] = Object.assign({}, data, { id });
-  render();
+  if (!quiet) render();
   if (state.mode === 'local') { saveLocal(); return; }
   const path = col + '/' + id;
   const body = data === null ? null : (() => { const b = clone(data); delete b.id; return b; })();
@@ -710,7 +725,7 @@ function renderRail() {
 function renderMain() {
   const main = $('#main'), L = T();
   if (!state.plansReady || !state.tasksReady) { main.innerHTML = `<div class="loading">${esc(L.loading)}</div>`; return; }
-  if (ui.planId === 'hub') { main.innerHTML = hubHTML(); return; }
+  if (ui.planId === 'hub') { main.classList.remove('selecting'); main.innerHTML = hubHTML(); return; }
   const plan = state.plans[ui.planId];
   const RO = state.readonly;
   main.innerHTML = `
@@ -722,8 +737,23 @@ function renderMain() {
     </div>
     <div class="tabs" role="tablist">${Object.entries(L.views).map(([k, v]) => `<button class="tab ${ui.view === k ? 'active' : ''}" role="tab" aria-selected="${ui.view === k}" data-act="view" data-view="${k}">${esc(v)}</button>`).join('')}</div>
     ${ui.view !== 'charts' ? toolbarHTML() : ''}
-    <div id="view">${ui.view === 'board' ? boardHTML(plan) : ui.view === 'grid' ? gridHTML(plan) : ui.view === 'schedule' ? scheduleHTML(plan) : chartsHTML(plan)}</div>`;
+    <div id="view">${ui.view === 'board' ? boardHTML(plan) : ui.view === 'grid' ? gridHTML(plan) : ui.view === 'schedule' ? scheduleHTML(plan) : chartsHTML(plan)}</div>
+    ${sel.on ? selbarHTML() : ''}`;
+  main.classList.toggle('selecting', sel.on);
 }
+
+function selbarHTML() {
+  const L = T(), n = sel.ids.size;
+  if (sel.confirm && n) return `<div class="selbar" role="region"><span class="q">${esc(L.deleteSelQ(n))}</span><button class="btn" data-act="sel-confirm-cancel">${esc(L.cancel)}</button><button class="btn danger solid" data-act="sel-delete">${esc(L.del)}</button></div>`;
+  return `<div class="selbar" role="region">
+    <span class="n">${esc(L.selN(n))}</span>
+    ${n ? '' : `<span class="hint">${esc(L.selHint)}</span>`}
+    <button class="btn" data-act="sel-all">${esc(L.selAll)}</button>
+    ${n ? `<button class="btn" data-act="sel-clear">${esc(L.selClear)}</button><button class="btn" data-act="sel-done">${esc(L.markDoneSel)}</button><button class="btn danger" data-act="sel-delete-ask">${esc(L.del)}</button>` : ''}
+    <button class="btn ghost" data-act="sel-toggle">${esc(L.selCancel)}</button>
+  </div>`;
+}
+const visibleTaskIds = () => applyFilter(tasksOf(ui.planId)).map(t => t.id);
 
 function toolbarHTML() {
   const f = ui.filter, L = T();
@@ -734,6 +764,7 @@ function toolbarHTML() {
     <select class="input" id="f-pri" aria-label="${esc(L.col.priority)}">${opt(Object.assign({ all: L.priAll }, L.priority), f.pri)}</select>
     <label class="chk"><input type="checkbox" id="f-done" ${f.hideDone ? 'checked' : ''}>${esc(L.hideDone)}</label>
     <span class="grow"></span>
+    ${!state.readonly && (ui.view === 'board' || ui.view === 'grid') ? `<button class="btn ${sel.on ? 'on' : ''}" data-act="sel-toggle">${esc(L.select)}</button>` : ''}
     ${ui.view === 'board' ? `<label class="chk">${esc(L.groupBy)} <select class="input" id="f-group">${opt(L.groupOpts, ui.groupBy)}</select></label>` : ''}
   </div>`;
 }
@@ -763,10 +794,11 @@ function cardHTML(t) {
   const clDone = cl.filter(c => c.done).length;
   const labels = (t.labels || []).filter(k => LABEL_KEYS.includes(k));
   const showMeta = t.due || cl.length || t.assignee || t.priority === 'urgent' || t.priority === 'important' || t.progress === 'doing';
-  return `<article class="card ${t.progress === 'done' ? 'is-done' : ''}" draggable="${!RO}" data-act="open-task" data-id="${t.id}" tabindex="0">
+  const picked = sel.on && sel.ids.has(t.id);
+  return `<article class="card ${t.progress === 'done' ? 'is-done' : ''} ${picked ? 'selected' : ''}" draggable="${!RO && !sel.on}" data-act="${sel.on ? 'sel-card' : 'open-task'}" data-id="${t.id}" tabindex="0" ${sel.on ? `aria-pressed="${picked}"` : ''}>
     ${labels.length ? `<div class="card-tags">${labels.map(k => `<span class="tag lbl-${k}">${esc(labelName(plan, k))}</span>`).join('')}</div>` : ''}
     <div class="card-top">
-      <button class="check ${t.progress === 'done' ? 'on' : ''}" data-act="toggle-done" data-id="${t.id}" aria-label="${esc(t.progress === 'done' ? L.markUndone : L.markDone)}" ${RO ? 'disabled' : ''}>${ICON_CHECK}</button>
+      ${sel.on ? `<span class="selbox ${picked ? 'on' : ''}">${ICON_CHECK}</span>` : `<button class="check ${t.progress === 'done' ? 'on' : ''}" data-act="toggle-done" data-id="${t.id}" aria-label="${esc(t.progress === 'done' ? L.markUndone : L.markDone)}" ${RO ? 'disabled' : ''}>${ICON_CHECK}</button>`}
       <h4>${esc(t.title)}</h4>
     </div>
     ${showMeta ? `<div class="card-meta">
@@ -801,7 +833,8 @@ function boardHTML(plan) {
     return `<section class="col" data-drop='${c.drop && !RO ? esc(JSON.stringify(c.drop)) : ''}' ${c.bucketId ? `data-bucket-id="${esc(c.bucketId)}"` : ''}>
       <div class="col-head ${c.cls || ''}" ${movable ? `draggable="true" data-bucket-id="${esc(c.bucketId)}" title="${esc(L.dragBucket)}"` : ''}>
         <h3>${esc(c.name)}</h3>
-        ${movable && c.total > 1 ? `<span class="col-move"><button class="icon-btn" data-act="bucket-move" data-bucket="${esc(c.bucketId)}" data-to="${c.idx - 1}" aria-label="${esc(L.moveLeft)}" title="${esc(L.moveLeft)}" ${c.idx === 0 ? 'disabled' : ''}>‹</button><button class="icon-btn" data-act="bucket-move" data-bucket="${esc(c.bucketId)}" data-to="${c.idx + 1}" aria-label="${esc(L.moveRight)}" title="${esc(L.moveRight)}" ${c.idx === c.total - 1 ? 'disabled' : ''}>›</button></span>` : ''}
+        ${sel.on && list.length ? `<button class="btn mini" data-act="sel-col" data-ids="${list.map(t => t.id).join(',')}">${esc(L.selAll)}</button>` : ''}
+        ${movable && !sel.on && c.total > 1 ? `<span class="col-move"><button class="icon-btn" data-act="bucket-move" data-bucket="${esc(c.bucketId)}" data-to="${c.idx - 1}" aria-label="${esc(L.moveLeft)}" title="${esc(L.moveLeft)}" ${c.idx === 0 ? 'disabled' : ''}>‹</button><button class="icon-btn" data-act="bucket-move" data-bucket="${esc(c.bucketId)}" data-to="${c.idx + 1}" aria-label="${esc(L.moveRight)}" title="${esc(L.moveRight)}" ${c.idx === c.total - 1 ? 'disabled' : ''}>›</button></span>` : ''}
         <span class="count">${list.length}</span>
       </div>
       ${c.add && !RO ? `<input class="qa" id="qa-${esc(c.key)}" data-add='${esc(JSON.stringify(c.add))}' placeholder="${esc(L.quickAdd)}" maxlength="200" autocomplete="off">` : ''}
@@ -827,8 +860,8 @@ function gridHTML(plan) {
   const th = k => `<th data-sort="${k}">${esc(L.col[k])} ${s.key === k ? (s.dir > 0 ? '↑' : '↓') : ''}</th>`;
   return `<div class="table-wrap"><table class="grid">
     <thead><tr><th style="width:40px"></th>${['title', 'bucket', 'progress', 'priority', 'start', 'due', 'assignee'].map(th).join('')}</tr></thead>
-    <tbody>${tasks.map(t => `<tr class="${t.progress === 'done' ? 'is-done' : ''}" data-act="open-task" data-id="${t.id}">
-      <td><button class="check ${t.progress === 'done' ? 'on' : ''}" data-act="toggle-done" data-id="${t.id}" aria-label="${esc(L.toggle)}" ${state.readonly ? 'disabled' : ''}>${ICON_CHECK}</button></td>
+    <tbody>${tasks.map(t => `<tr class="${t.progress === 'done' ? 'is-done' : ''} ${sel.on && sel.ids.has(t.id) ? 'selected' : ''}" data-act="${sel.on ? 'sel-card' : 'open-task'}" data-id="${t.id}">
+      <td>${sel.on ? `<span class="selbox ${sel.ids.has(t.id) ? 'on' : ''}">${ICON_CHECK}</span>` : `<button class="check ${t.progress === 'done' ? 'on' : ''}" data-act="toggle-done" data-id="${t.id}" aria-label="${esc(L.toggle)}" ${state.readonly ? 'disabled' : ''}>${ICON_CHECK}</button>`}</td>
       <td class="title">${esc(t.title)}</td>
       <td>${esc(bucketName(t.bucketId))}</td>
       <td><span class="chip ${t.progress === 'done' ? 'done' : t.progress === 'doing' ? 'doing' : ''}">${esc(L.progress[t.progress] || L.progress.todo)}</span></td>
@@ -1087,8 +1120,32 @@ document.addEventListener('click', e => {
     case 'lang': ui.lang = el.dataset.lang; savePrefs(); render(); break;
     case 'theme': ui.theme = el.dataset.themeVal; savePrefs(); render(); break;
     case 'bucket-move': if (!RO) moveBucket(ui.planId, el.dataset.bucket, +el.dataset.to); break;
-    case 'goto': ui.planId = el.dataset.plan; savePrefs(); render(); window.scrollTo(0, 0); break;
-    case 'view': ui.view = el.dataset.view; savePrefs(); render(); break;
+    case 'goto': exitSelect(); ui.planId = el.dataset.plan; savePrefs(); render(); window.scrollTo(0, 0); break;
+    case 'view': if (el.dataset.view !== 'board' && el.dataset.view !== 'grid') exitSelect(); ui.view = el.dataset.view; savePrefs(); render(); break;
+    case 'sel-toggle': if (sel.on) exitSelect(); else sel.on = true; render(); break;
+    case 'sel-card': { const id = el.dataset.id; if (sel.ids.has(id)) sel.ids.delete(id); else sel.ids.add(id); sel.confirm = false; render(); break; }
+    case 'sel-col': {
+      const ids = el.dataset.ids.split(',').filter(Boolean);
+      const all = ids.every(id => sel.ids.has(id));
+      ids.forEach(id => all ? sel.ids.delete(id) : sel.ids.add(id));
+      sel.confirm = false; render(); break;
+    }
+    case 'sel-all': visibleTaskIds().forEach(id => sel.ids.add(id)); sel.confirm = false; render(); break;
+    case 'sel-clear': sel.ids.clear(); sel.confirm = false; render(); break;
+    case 'sel-delete-ask': sel.confirm = true; render(); break;
+    case 'sel-confirm-cancel': sel.confirm = false; render(); break;
+    case 'sel-delete': {
+      if (RO) break;
+      const ids = [...sel.ids].filter(id => state.tasks[id]);
+      ids.forEach(id => write('tasks', id, null, true));
+      exitSelect(); render(); toast(L.deletedN(ids.length)); break;
+    }
+    case 'sel-done': {
+      if (RO) break;
+      const ids = [...sel.ids].filter(id => state.tasks[id] && state.tasks[id].progress !== 'done');
+      ids.forEach(id => { const t = state.tasks[id]; write('tasks', id, Object.assign(clone(t), { progress: 'done', completedAt: Date.now(), updatedAt: Date.now() }), true); });
+      sel.ids.clear(); sel.confirm = false; render(); toast(L.doneN(ids.length)); break;
+    }
     case 'new-plan-show': $('#new-plan-form').hidden = false; $('#new-plan-name').focus(); break;
     case 'toggle-done': {
       e.stopPropagation(); if (RO) break;
@@ -1175,6 +1232,8 @@ document.addEventListener('click', e => {
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && $('#dialog-root').firstChild) { closeDialog(); return; }
+  if (e.key === 'Escape' && sel.on) { exitSelect(); render(); return; }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-act="sel-card"]')) { e.preventDefault(); e.target.click(); return; }
   if (e.key === 'Enter' && e.target.matches('[data-act="open-task"]') && !e.target.matches('button')) { openTask(e.target.dataset.id); return; }
   if (e.key === 'Enter' && e.target.classList.contains('qa')) {
     e.preventDefault();
