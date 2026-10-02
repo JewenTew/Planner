@@ -3,7 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5aecb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Planner">
 <style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<script src="firebase-config.js"></script>
+<script>
+if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
 </head>
 <body>
 <title>Planner</title>
@@ -262,6 +272,14 @@ table.grid { width: 100%; border-collapse: collapse; min-width: 820px; }
 .bk .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .bk .sum { background: var(--blue-soft); border-radius: 12px; padding: 10px 12px; font-weight: 700; }
 .bk .err { color: var(--danger); font-weight: 700; }
+.signin { max-width: 460px; margin: 40px auto; text-align: center; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.signin .brand-mark { width: 56px; height: 56px; border-radius: 18px; }
+.signin .brand-mark svg { width: 28px; height: 28px; }
+.signin h2 { font-family: var(--font-display); font-size: 24px; margin: 0; }
+.signin p { margin: 0; color: var(--muted); }
+.signin .btn.primary { min-height: 42px; padding: 8px 22px; font-size: 15px; }
+.banner { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: var(--blue-soft); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; font-weight: 600; }
+.banner .grow { flex: 1; min-width: 200px; }
 .unsched { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
 .unsched h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 800; }
 .unsched .list { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -415,6 +433,10 @@ const I18N = {
     importH: 'Import', importP: 'Load plans and tasks from a backup file made by Planner.', chooseFile: 'Choose backup file', importSummary: (p, t) => `This file has ${p} plan${p === 1 ? '' : 's'} and ${t} task${t === 1 ? '' : 's'}.`,
     merge: 'Add to my data', mergeHint: 'Keeps your current plans. Anything with the same ID is updated from the file.', replace: 'Replace everything', replaceQ: 'Delete all your current plans and tasks, then load the file? This cannot be undone.',
     imported: (p, t) => `Imported ${p} plan${p === 1 ? '' : 's'} and ${t} task${t === 1 ? '' : 's'}`, badFile: 'This file is not a Planner backup. Choose a .json file exported from Planner.', orImport: 'Import a backup',
+    signInH: 'Sign in to sync', signInP: 'Sign in with Google to keep your plans in the cloud. Only your account can see them, and they sync across your computer and phone.', signInBtn: 'Sign in with Google', useLocal: 'Use without an account', useLocalHint: 'Without an account, data stays in this browser only.',
+    signOut: 'Sign out', signInSync: 'Sign in to sync', syncCloud: n => `Synced to the cloud as ${n}.`,
+    migrateQ: (p, t) => `This browser has ${p} plan${p === 1 ? '' : 's'} and ${t} task${t === 1 ? '' : 's'} saved before you signed in. Upload them to your account?`, upload: 'Upload', notNow: 'Not now', uploaded: 'Uploaded to your account',
+    cloudFail: 'Could not connect to the cloud. Using this browser only for now.', signInFail: 'Sign-in did not finish. Please try again.', errCloudPerm: 'The cloud refused to save. Check the Firestore security rules.',
     select: 'Select', selCancel: 'Cancel', selN: n => `${n} selected`, selAll: 'Select all', selClear: 'Clear', selHint: 'Click tasks to select them', markDoneSel: 'Mark complete', deleteSelQ: n => `Delete ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`, deletedN: n => `${n} task${n === 1 ? '' : 's'} deleted`, doneN: n => `${n} task${n === 1 ? '' : 's'} marked complete`, moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
     dueOverdue: (d, n) => `${d} · ${n} day${n === 1 ? '' : 's'} late`, dueToday: 'Due today', dueTomorrow: 'Due tomorrow',
     markDone: 'Mark complete', markUndone: 'Mark not complete',
@@ -454,6 +476,10 @@ const I18N = {
     importH: '导入', importP: '从 Planner 导出的备份文件载入计划和任务。', chooseFile: '选择备份文件', importSummary: (p, t) => `这个文件里有 ${p} 个计划，${t} 项任务。`,
     merge: '加入现有数据', mergeHint: '保留你现在的计划。ID 相同的内容会用文件里的版本更新。', replace: '全部替换', replaceQ: '删除你现在所有的计划和任务，再载入这个文件？此操作无法撤销。',
     imported: (p, t) => `已导入 ${p} 个计划，${t} 项任务`, badFile: '这不是 Planner 的备份文件。请选择从 Planner 导出的 .json 文件。', orImport: '从备份导入',
+    signInH: '登录以同步', signInP: '用 Google 账号登录，计划会保存在云端。只有你的账号能看到，电脑和手机会自动同步。', signInBtn: '用 Google 登录', useLocal: '不登录，直接使用', useLocalHint: '不登录的话，数据只保存在这个浏览器里。',
+    signOut: '退出登录', signInSync: '登录以同步', syncCloud: n => `已同步到云端（${n}）。`,
+    migrateQ: (p, t) => `这个浏览器里有 ${p} 个计划、${t} 项任务是登录前建的。要上传到你的账号吗？`, upload: '上传', notNow: '暂不', uploaded: '已上传到你的账号',
+    cloudFail: '无法连接云端，暂时只保存在这个浏览器里。', signInFail: '登录没有完成，请再试一次。', errCloudPerm: '云端拒绝保存，请检查 Firestore 安全规则。',
     select: '多选', selCancel: '取消', selN: n => `已选 ${n} 项`, selAll: '全选', selClear: '清空', selHint: '点任务即可选择', markDoneSel: '标记完成', deleteSelQ: n => `删除这 ${n} 项任务？此操作无法撤销。`, deletedN: n => `已删除 ${n} 项任务`, doneN: n => `${n} 项任务已标记完成`, moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
     dueOverdue: (d, n) => `${d} · 逾期 ${n} 天`, dueToday: '今天到期', dueTomorrow: '明天到期',
     markDone: '标记为已完成', markUndone: '标记为未完成',
@@ -486,6 +512,8 @@ const ICON_SUN = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" str
 const ICON_MOON = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M11.8 8.6A5 5 0 0 1 5.4 2.2a5 5 0 1 0 6.4 6.4z"/></svg>';
 const ICON_REPEAT = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5V5a2 2 0 0 1 2-2h5.5M8 1.5L9.5 3 8 4.5M10 6.5V7a2 2 0 0 1-2 2H2.5M4 10.5L2.5 9 4 7.5"/></svg>';
 const ICON_BACKUP = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1.5v7M4.2 5.8L7 8.6l2.8-2.8M2 9.5v1.5a1.5 1.5 0 0 0 1.5 1.5h7A1.5 1.5 0 0 0 12 11V9.5"/></svg>';
+const ICON_GOOGLE = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72A5.41 5.41 0 0 1 3.68 9c0-.6.1-1.18.29-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>';
+const ICON_USER = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="5" r="2.5"/><path d="M2.5 12.5a4.5 4.5 0 0 1 9 0"/></svg>';
 const ICON_CHECK = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>';
 const ICON_CAL = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="2.5" width="9" height="8" rx="1.5"/><path d="M1.5 5h9M4 1.2v2.4M8 1.2v2.4"/></svg>';
 const ICON_LIST = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1.5 3l1 1 1.6-1.8M1.5 8l1 1 1.6-1.8M6 3.2h4.5M6 8.2h4.5"/></svg>';
@@ -592,6 +620,7 @@ function handleErr(e) {
   if (code === 'invalid_argument') { state.readonly = true; toast(T().errPerm); render(); }
   else if (code === 'quota_exceeded') toast(T().errQuota);
   else if (code === 'revoked') { state.readonly = true; render(); }
+  else if (code === 'permission-denied') toast(T().errCloudPerm);
   else toast(T().errNet);
 }
 function saveLocal() {
@@ -602,6 +631,7 @@ function write(col, id, data, quiet) {
   if (data === null) delete map[id]; else map[id] = Object.assign({}, data, { id });
   if (!quiet) render();
   if (state.mode === 'local') { saveLocal(); return; }
+  if (state.mode === 'cloud') { cloudWrite(col, id, data); return; }
   const path = col + '/' + id;
   const body = data === null ? null : (() => { const b = clone(data); delete b.id; return b; })();
   const q = queues[path] || (queues[path] = { running: false, has: false, next: null });
@@ -716,14 +746,103 @@ async function initStore() {
       state.tasks = m; state.tasksReady = true; render();
     }, onErr);
   } else {
-    state.mode = 'local';
-    try {
-      const saved = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null');
-      if (saved) { state.plans = saved.plans || {}; state.tasks = saved.tasks || {}; }
-    } catch (e) {}
-    state.plansReady = state.tasksReady = true;
-    render();
+    const cfg = window.PLANNER_FIREBASE;
+    if (cfg && cfg.apiKey) {
+      try { await initCloud(cfg); return; }
+      catch (e) { console.warn('Cloud sync unavailable', e); cloud.available = false; toast(T().cloudFail); }
+    }
+    startLocal();
   }
+}
+
+/* ---------- local mode ---------- */
+function readLocal() {
+  try { const saved = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null'); return saved && saved.plans ? { plans: saved.plans, tasks: saved.tasks || {} } : null; } catch (e) { return null; }
+}
+function startLocal() {
+  state.mode = 'local';
+  const saved = readLocal();
+  state.plans = saved ? saved.plans : {}; state.tasks = saved ? saved.tasks : {};
+  state.plansReady = state.tasksReady = true;
+  render();
+}
+
+/* ---------- cloud mode (GitHub Pages build with Firebase) ---------- */
+const FB_VERSION = '10.14.1';
+const LOCAL_ONLY_KEY = 'planner-local-only';
+const MIGRATED_KEY = 'planner-migrated';
+const cloud = { available: false, auth: null, fs: null, user: null, unsub: [] };
+const loadScript = src => new Promise((res, rej) => { const el = document.createElement('script'); el.src = src; el.onload = res; el.onerror = () => rej(new Error('load ' + src)); document.head.appendChild(el); });
+const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const lsSet = (k, v) => { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} };
+
+async function initCloud(cfg) {
+  const base = `https://www.gstatic.com/firebasejs/${FB_VERSION}/`;
+  await loadScript(base + 'firebase-app-compat.js');
+  await Promise.all([loadScript(base + 'firebase-auth-compat.js'), loadScript(base + 'firebase-firestore-compat.js')]);
+  if (!firebase.apps.length) firebase.initializeApp(cfg);
+  cloud.auth = firebase.auth();
+  cloud.fs = firebase.firestore();
+  try { await cloud.fs.enablePersistence({ synchronizeTabs: true }); } catch (e) {}
+  cloud.available = true;
+  cloud.auth.onAuthStateChanged(user => {
+    cloud.unsub.forEach(u => u()); cloud.unsub = [];
+    if (user) {
+      lsSet(LOCAL_ONLY_KEY, null);
+      cloud.user = { uid: user.uid, name: user.displayName || user.email || '', email: user.email || '' };
+      subscribeCloud(user.uid);
+    } else {
+      cloud.user = null;
+      if (lsGet(LOCAL_ONLY_KEY)) startLocal();
+      else { state.mode = 'signin'; state.plans = {}; state.tasks = {}; state.plansReady = state.tasksReady = true; render(); }
+    }
+  });
+}
+const cloudCol = (uid, name) => cloud.fs.collection('users').doc(uid).collection(name);
+function subscribeCloud(uid) {
+  state.mode = 'cloud'; state.plans = {}; state.tasks = {}; state.plansReady = state.tasksReady = false;
+  render();
+  const onErr = e => { handleErr(e); };
+  cloud.unsub.push(cloudCol(uid, 'plans').onSnapshot(snap => {
+    const m = {}; snap.docs.forEach(d => { m[d.id] = Object.assign({}, d.data(), { id: d.id }); });
+    state.plans = m; state.plansReady = true; render();
+  }, onErr));
+  cloud.unsub.push(cloudCol(uid, 'tasks').onSnapshot(snap => {
+    const m = {}; snap.docs.forEach(d => { m[d.id] = Object.assign({}, d.data(), { id: d.id }); });
+    state.tasks = m; state.tasksReady = true; render();
+  }, onErr));
+}
+function cloudWrite(col, id, data) {
+  if (!cloud.user) return;
+  const ref = cloudCol(cloud.user.uid, col).doc(id);
+  const body = data === null ? null : (() => { const b = clone(data); delete b.id; return b; })();
+  (body === null ? ref.delete() : ref.set(body)).catch(handleErr);
+}
+function signIn() {
+  if (!cloud.available) return;
+  const provider = new firebase.auth.GoogleAuthProvider();
+  cloud.auth.signInWithPopup(provider).catch(e => {
+    const code = e && e.code;
+    if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') cloud.auth.signInWithRedirect(provider);
+    else if (code !== 'auth/popup-closed-by-user' && code !== 'auth/cancelled-popup-request') toast(T().signInFail);
+  });
+}
+// data saved in this browser before signing in, offered for upload once
+function pendingLocalData() {
+  if (state.mode !== 'cloud' || !state.plansReady || lsGet(MIGRATED_KEY)) return null;
+  const saved = readLocal();
+  return saved && Object.keys(saved.plans).length ? saved : null;
+}
+function signinHTML() {
+  const L = T();
+  return `<div class="panel signin">
+    <div class="brand-mark">${ICON_MARK}</div>
+    <h2>${esc(L.signInH)}</h2>
+    <p>${esc(L.signInP)}</p>
+    <button class="btn primary" data-act="sign-in" style="background:var(--surface-solid);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow)">${ICON_GOOGLE}${esc(L.signInBtn)}</button>
+    <button class="btn ghost" data-act="use-local">${esc(L.useLocal)}</button>
+    <p style="font-size:12px">${esc(L.useLocalHint)}</p>
+  </div>`;
 }
 
 /* ---------- focus preservation across re-renders ---------- */
@@ -776,21 +895,26 @@ function renderRail() {
           const od = tasksOf(p.id).filter(t => dueStatus(t) === 'overdue').length;
           return `<button class="nav-item ${ui.planId === p.id ? 'active' : ''}" data-act="goto" data-plan="${p.id}"><span class="dot bg-${esc(p.color)}"></span><span class="name">${esc(p.name)}</span>${od ? `<span class="badge" title="${esc(L.overdue)}">${od}</span>` : ''}</button>`;
         }).join('')}
-        ${!RO ? `<button class="nav-item" data-act="new-plan-show" style="color:var(--muted)">${ICON_PLUS}<span class="name">${esc(L.newPlan)}</span></button>` : ''}
+        ${!RO && state.mode !== 'signin' ? `<button class="nav-item" data-act="new-plan-show" style="color:var(--muted)">${ICON_PLUS}<span class="name">${esc(L.newPlan)}</span></button>` : ''}
       </nav>
       <form class="new-plan" id="new-plan-form" hidden>
         <input class="input" id="new-plan-name" placeholder="${esc(L.planNamePh)}" maxlength="80" autocomplete="off">
         <button class="btn primary" type="submit">${esc(L.create)}</button>
       </form>
     </div>
-    <nav class="nav"><button class="nav-item" data-act="backup" style="color:var(--muted)">${ICON_BACKUP}<span class="name">${esc(L.backup)}</span></button></nav>
-    <div class="rail-foot"><span class="sync-dot ${state.mode === 'db' ? 'on' : ''}"></span><span>${esc(state.mode === 'db' ? (RO ? L.syncRO : L.syncOn) : L.syncLocal)}</span></div>`;
+    <nav class="nav">
+      ${state.mode !== 'signin' ? `<button class="nav-item" data-act="backup" style="color:var(--muted)">${ICON_BACKUP}<span class="name">${esc(L.backup)}</span></button>` : ''}
+      ${state.mode === 'cloud' ? `<button class="nav-item" data-act="sign-out" style="color:var(--muted)" title="${esc(cloud.user ? cloud.user.email : '')}">${ICON_USER}<span class="name">${esc(L.signOut)}</span></button>` : ''}
+      ${state.mode === 'local' && cloud.available ? `<button class="nav-item" data-act="sign-in" style="color:var(--muted)">${ICON_USER}<span class="name">${esc(L.signInSync)}</span></button>` : ''}
+    </nav>
+    <div class="rail-foot"><span class="sync-dot ${state.mode === 'db' || state.mode === 'cloud' ? 'on' : ''}"></span><span>${esc(state.mode === 'db' ? (RO ? L.syncRO : L.syncOn) : state.mode === 'cloud' ? L.syncCloud(cloud.user ? cloud.user.name : '') : state.mode === 'signin' ? L.signInH : L.syncLocal)}</span></div>`;
 }
 
 function renderMain() {
   const main = $('#main'), L = T();
   if (!state.plansReady || !state.tasksReady) { main.innerHTML = `<div class="loading">${esc(L.loading)}</div>`; return; }
-  if (ui.planId === 'hub') { main.classList.remove('selecting'); main.innerHTML = hubHTML(); return; }
+  if (state.mode === 'signin') { main.classList.remove('selecting'); main.innerHTML = signinHTML(); return; }
+  if (ui.planId === 'hub') { main.classList.remove('selecting'); main.innerHTML = migrateBannerHTML() + hubHTML(); return; }
   const plan = state.plans[ui.planId];
   const RO = state.readonly;
   main.innerHTML = `
@@ -1063,6 +1187,12 @@ function chartsHTML(plan) {
   </div>`;
 }
 
+function migrateBannerHTML() {
+  const d = pendingLocalData(); if (!d) return '';
+  const L = T();
+  return `<div class="banner"><span class="grow">${esc(L.migrateQ(Object.keys(d.plans).length, Object.keys(d.tasks).length))}</span><button class="btn primary" data-act="migrate">${esc(L.upload)}</button><button class="btn ghost" data-act="migrate-skip">${esc(L.notNow)}</button></div>`;
+}
+
 function hubHTML() {
   const RO = state.readonly, L = T();
   const plans = plansList();
@@ -1320,6 +1450,11 @@ document.addEventListener('click', e => {
     case 'lang': ui.lang = el.dataset.lang; savePrefs(); render(); break;
     case 'theme': ui.theme = el.dataset.themeVal; savePrefs(); render(); break;
     case 'backup': closeBackup(); openBackup(); break;
+    case 'sign-in': signIn(); break;
+    case 'use-local': lsSet(LOCAL_ONLY_KEY, '1'); startLocal(); break;
+    case 'sign-out': if (cloud.auth) { exitSelect(); closeDialog(); cloud.auth.signOut(); } break;
+    case 'migrate': { const d = pendingLocalData(); if (d) { applyImport(parseBackup(JSON.stringify({ app: 'planner', plans: d.plans, tasks: d.tasks })) || { plans: {}, tasks: {} }, false); lsSet(MIGRATED_KEY, '1'); render(); toast(L.uploaded); } break; }
+    case 'migrate-skip': lsSet(MIGRATED_KEY, '1'); render(); break;
     case 'export': exportData(); break;
     case 'import-merge': if (pendingImport && !RO) { const d = pendingImport; applyImport(d, false); closeDialog(); toast(L.imported(Object.keys(d.plans).length, Object.keys(d.tasks).length)); } break;
     case 'import-replace-ask': importConfirm = true; openBackup(); break;
