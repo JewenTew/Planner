@@ -473,7 +473,12 @@ const fmtDate = s => {
 };
 const weekday = s => WEEKDAYS[ui.lang][(parse(s).getDay() + 6) % 7];
 const monthTitle = (y, m) => ui.lang === 'zh' ? `${y}年${m}月` : `${MONTHS_EN[m - 1]} ${y}`;
-const labelName = (plan, k) => (plan && plan.labels && plan.labels[k]) || T().labels[k];
+// default bucket names (from either language, old or new) follow the language switch; custom names stay as typed
+const DEFAULT_BUCKET_IDX = { 'To do': 0, '待办': 0, 'In progress': 1, '进行中': 1, 'Waiting': 2, '等待中': 2, '等待客户': 2 };
+const bName = name => name in DEFAULT_BUCKET_IDX ? T().defaultBuckets[DEFAULT_BUCKET_IDX[name]] : name;
+// label names saved by the first version count as defaults, so they also follow the language switch
+const OLD_LABEL_DEFAULTS = ['紧急客户', '等待回复', '采购', '内部', '现场', '文档'];
+const labelName = (plan, k) => { const v = plan && plan.labels && plan.labels[k]; return v && !OLD_LABEL_DEFAULTS.includes(v) ? v : T().labels[k]; };
 
 function dueGroup(t) {
   if (!t.due) return 'none';
@@ -765,7 +770,7 @@ function boardColumns(plan) {
     return Object.entries(dates).map(([k, date]) => ({ key: k, name: L.dueGroups[k], match: t => dueGroup(t) === k, drop: date === null ? null : { due: date }, add: date === null ? null : { due: date }, cls: k === 'overdue' ? 'overdue' : '' }));
   }
   const ids = plan.buckets.map(b => b.id);
-  return plan.buckets.map((b, i) => ({ key: b.id, name: b.name, match: t => t.bucketId === b.id || (i === 0 && !ids.includes(t.bucketId)), drop: { bucketId: b.id }, add: { bucketId: b.id } }));
+  return plan.buckets.map((b, i) => ({ key: b.id, name: bName(b.name), match: t => t.bucketId === b.id || (i === 0 && !ids.includes(t.bucketId)), drop: { bucketId: b.id }, add: { bucketId: b.id } }));
 }
 
 function boardHTML(plan) {
@@ -788,7 +793,7 @@ function gridHTML(plan) {
   const L = T();
   const tasks = applyFilter(tasksOf(plan.id));
   if (!tasks.length) return emptyFiltered();
-  const bucketName = id => (plan.buckets.find(b => b.id === id) || plan.buckets[0] || {}).name || '';
+  const bucketName = id => bName((plan.buckets.find(b => b.id === id) || plan.buckets[0] || {}).name || '');
   const s = ui.sort;
   const key = {
     title: t => t.title.toLowerCase(), bucket: t => bucketName(t.bucketId), progress: t => ['todo', 'doing', 'done'].indexOf(t.progress),
@@ -873,7 +878,7 @@ function chartsHTML(plan) {
     return `<div class="hbars">${groups.map(g => `<div class="hbar"><span class="n" title="${esc(g.name)}">${esc(g.name)}</span><div style="width:${(g.list.length / max * 100).toFixed(2)}%;min-width:${g.list.length ? '4px' : '0'}">${stackBar(g.list, g.list.length)}</div><span class="v">${g.list.length}</span></div>`).join('')}</div>`;
   };
   const ids = plan.buckets.map(b => b.id);
-  const byBucket = plan.buckets.map((b, i) => ({ name: b.name, list: tasks.filter(t => t.bucketId === b.id || (i === 0 && !ids.includes(t.bucketId))) }));
+  const byBucket = plan.buckets.map((b, i) => ({ name: bName(b.name), list: tasks.filter(t => t.bucketId === b.id || (i === 0 && !ids.includes(t.bucketId))) }));
   const byPri = Object.entries(L.priority).map(([k, v]) => ({ name: v, list: tasks.filter(t => (t.priority || 'medium') === k) }));
   const people = {};
   tasks.filter(t => t.progress !== 'done').forEach(t => { const n = t.assignee?.trim() || L.unassigned; (people[n] = people[n] || []).push(t); });
@@ -983,7 +988,7 @@ function openTask(id, focusTitle) {
   const RO = state.readonly;
   const dis = RO ? 'disabled' : '';
   const sel = (sid, obj, cur) => `<select class="input" id="${sid}" ${dis}>${Object.entries(obj).map(([k, v]) => `<option value="${esc(k)}" ${cur === k ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>`;
-  const buckets = Object.fromEntries(plan.buckets.map(b => [b.id, b.name]));
+  const buckets = Object.fromEntries(plan.buckets.map(b => [b.id, bName(b.name)]));
   const bucketCur = buckets[t.bucketId] ? t.bucketId : plan.buckets[0]?.id;
   $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.taskDetails)}">
     <div class="sheet-head"><span class="dot bg-${esc(plan.color)}"></span><span>${esc(plan.name)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
@@ -1039,7 +1044,7 @@ function openPlanSettings(id) {
     <label class="field"><span>${esc(L.planName)}</span><input class="input" id="p-name" value="${esc(p.name)}" maxlength="80"></label>
     <div><span class="section-label">${esc(L.color)}</span><div class="swatches">${LABEL_KEYS.map(c => `<button class="swatch bg-${c} ${p.color === c ? 'on' : ''}" data-act="plan-color" data-color="${c}" aria-label="${esc(L.color)} ${c}"></button>`).join('')}</div></div>
     <div><span class="section-label">${esc(L.bucketsH)}</span><div class="bucket-rows">
-      ${p.buckets.map(b => `<div class="r"><input class="input" id="b-${esc(b.id)}" data-bucket="${esc(b.id)}" value="${esc(b.name)}" maxlength="40">${p.buckets.length > 1 ? `<button class="icon-btn" data-act="bucket-del" data-bucket="${esc(b.id)}" aria-label="${esc(L.deleteBucket)}" title="${esc(L.bucketDelTitle)}">${ICON_X}</button>` : ''}</div>`).join('')}
+      ${p.buckets.map(b => `<div class="r"><input class="input" id="b-${esc(b.id)}" data-bucket="${esc(b.id)}" value="${esc(bName(b.name))}" maxlength="40">${p.buckets.length > 1 ? `<button class="icon-btn" data-act="bucket-del" data-bucket="${esc(b.id)}" aria-label="${esc(L.deleteBucket)}" title="${esc(L.bucketDelTitle)}">${ICON_X}</button>` : ''}</div>`).join('')}
       <form id="p-bucket-add" class="r"><input class="input" id="p-bucket-new" placeholder="${esc(L.newBucketPh)}" maxlength="40" autocomplete="off"><button class="btn" type="submit">${esc(L.add)}</button></form>
     </div></div>
     <div><span class="section-label">${esc(L.labelNames)}</span><div class="label-names">${LABEL_KEYS.map(k => `<label class="lbl-${k}"><i></i><input class="input" data-labelname="${k}" value="${esc(labelName(p, k))}" maxlength="24"></label>`).join('')}</div></div>
@@ -1196,7 +1201,7 @@ document.addEventListener('change', e => {
     else if (el.dataset.bucket) {
       const v = el.value.trim();
       if (v) patchPlan(p.id, { buckets: p.buckets.map(b => b.id === el.dataset.bucket ? { id: b.id, name: v } : b) });
-      else el.value = p.buckets.find(b => b.id === el.dataset.bucket)?.name || '';
+      else el.value = bName(p.buckets.find(b => b.id === el.dataset.bucket)?.name || '');
     } else if (el.dataset.labelname) {
       // store only custom names so default labels follow the language setting
       const k = el.dataset.labelname, v = el.value.trim();
