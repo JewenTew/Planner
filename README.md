@@ -12,6 +12,10 @@ Single HTML file. No build step, no server, no dependencies to install.
 - **Schedule**: month calendar by due date.
 - **Charts**: progress by bucket, priority and person.
 - **Task details**: bucket, progress, priority, start and due date, assigned person, labels, notes, checklist.
+- **My Day**: pick tasks from any plan to work on today; the list clears itself every night.
+- **Search all plans** from the Overview.
+- **Undo**: deleting tasks or a plan shows an Undo button for 10 seconds (or press Ctrl + Z).
+- **Reminders**: the installed app shows the number of overdue and due-today tasks on its icon, and a summary when you open it each day.
 - **Links**: attach links (assignment brief, Google Drive, Teams) to a task and open them in one click.
 - **Custom order**: drag cards up and down inside a column (Sort: Custom).
 - **Archive plans**: hide finished classes or projects without deleting them; restore any time.

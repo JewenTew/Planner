@@ -297,6 +297,20 @@ table.grid { width: 100%; border-collapse: collapse; min-width: 820px; }
 kbd { font-family: var(--font-body); font-weight: 800; font-size: 12px; background: var(--surface-2); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 1px 7px; white-space: nowrap; }
 .sc-list { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; align-items: center; }
 @media (max-width: 760px) { .desk-only { display: none !important; } }
+.toast.undo { display: flex; align-items: center; gap: 14px; padding: 8px 10px 8px 18px; }
+.toast.undo button { border: 0; border-radius: 999px; padding: 4px 14px; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--accent-ink); }
+.day-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 6px; border-top: 1px solid var(--line); cursor: pointer; border-radius: 8px; }
+.day-row:first-of-type { border-top: 0; }
+.day-row:hover { background: var(--surface-2); }
+.day-row .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.day-row.is-done .t { text-decoration: line-through; color: var(--muted); }
+.day-row .p { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; font-weight: 600; flex-wrap: wrap; }
+.day-row .slot { display: flex; justify-content: flex-end; min-width: 0; }
+.hub-search { width: 260px; max-width: 100%; }
+.myday-h1 svg { width: 22px; height: 22px; color: var(--warn); }
+.btn.sun.on { background: var(--warn-soft); border-color: transparent; color: var(--warn); }
+.remind-group { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; font-weight: 800; color: var(--muted); padding: 8px 0 2px; }
+.remind-group.overdue { color: var(--danger); }
 .unsched { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
 .unsched h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 800; }
 .unsched .list { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -457,7 +471,13 @@ const I18N = {
     linksH: 'Links', linkUrlPh: 'Paste a link, e.g. https://drive.google.com/...', linkNamePh: 'Name (optional)', badLink: 'That does not look like a web link. It should start with https://', deleteLink: 'Remove link', linksN: n => `${n} link${n === 1 ? '' : 's'}`,
     archive: 'Archive plan', unarchive: 'Restore plan', archivedN: n => `Archived (${n})`, archivedNote: 'This plan is archived. It is hidden from the sidebar list and the overview.', archivedToast: 'Plan archived. Find it under Archived in the sidebar.', unarchivedToast: 'Plan restored',
     sortBy: 'Sort', sortOpts: { due: 'By due date', manual: 'Custom (drag)' }, sortSwitched: 'Switched to custom order. Drag cards to arrange them.',
-    shortcuts: 'Keyboard shortcuts', scList: [['N', 'New task (on Overview: new plan)'], ['/', 'Search'], ['1  2  3  4', 'Board, Grid, Schedule, Charts'], ['Esc', 'Close a window, or leave Select'], ['?', 'Show this list']],
+    shortcuts: 'Keyboard shortcuts', scList: [['N', 'New task (on Overview: new plan)'], ['/', 'Search'], ['1  2  3  4', 'Board, Grid, Schedule, Charts'], ['Esc', 'Close a window, or leave Select'], ['Ctrl + Z', 'Undo a delete'], ['?', 'Show this list']],
+    undo: 'Undo', restored: 'Restored',
+    myDay: 'My Day', myDaySub: 'Clears itself every night', addMyDay: 'Add to My Day', inMyDay: 'In My Day', removeMyDay: 'Remove from My Day', addShort: 'Add',
+    myDayEmpty: 'Nothing picked for today yet. Add tasks from the suggestions below, or open any task and click Add to My Day.',
+    suggestions: 'Suggestions', suggestionsSub: 'Late, due today or due tomorrow', myDayDone: (a, b) => `${a} of ${b} done`,
+    searchAll: 'Search all plans', resultsN: n => `${n} result${n === 1 ? '' : 's'}`, noResults: 'No tasks match. Try another word.', archivedTag: 'archived',
+    remindH: 'Today', remindSub: (o, d) => `${o} overdue, ${d} due today`, gotIt: 'Got it', enableNotif: 'Turn on desktop notifications', notifOn: 'Desktop notifications are on', notifOff: 'Notifications are blocked. You can allow them in the browser settings.',
     select: 'Select', selCancel: 'Cancel', selN: n => `${n} selected`, selAll: 'Select all', selClear: 'Clear', selHint: 'Click tasks to select them', markDoneSel: 'Mark complete', deleteSelQ: n => `Delete ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`, deletedN: n => `${n} task${n === 1 ? '' : 's'} deleted`, doneN: n => `${n} task${n === 1 ? '' : 's'} marked complete`, moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
     dueOverdue: (d, n) => `${d} · ${n} day${n === 1 ? '' : 's'} late`, dueToday: 'Due today', dueTomorrow: 'Due tomorrow',
     markDone: 'Mark complete', markUndone: 'Mark not complete',
@@ -504,7 +524,13 @@ const I18N = {
     linksH: '链接', linkUrlPh: '贴上链接，例如 https://drive.google.com/...', linkNamePh: '名称（可选）', badLink: '这看起来不是网址，应以 https:// 开头。', deleteLink: '删除链接', linksN: n => `${n} 个链接`,
     archive: '归档计划', unarchive: '取消归档', archivedN: n => `已归档（${n}）`, archivedNote: '这个计划已归档，不会显示在左边栏的计划列表和概览里。', archivedToast: '计划已归档，可以在左边栏的“已归档”里找到。', unarchivedToast: '计划已恢复',
     sortBy: '排序', sortOpts: { due: '按截止日期', manual: '自定义（拖动）' }, sortSwitched: '已切换为自定义排序，可以拖动卡片调整顺序。',
-    shortcuts: '键盘快捷键', scList: [['N', '新建任务（在概览页：新建计划）'], ['/', '搜索'], ['1  2  3  4', '看板、表格、日程、图表'], ['Esc', '关闭窗口，或退出多选'], ['?', '显示这个列表']],
+    shortcuts: '键盘快捷键', scList: [['N', '新建任务（在概览页：新建计划）'], ['/', '搜索'], ['1  2  3  4', '看板、表格、日程、图表'], ['Esc', '关闭窗口，或退出多选'], ['Ctrl + Z', '撤销删除'], ['?', '显示这个列表']],
+    undo: '撤销', restored: '已恢复',
+    myDay: '我的一天', myDaySub: '每天晚上自动清空', addMyDay: '加入我的一天', inMyDay: '已在我的一天', removeMyDay: '移出我的一天', addShort: '加入',
+    myDayEmpty: '今天还没有挑任务。可以从下面的建议加入，或打开任意任务点“加入我的一天”。',
+    suggestions: '建议', suggestionsSub: '已逾期、今天或明天到期', myDayDone: (a, b) => `已完成 ${a} / ${b}`,
+    searchAll: '搜索所有计划', resultsN: n => `${n} 个结果`, noResults: '没有符合的任务，换个关键词试试。', archivedTag: '已归档',
+    remindH: '今天要注意', remindSub: (o, d) => `${o} 项逾期，${d} 项今天到期`, gotIt: '知道了', enableNotif: '开启桌面通知', notifOn: '桌面通知已开启', notifOff: '通知被浏览器阻止了，可以在浏览器设置里允许。',
     select: '多选', selCancel: '取消', selN: n => `已选 ${n} 项`, selAll: '全选', selClear: '清空', selHint: '点任务即可选择', markDoneSel: '标记完成', deleteSelQ: n => `删除这 ${n} 项任务？此操作无法撤销。`, deletedN: n => `已删除 ${n} 项任务`, doneN: n => `${n} 项任务已标记完成`, moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
     dueOverdue: (d, n) => `${d} · 逾期 ${n} 天`, dueToday: '今天到期', dueTomorrow: '明天到期',
     markDone: '标记为已完成', markUndone: '标记为未完成',
@@ -655,6 +681,113 @@ const hostOf = url => { try { return new URL(url).hostname.replace(/^www\./, '')
 /* ---------- store ---------- */
 let db = null;
 const queues = {};
+
+/* ---------- undo for deletions ---------- */
+let undoState = null;
+function clearUndo() { if (!undoState) return; clearTimeout(undoState.timer); undoState.el.remove(); undoState = null; }
+function deleteWithUndo(planIds, taskIds, msg) {
+  const snap = { plans: {}, tasks: {} };
+  planIds.forEach(id => { if (state.plans[id]) snap.plans[id] = clone(state.plans[id]); });
+  taskIds.forEach(id => { if (state.tasks[id]) snap.tasks[id] = clone(state.tasks[id]); });
+  Object.keys(snap.tasks).forEach(id => write('tasks', id, null, true));
+  Object.keys(snap.plans).forEach(id => write('plans', id, null, true));
+  render();
+  clearUndo();
+  const el = document.createElement('div');
+  el.className = 'toast undo'; el.setAttribute('role', 'status');
+  el.innerHTML = `<span>${esc(msg)}</span><button data-act="undo">${esc(T().undo)}</button>`;
+  document.body.appendChild(el);
+  undoState = { snap, el, timer: setTimeout(clearUndo, 10000) };
+}
+function undoDelete() {
+  if (!undoState) return;
+  const snap = undoState.snap;
+  clearUndo();
+  Object.entries(snap.plans).forEach(([id, p]) => write('plans', id, p, true));
+  Object.entries(snap.tasks).forEach(([id, t]) => write('tasks', id, t, true));
+  render();
+  toast(T().restored);
+}
+
+/* ---------- app badge and daily reminder ---------- */
+let lastBadge = -1, remindedThisLoad = false;
+const REMIND_KEY = 'planner-reminded';
+const dueNow = () => { const td = today(); return allTasks().filter(t => t.progress !== 'done' && t.due && t.due <= td); };
+function updateBadge() {
+  if (window.claude || !('setAppBadge' in navigator)) return;
+  if (state.mode === 'signin' || !state.plansReady || !state.tasksReady) return;
+  const n = dueNow().length;
+  if (n === lastBadge) return;
+  lastBadge = n;
+  try { (n ? navigator.setAppBadge(n) : navigator.clearAppBadge()).catch(() => {}); } catch (e) {}
+}
+function maybeRemind() {
+  if (remindedThisLoad || state.mode === 'signin' || !state.plansReady || !state.tasksReady) return;
+  const td = today();
+  if (new Date().getHours() < 7) return;
+  let last = null; try { last = localStorage.getItem(REMIND_KEY); } catch (e) {}
+  if (last === td) { remindedThisLoad = true; return; }
+  const list = dueNow();
+  if (!list.length || $('#dialog-root').firstChild) return;
+  remindedThisLoad = true;
+  try { localStorage.setItem(REMIND_KEY, td); } catch (e) {}
+  const L = T(), od = list.filter(t => t.due < td).length, dt = list.length - od;
+  if (document.visibilityState === 'hidden' && !window.claude && 'Notification' in window && Notification.permission === 'granted') {
+    try { const n = new Notification('Planner', { body: L.remindSub(od, dt), icon: 'icons/icon-192.png', tag: 'planner-' + td }); n.onclick = () => { window.focus(); n.close(); }; } catch (e) {}
+  }
+  openReminder(list);
+}
+function openReminder(list) {
+  const L = T(), td = today();
+  const od = list.filter(t => t.due < td).sort(cmpTasks), dt = list.filter(t => t.due === td).sort(cmpTasks);
+  const canAsk = !window.claude && 'Notification' in window && Notification.permission === 'default';
+  openTaskId = null; openPlanSettingsId = null;
+  $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.remindH)}">
+    <div class="sheet-head"><span>${esc(L.remindH)} · ${esc(fmtDate(td))}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
+    <h2 style="margin:0;font-family:var(--font-display)">${esc(L.remindSub(od.length, dt.length))}</h2>
+    <div>
+      ${od.length ? `<div class="remind-group overdue">${esc(L.dueGroups.overdue)}</div>${od.map(t => dayRowHTML(t, null)).join('')}` : ''}
+      ${dt.length ? `<div class="remind-group">${esc(L.dueGroups.today)}</div>${dt.map(t => dayRowHTML(t, null)).join('')}` : ''}
+    </div>
+    <div class="row" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" data-act="close">${esc(L.gotIt)}</button>${canAsk ? `<button class="btn" data-act="notif-on">${esc(L.enableNotif)}</button>` : ''}</div>
+  </div></div>`;
+}
+
+/* ---------- My Day and search rows ---------- */
+let hubQ = '';
+// mode: 'add' shows an Add button, 'remove' a remove button, null nothing
+function dayRowHTML(t, mode) {
+  const L = T(), RO = state.readonly, pl = state.plans[t.planId];
+  const bucket = pl ? (pl.buckets.find(b => b.id === t.bucketId) || pl.buckets[0] || {}).name : '';
+  return `<div class="day-row ${t.progress === 'done' ? 'is-done' : ''}" data-act="open-task" data-id="${t.id}" tabindex="0">
+    <button class="check ${t.progress === 'done' ? 'on' : ''}" data-act="toggle-done" data-id="${t.id}" aria-label="${esc(t.progress === 'done' ? L.markUndone : L.markDone)}" ${RO ? 'disabled' : ''}>${ICON_CHECK}</button>
+    <div style="min-width:0"><div class="t">${esc(t.title)}</div><div class="p">${pl ? `<span class="dot bg-${esc(pl.color)}" style="width:8px;height:8px"></span>${esc(pl.name)}${bucket ? ' · ' + esc(bName(bucket)) : ''}${pl.archived ? ' · ' + esc(L.archivedTag) : ''}` : ''}${t.assignee ? ' · ' + esc(t.assignee) : ''}</div></div>
+    <div class="slot">${dueChip(t)}</div>
+    <div class="slot">${RO || !mode ? '' : mode === 'add' ? `<button class="btn mini" data-act="myday-add" data-id="${t.id}">+ ${esc(L.addShort)}</button>` : `<button class="icon-btn" data-act="myday-remove" data-id="${t.id}" aria-label="${esc(L.removeMyDay)}" title="${esc(L.removeMyDay)}">${ICON_X}</button>`}</div>
+  </div>`;
+}
+function myDayHTML() {
+  const L = T(), td = today(), RO = state.readonly;
+  const picked = allTasks().filter(t => t.myDay === td).sort(cmpTasks);
+  const done = picked.filter(t => t.progress === 'done').length;
+  const sugg = allTasks().filter(t => t.myDay !== td && t.progress !== 'done' && t.due && t.due <= addDays(td, 1)).sort(cmpTasks);
+  return `<div class="head"><h1 class="myday-h1">${ICON_SUN}${esc(L.myDay)}</h1><span class="sub">${esc(fmtDate(td))} ${esc(weekday(td))} · ${esc(L.myDaySub)}</span></div>
+    <section class="panel">
+      ${picked.length ? `<h2>${esc(L.myDay)} <small>${esc(L.myDayDone(done, picked.length))}</small></h2>${stackBar(picked, picked.length)}<div style="margin-top:8px">${picked.map(t => dayRowHTML(t, 'remove')).join('')}</div>` : `<p class="faint" style="margin:0;padding:12px 0">${esc(L.myDayEmpty)}</p>`}
+    </section>
+    ${sugg.length && !RO ? `<section class="panel"><h2>${esc(L.suggestions)} <small>${esc(L.suggestionsSub)}</small></h2>${sugg.map(t => dayRowHTML(t, 'add')).join('')}</section>` : ''}`;
+}
+function hubHeadHTML() {
+  const L = T(), td = today();
+  return `<div class="head"><h1>${esc(L.overview)}</h1><span class="sub">${esc(L.todayIs(`${fmtDate(td)} ${weekday(td)}`))}</span><span class="spacer"></span><input class="input hub-search" id="hub-q" type="search" placeholder="${esc(L.searchAll)}" value="${esc(hubQ)}" autocomplete="off" title="/"></div>`;
+}
+function searchResultsHTML() {
+  const L = T(), q = hubQ.trim().toLowerCase();
+  const hits = Object.values(state.tasks).filter(t => state.plans[t.planId]).filter(t =>
+    [t.title, t.notes, t.assignee, state.plans[t.planId].name, ...(t.checklist || []).map(c => c.text), ...(t.links || []).map(l => (l.title || '') + ' ' + l.url)].join(' ').toLowerCase().includes(q)
+  ).sort(cmpTasks).slice(0, 200);
+  return `<section class="panel"><h2>${esc(L.resultsN(hits.length))}</h2>${hits.length ? hits.map(t => dayRowHTML(t, null)).join('') : `<p class="faint" style="margin:0">${esc(L.noResults)}</p>`}</section>`;
+}
 
 function toast(msg) {
   const el = document.createElement('div');
@@ -910,11 +1043,13 @@ function restoreFocus(f) {
 function render() {
   document.documentElement.lang = ui.lang === 'zh' ? 'zh-CN' : 'en';
   document.documentElement.setAttribute('data-theme', ui.theme === 'dark' ? 'dark' : 'light');
-  if (ui.planId !== 'hub' && state.plansReady && !state.plans[ui.planId]) ui.planId = 'hub';
+  if (ui.planId !== 'hub' && ui.planId !== 'myday' && state.plansReady && !state.plans[ui.planId]) ui.planId = 'hub';
   const f = captureFocus();
   renderRail();
   renderMain();
   restoreFocus(f);
+  updateBadge();
+  maybeRemind();
 }
 
 function renderRail() {
@@ -934,6 +1069,7 @@ function renderRail() {
     <div>
       <nav class="nav">
         <button class="nav-item ${ui.planId === 'hub' ? 'active' : ''}" data-act="goto" data-plan="hub"><span class="dot hub"></span><span class="name">${esc(L.overview)}</span>${hubOverdue ? `<span class="badge">${hubOverdue}</span>` : ''}</button>
+        ${state.mode !== 'signin' ? (() => { const n = allTasks().filter(t => t.myDay === today() && t.progress !== 'done').length; return `<button class="nav-item ${ui.planId === 'myday' ? 'active' : ''}" data-act="goto" data-plan="myday"><span style="display:grid;place-items:center;width:10px;color:var(--warn)">${ICON_SUN.replace('<svg', '<svg width="14" height="14"')}</span><span class="name">${esc(L.myDay)}</span>${n ? `<span class="count" style="font-size:12px;font-weight:800;color:var(--muted)">${n}</span>` : ''}</button>`; })() : ''}
       </nav>
     </div>
     <div>
@@ -965,7 +1101,8 @@ function renderMain() {
   const main = $('#main'), L = T();
   if (!state.plansReady || !state.tasksReady) { main.innerHTML = `<div class="loading">${esc(L.loading)}</div>`; return; }
   if (state.mode === 'signin') { main.classList.remove('selecting'); main.innerHTML = signinHTML(); return; }
-  if (ui.planId === 'hub') { main.classList.remove('selecting'); main.innerHTML = migrateBannerHTML() + hubHTML(); return; }
+  if (ui.planId === 'myday') { main.classList.remove('selecting'); main.innerHTML = myDayHTML(); return; }
+  if (ui.planId === 'hub') { main.classList.remove('selecting'); main.innerHTML = migrateBannerHTML() + (hubQ.trim() ? hubHeadHTML() + searchResultsHTML() : hubHTML()); return; }
   const plan = state.plans[ui.planId];
   const RO = state.readonly;
   main.innerHTML = `
@@ -1036,7 +1173,7 @@ function cardHTML(t) {
   const clDone = cl.filter(c => c.done).length;
   const labels = (t.labels || []).filter(k => LABEL_KEYS.includes(k));
   const nLinks = (t.links || []).length;
-  const showMeta = t.due || t.repeat || nLinks || cl.length || t.assignee || t.priority === 'urgent' || t.priority === 'important' || t.progress === 'doing';
+  const showMeta = t.due || t.repeat || nLinks || t.myDay === today() || cl.length || t.assignee || t.priority === 'urgent' || t.priority === 'important' || t.progress === 'doing';
   const picked = sel.on && sel.ids.has(t.id);
   return `<article class="card ${t.progress === 'done' ? 'is-done' : ''} ${picked ? 'selected' : ''}" draggable="${!RO && !sel.on}" data-act="${sel.on ? 'sel-card' : 'open-task'}" data-id="${t.id}" tabindex="0" ${sel.on ? `aria-pressed="${picked}"` : ''}>
     ${labels.length ? `<div class="card-tags">${labels.map(k => `<span class="tag lbl-${k}">${esc(labelName(plan, k))}</span>`).join('')}</div>` : ''}
@@ -1046,6 +1183,7 @@ function cardHTML(t) {
     </div>
     ${showMeta ? `<div class="card-meta">
       ${dueChip(t)}
+      ${t.myDay === today() && t.progress !== 'done' ? `<span class="chip today" title="${esc(L.inMyDay)}">${ICON_SUN.replace('<svg', '<svg width="12" height="12"')}</span>` : ''}
       ${t.repeat ? `<span class="chip" title="${esc(L.repeat)}: ${esc(L.repeatOpts[t.repeat] || '')}">${ICON_REPEAT}</span>` : ''}
       ${t.priority === 'urgent' || t.priority === 'important' ? `<span class="chip pri-${t.priority}">${esc(L.priority[t.priority])}</span>` : ''}
       ${t.progress === 'doing' ? `<span class="chip doing">${esc(L.progress.doing)}</span>` : ''}
@@ -1271,7 +1409,7 @@ function hubHTML() {
     ['next', L.next14, soon.filter(t => t.due > eow)]
   ].filter(g => g[2].length);
   return `
-    <div class="head"><h1>${esc(L.overview)}</h1><span class="sub">${esc(L.todayIs(dayLine))}</span></div>
+    ${hubHeadHTML()}
     <div class="stats">
       <button class="stat danger" data-act="hub-filter" data-due="overdue"><span class="k">${esc(L.statOverdue)}</span><span class="v">${overdue.length}</span></button>
       <button class="stat warn" data-act="hub-filter" data-due="today"><span class="k">${esc(L.statToday)}</span><span class="v">${dueToday.length}</span></button>
@@ -1339,7 +1477,7 @@ function openTask(id, focusTitle) {
   const buckets = Object.fromEntries(plan.buckets.map(b => [b.id, bName(b.name)]));
   const bucketCur = buckets[t.bucketId] ? t.bucketId : plan.buckets[0]?.id;
   $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.taskDetails)}">
-    <div class="sheet-head"><span class="dot bg-${esc(plan.color)}"></span><span>${esc(plan.name)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
+    <div class="sheet-head"><span class="dot bg-${esc(plan.color)}"></span><span>${esc(plan.name)}</span><span class="grow"></span>${!RO ? `<button class="btn mini sun ${t.myDay === today() ? 'on' : ''}" data-act="myday-toggle" data-id="${t.id}">${ICON_SUN.replace('<svg', '<svg width="12" height="12"')}${esc(t.myDay === today() ? L.inMyDay : L.addMyDay)}</button>` : ''}<button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
     <input class="title-input" id="t-title" value="${esc(t.title)}" maxlength="200" ${dis} aria-label="${esc(L.taskName)}">
     <div class="fields">
       <label class="field"><span>${esc(L.col.bucket)}</span>${sel('t-bucket', buckets, bucketCur)}</label>
@@ -1463,7 +1601,7 @@ function parseBackup(text) {
       repeat: REPEATS.includes(t.repeat) ? t.repeat : '', repeatSpawned: !!t.repeatSpawned,
       links: Array.isArray(t.links) ? t.links.slice(0, 50).map(l => l && normalizeUrl(l.url) ? { id: str(l.id, 60) || uid(), url: normalizeUrl(l.url), title: str(l.title, 80) } : null).filter(Boolean) : [],
       ...(typeof t.order === 'number' && isFinite(t.order) ? { order: t.order } : {}),
-      createdAt: +t.createdAt || Date.now(), updatedAt: Date.now(), completedAt: +t.completedAt || null
+      myDay: date(t.myDay), createdAt: +t.createdAt || Date.now(), updatedAt: Date.now(), completedAt: +t.completedAt || null
     };
   }
   return { plans, tasks };
@@ -1531,6 +1669,21 @@ document.addEventListener('click', e => {
     case 'lang': ui.lang = el.dataset.lang; savePrefs(); render(); break;
     case 'theme': ui.theme = el.dataset.themeVal; savePrefs(); render(); break;
     case 'backup': closeBackup(); openBackup(); break;
+    case 'undo': undoDelete(); break;
+    case 'myday-add': if (!RO) patchTask(el.dataset.id, { myDay: today() }); break;
+    case 'myday-remove': if (!RO) patchTask(el.dataset.id, { myDay: '' }); break;
+    case 'myday-toggle': {
+      if (RO) break;
+      const t = state.tasks[el.dataset.id]; if (!t) break;
+      const on = t.myDay !== today();
+      patchTask(t.id, { myDay: on ? today() : '' });
+      el.classList.toggle('on', on);
+      el.innerHTML = ICON_SUN.replace('<svg', '<svg width="12" height="12"') + esc(on ? L.inMyDay : L.addMyDay);
+      break;
+    }
+    case 'notif-on':
+      try { Notification.requestPermission().then(p => { toast(p === 'granted' ? L.notifOn : L.notifOff); el.remove(); }); } catch (e) { toast(L.notifOff); }
+      break;
     case 'shortcuts': openShortcuts(); break;
     case 'toggle-archived': ui.showArchived = !ui.showArchived; savePrefs(); render(); break;
     case 'archive': if (!RO) { patchPlan(el.dataset.plan, { archived: true }); closeDialog(); ui.planId = 'hub'; savePrefs(); render(); toast(L.archivedToast); } break;
@@ -1577,8 +1730,7 @@ document.addEventListener('click', e => {
     case 'sel-delete': {
       if (RO) break;
       const ids = [...sel.ids].filter(id => state.tasks[id]);
-      ids.forEach(id => write('tasks', id, null, true));
-      exitSelect(); render(); toast(L.deletedN(ids.length)); break;
+      exitSelect(); deleteWithUndo([], ids, L.deletedN(ids.length)); break;
     }
     case 'sel-done': {
       if (RO) break;
@@ -1639,7 +1791,7 @@ document.addEventListener('click', e => {
     }
     case 'delete-task-ask': $('#t-foot').innerHTML = confirmHTML(L.deleteTaskQ, 'delete-task-cancel', 'delete-task'); break;
     case 'delete-task-cancel': { const t = state.tasks[openTaskId]; if (t) $('#t-foot').innerHTML = taskFootHTML(t); break; }
-    case 'delete-task': { const id = openTaskId; openTaskId = null; $('#dialog-root').innerHTML = ''; write('tasks', id, null); toast(L.taskDeleted); break; }
+    case 'delete-task': { const id = openTaskId; openTaskId = null; $('#dialog-root').innerHTML = ''; deleteWithUndo([], [id], L.taskDeleted); break; }
     case 'plan-color': patchPlan(openPlanSettingsId, { color: el.dataset.color }); openPlanSettings(openPlanSettingsId); break;
     case 'bucket-del': {
       const p = state.plans[openPlanSettingsId]; if (!p) break;
@@ -1653,10 +1805,8 @@ document.addEventListener('click', e => {
     case 'plan-delete': {
       const id = openPlanSettingsId;
       closeDialog();
-      tasksOf(id).forEach(t => write('tasks', t.id, null));
-      write('plans', id, null);
-      ui.planId = 'hub'; savePrefs(); render();
-      toast(L.planDeleted);
+      ui.planId = 'hub'; savePrefs();
+      deleteWithUndo([id], tasksOf(id).map(t => t.id), L.planDeleted);
       break;
     }
   }
@@ -1673,6 +1823,8 @@ document.addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && $('#dialog-root').firstChild) { closeDialog(); return; }
   if (e.key === 'Escape' && sel.on) { exitSelect(); render(); return; }
+  if (e.key === 'Escape' && e.target.id === 'hub-q' && hubQ) { hubQ = ''; render(); return; }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z') && undoState && !(e.target.closest && e.target.closest('input, textarea'))) { e.preventDefault(); undoDelete(); return; }
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-act="sel-card"]')) { e.preventDefault(); e.target.click(); return; }
   if (e.key === 'Enter' && e.target.matches('[data-act="open-task"]') && !e.target.matches('button')) { openTask(e.target.dataset.id); return; }
   if (e.key === 'Enter' && e.target.classList.contains('qa')) {
@@ -1691,7 +1843,7 @@ document.addEventListener('keydown', e => {
   if ($('#dialog-root').firstChild || state.mode === 'signin' || !state.plansReady) return;
   const k = e.key, inPlan = ui.planId !== 'hub' && state.plans[ui.planId];
   if (k === '?') { e.preventDefault(); openShortcuts(); }
-  else if (k === '/') { const q = $('#f-q'); if (q) { e.preventDefault(); q.focus(); q.select(); } }
+  else if (k === '/') { const q = $('#f-q') || $('#hub-q'); if (q) { e.preventDefault(); q.focus(); q.select(); } }
   else if (k === 'n' || k === 'N') {
     if (state.readonly) return;
     e.preventDefault();
@@ -1707,6 +1859,12 @@ document.addEventListener('keydown', e => {
 
 let qTimer = null;
 document.addEventListener('input', e => {
+  if (e.target.id === 'hub-q') {
+    clearTimeout(qTimer);
+    const v = e.target.value;
+    qTimer = setTimeout(() => { hubQ = v; render(); }, 180);
+    return;
+  }
   if (e.target.id === 'f-q') {
     clearTimeout(qTimer);
     const v = e.target.value;
@@ -1889,7 +2047,8 @@ document.addEventListener('drop', e => {
 
 /* refresh "today" math when the date rolls over */
 let lastDay = today();
-setInterval(() => { if (today() !== lastDay) { lastDay = today(); render(); } }, 60000);
+setInterval(() => { if (today() !== lastDay) { lastDay = today(); remindedThisLoad = false; render(); } else maybeRemind(); }, 60000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { lastBadge = -1; render(); } });
 
 render();
 initStore();
