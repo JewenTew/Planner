@@ -330,6 +330,27 @@ table.grades { min-width: 760px; }
 .grades .tlink:hover { text-decoration: underline; }
 .grade-add { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .grade-add .input { flex: 1 1 220px; min-width: 0; }
+.tt-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+.tt { display: grid; min-width: 680px; }
+.tt-dow { padding: 8px; font-size: 12px; font-weight: 800; color: var(--muted); background: var(--surface-2); border-bottom: 1px solid var(--line); text-align: center; }
+.tt-dow.is-today { color: var(--accent-ink); background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.tt-gutter { position: relative; border-right: 1px solid var(--line); }
+.tt-gutter span { position: absolute; right: 6px; transform: translateY(-50%); font-size: 11px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tt-col { position: relative; border-right: 1px solid var(--line); background-image: repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px 60px); }
+.tt-col:last-child { border-right: 0; }
+.tt-col.is-today { background-color: color-mix(in srgb, var(--accent-soft) 45%, transparent); }
+.tt-block { position: absolute; border: 0; border-left: 4px solid var(--lc); border-radius: 8px; padding: 4px 6px; background: color-mix(in srgb, var(--lc) 20%, var(--surface-solid)); color: var(--ink); text-align: left; overflow: hidden; font-size: 12px; line-height: 1.3; display: flex; flex-direction: column; gap: 1px; box-shadow: var(--shadow); }
+.tt-block:hover { filter: brightness(1.03); outline: 2px solid color-mix(in srgb, var(--lc) 55%, transparent); }
+.tt-block b { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-block span { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.tt-now { position: absolute; left: 0; right: 0; height: 2px; background: var(--danger); z-index: 2; }
+.tt-now::before { content: ""; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
+.class-row { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 6px; border-top: 1px solid var(--line); cursor: pointer; border-radius: 8px; border-left: 4px solid var(--lc); }
+.class-row:first-of-type { border-top: 0; }
+.class-row:hover { background: var(--surface-2); }
+.class-row .tm { font-weight: 800; font-variant-numeric: tabular-nums; font-size: 13px; }
+.class-row .p { font-size: 12px; color: var(--muted); font-weight: 600; }
+.class-row.past { opacity: .55; }
 .unsched { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
 .unsched h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 800; }
 .unsched .list { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -508,6 +529,11 @@ const I18N = {
     addGradeItem: 'Add an existing task…', newGradePh: 'New graded item, e.g. Midterm exam', removeFromGrades: 'Remove from grades',
     gradesEmptyH: 'No graded work yet', gradesEmptyP: 'Add assignments, quizzes and exams with their weight. When a score comes back, fill it in to see your current grade.',
     gradeShort: g => `Grade ${g}%`, weightL: 'Weight %', scoreL: 'Score', outOfL: 'Out of',
+    timetable: 'Timetable', timetableSub: 'Your weekly classes', addClass: 'Add class', newClass: 'New class',
+    ttEmptyH: 'No classes yet', ttEmptyP: 'Add your weekly classes here, or import a timetable file under Backup & restore.',
+    classDetails: 'Class details', cTitle: 'Class name', cCode: 'Course code', cType: 'Type', cDay: 'Day', cStart: 'Starts', cEnd: 'Ends', cRoom: 'Room', cLecturer: 'Lecturer', cPlan: 'Linked plan', cNoPlan: 'None', openPlan: 'Open plan',
+    deleteClass: 'Delete class', classDeleted: 'Class deleted', todayClasses: "Today's classes", noClassesToday: 'No classes today.', classesN: n => `${n} class${n === 1 ? '' : 'es'}`,
+    typeOpts: ['Lecture', 'Tutorial', 'Lab', 'Practical'], dayNames: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     select: 'Select', selCancel: 'Cancel', selN: n => `${n} selected`, selAll: 'Select all', selClear: 'Clear', selHint: 'Click tasks to select them', markDoneSel: 'Mark complete', deleteSelQ: n => `Delete ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`, deletedN: n => `${n} task${n === 1 ? '' : 's'} deleted`, doneN: n => `${n} task${n === 1 ? '' : 's'} marked complete`, moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
     dueOverdue: (d, n) => `${d} · ${n} day${n === 1 ? '' : 's'} late`, dueToday: 'Due today', dueTomorrow: 'Due tomorrow',
     markDone: 'Mark complete', markUndone: 'Mark not complete',
@@ -572,6 +598,11 @@ const I18N = {
     addGradeItem: '把现有任务加进来…', newGradePh: '新评分项，例如：期中考试', removeFromGrades: '从成绩表移除',
     gradesEmptyH: '还没有评分项', gradesEmptyP: '把作业、小测和考试加进来并填上占比。拿到分数后填进去，就能看到目前的成绩。',
     gradeShort: g => `成绩 ${g}%`, weightL: '占比 %', scoreL: '得分', outOfL: '满分',
+    timetable: '课程表', timetableSub: '每周固定的课程', addClass: '添加课程', newClass: '新课程',
+    ttEmptyH: '还没有课程', ttEmptyP: '把每周的课加进来，或在“备份与还原”里导入课程表文件。',
+    classDetails: '课程详情', cTitle: '课程名称', cCode: '课程代码', cType: '类型', cDay: '星期', cStart: '开始', cEnd: '结束', cRoom: '教室', cLecturer: '讲师', cPlan: '关联计划', cNoPlan: '无', openPlan: '打开计划',
+    deleteClass: '删除课程', classDeleted: '课程已删除', todayClasses: '今天的课', noClassesToday: '今天没有课。', classesN: n => `${n} 节课`,
+    typeOpts: ['讲课', '辅导', '实验', '实践'], dayNames: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
     select: '多选', selCancel: '取消', selN: n => `已选 ${n} 项`, selAll: '全选', selClear: '清空', selHint: '点任务即可选择', markDoneSel: '标记完成', deleteSelQ: n => `删除这 ${n} 项任务？此操作无法撤销。`, deletedN: n => `已删除 ${n} 项任务`, doneN: n => `${n} 项任务已标记完成`, moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
     dueOverdue: (d, n) => `${d} · 逾期 ${n} 天`, dueToday: '今天到期', dueTomorrow: '明天到期',
     markDone: '标记为已完成', markUndone: '标记为未完成',
@@ -609,6 +640,7 @@ const ICON_USER = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" s
 const ICON_LINK = '<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5.8 8.2a2.6 2.6 0 0 0 3.7 0l2-2a2.6 2.6 0 0 0-3.7-3.7l-.8.8M8.2 5.8a2.6 2.6 0 0 0-3.7 0l-2 2a2.6 2.6 0 0 0 3.7 3.7l.8-.8"/></svg>';
 const ICON_ARCHIVE = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="1.5" y="2" width="11" height="3" rx="1"/><path d="M2.5 5v6a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V5M5.5 7.5h3"/></svg>';
 const ICON_KEYS = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="1" y="3" width="12" height="8" rx="1.5"/><path d="M3.5 5.5h.01M6 5.5h.01M8.5 5.5h.01M11 5.5h.01M4 8.5h6"/></svg>';
+const ICON_TT = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="1.5" y="2" width="11" height="10.5" rx="1.5"/><path d="M1.5 5.2h11M5.2 5.2v7.3M8.8 5.2v7.3"/></svg>';
 const ICON_CHECK = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>';
 const ICON_CAL = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="2.5" width="9" height="8" rx="1.5"/><path d="M1.5 5h9M4 1.2v2.4M8 1.2v2.4"/></svg>';
 const ICON_LIST = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1.5 3l1 1 1.6-1.8M1.5 8l1 1 1.6-1.8M6 3.2h4.5M6 8.2h4.5"/></svg>';
@@ -630,7 +662,7 @@ const endOfWeek = s => { const d = parse(s); const dow = (d.getDay() + 6) % 7; d
 const diffDays = (a, b) => Math.round((parse(b) - parse(a)) / 86400000);
 
 /* ---------- state ---------- */
-const state = { plans: {}, tasks: {}, plansReady: false, tasksReady: false, mode: 'local', readonly: false };
+const state = { plans: {}, tasks: {}, classes: {}, plansReady: false, tasksReady: false, mode: 'local', readonly: false };
 const PREF_KEY = 'planner-prefs';
 const LOCAL_KEY = 'planner-data';
 let ui = { lang: 'en', theme: 'light', planId: 'hub', view: 'board', groupBy: 'bucket', filter: { q: '', due: 'all', pri: 'all', hideDone: false }, calMonth: today().slice(0, 7), hubCal: { mode: 'week', anchor: today() }, boardSort: 'due', showArchived: false, sort: { key: 'due', dir: 1 } };
@@ -726,8 +758,10 @@ const queues = {};
 /* ---------- undo for deletions ---------- */
 let undoState = null;
 function clearUndo() { if (!undoState) return; clearTimeout(undoState.timer); undoState.el.remove(); undoState = null; }
-function deleteWithUndo(planIds, taskIds, msg) {
-  const snap = { plans: {}, tasks: {} };
+function deleteWithUndo(planIds, taskIds, msg, classIds = []) {
+  const snap = { plans: {}, tasks: {}, classes: {} };
+  classIds.forEach(id => { if (state.classes[id]) snap.classes[id] = clone(state.classes[id]); });
+  Object.keys(snap.classes).forEach(id => write('classes', id, null, true));
   planIds.forEach(id => { if (state.plans[id]) snap.plans[id] = clone(state.plans[id]); });
   taskIds.forEach(id => { if (state.tasks[id]) snap.tasks[id] = clone(state.tasks[id]); });
   Object.keys(snap.tasks).forEach(id => write('tasks', id, null, true));
@@ -746,6 +780,7 @@ function undoDelete() {
   clearUndo();
   Object.entries(snap.plans).forEach(([id, p]) => write('plans', id, p, true));
   Object.entries(snap.tasks).forEach(([id, t]) => write('tasks', id, t, true));
+  Object.entries(snap.classes || {}).forEach(([id, c]) => write('classes', id, c, true));
   render();
   toast(T().restored);
 }
@@ -807,12 +842,115 @@ function dayRowHTML(t, mode) {
     <div class="slot">${RO || !mode ? '' : mode === 'add' ? `<button class="btn mini" data-act="myday-add" data-id="${t.id}">+ ${esc(L.addShort)}</button>` : `<button class="icon-btn" data-act="myday-remove" data-id="${t.id}" aria-label="${esc(L.removeMyDay)}" title="${esc(L.removeMyDay)}">${ICON_X}</button>`}</div>
   </div>`;
 }
+/* ---------- timetable ---------- */
+const validTime = v => typeof v === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(v);
+const toMin = v => { const [h, m] = v.split(':').map(Number); return h * 60 + m; };
+const fromMin = n => `${pad(Math.floor(n / 60) % 24)}:${pad(n % 60)}`;
+const todayDow = () => (new Date().getDay() + 6) % 7 + 1;
+const classesList = () => Object.values(state.classes || {}).filter(c => c && c.day >= 1 && c.day <= 7 && validTime(c.start) && validTime(c.end) && toMin(c.end) > toMin(c.start));
+const classColor = c => LABEL_KEYS.includes(c.color) ? c.color : 'c5';
+const classLine = c => [c.code, c.type, c.room].filter(Boolean).join(' · ');
+function layoutDay(list) {
+  list = list.slice().sort((a, b) => toMin(a.start) - toMin(b.start) || toMin(a.end) - toMin(b.end));
+  const out = []; let cluster = [], clusterEnd = -1, lanesEnd = [];
+  const flush = () => { cluster.forEach(x => { x.lanes = lanesEnd.length; }); cluster = []; lanesEnd = []; };
+  for (const c of list) {
+    const st = toMin(c.start), en = toMin(c.end);
+    if (cluster.length && st >= clusterEnd) { flush(); clusterEnd = -1; }
+    let lane = lanesEnd.findIndex(e => e <= st);
+    if (lane < 0) { lane = lanesEnd.length; lanesEnd.push(en); } else lanesEnd[lane] = en;
+    const item = { c, lane }; cluster.push(item); out.push(item);
+    clusterEnd = Math.max(clusterEnd, en);
+  }
+  flush();
+  return out;
+}
+function timetableHTML() {
+  const L = T(), RO = state.readonly;
+  const cls = classesList();
+  const head = `<div class="head"><h1 style="gap:10px">${ICON_TT.replace('width="14" height="14"', 'width="22" height="22"')}${esc(L.timetable)}</h1><span class="sub">${esc(L.timetableSub)}${cls.length ? ' · ' + esc(L.classesN(cls.length)) : ''}</span><span class="spacer"></span>${!RO ? `<button class="btn primary" data-act="class-new" title="N">${ICON_PLUS}${esc(L.addClass)}</button>` : ''}</div>`;
+  if (!cls.length) return head + `<div class="empty"><h2>${esc(L.ttEmptyH)}</h2><p>${esc(L.ttEmptyP)}</p>${!RO ? `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn primary" data-act="class-new">${ICON_PLUS}${esc(L.addClass)}</button><button class="btn" data-act="backup">${ICON_BACKUP}${esc(L.orImport)}</button></div>` : ''}</div>`;
+  const days = [1, 2, 3, 4, 5].concat([6, 7].filter(d => cls.some(c => c.day === d)));
+  const startH = Math.min(8, Math.floor(Math.min(...cls.map(c => toMin(c.start))) / 60));
+  const endH = Math.max(17, Math.ceil(Math.max(...cls.map(c => toMin(c.end))) / 60));
+  const H = (endH - startH) * 60, base = startH * 60, dow = todayDow();
+  const now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
+  const hours = []; for (let h = startH; h <= endH; h++) hours.push(h);
+  return head + `<div class="tt-wrap"><div class="tt" style="grid-template-columns:52px repeat(${days.length}, minmax(110px, 1fr))">
+    <div class="tt-dow"></div>
+    ${days.map(d => `<div class="tt-dow ${d === dow ? 'is-today' : ''}">${esc(WEEKDAYS[ui.lang][d - 1])}</div>`).join('')}
+    <div class="tt-gutter" style="height:${H}px">${hours.map(h => `<span style="top:${(h - startH) * 60}px">${h === startH ? '' : pad(h) + ':00'}</span>`).join('')}</div>
+    ${days.map(d => `<div class="tt-col ${d === dow ? 'is-today' : ''}" style="height:${H}px">
+      ${d === dow && nowM > base && nowM < base + H ? `<div class="tt-now" style="top:${nowM - base}px"></div>` : ''}
+      ${layoutDay(cls.filter(c => c.day === d)).map(({ c, lane, lanes }) => {
+        const st = toMin(c.start), en = toMin(c.end);
+        return `<button class="tt-block lbl-${classColor(c)}" data-act="class-open" data-id="${esc(c.id)}" style="top:${st - base + 1}px;height:${en - st - 2}px;left:calc(${(lane / lanes * 100).toFixed(3)}% + 3px);width:calc(${(100 / lanes).toFixed(3)}% - 6px)" title="${esc(c.title)} ${esc(c.start)} - ${esc(c.end)}">
+          <b>${esc(c.title)}</b><span>${esc(c.start)} - ${esc(c.end)}</span>${classLine(c) ? `<span>${esc(classLine(c))}</span>` : ''}${c.lecturer ? `<span>${esc(c.lecturer)}</span>` : ''}
+        </button>`;
+      }).join('')}
+    </div>`).join('')}
+  </div></div>`;
+}
+function todayClassesHTML() {
+  const L = T(), dow = todayDow();
+  const list = classesList().filter(c => c.day === dow).sort((a, b) => toMin(a.start) - toMin(b.start));
+  if (!classesList().length) return '';
+  const now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
+  return `<section class="panel"><h2>${esc(L.todayClasses)} <small>${esc(L.classesN(list.length))}</small></h2>
+    ${list.length ? list.map(c => `<div class="class-row lbl-${classColor(c)} ${toMin(c.end) <= nowM ? 'past' : ''}" data-act="class-open" data-id="${esc(c.id)}" tabindex="0">
+      <span class="tm">${esc(c.start)} - ${esc(c.end)}</span>
+      <div style="min-width:0"><div style="font-weight:700">${esc(c.title)}</div>${classLine(c) || c.lecturer ? `<div class="p">${esc([classLine(c), c.lecturer].filter(Boolean).join(' · '))}</div>` : ''}</div>
+      <span></span>
+    </div>`).join('') : `<p class="faint" style="margin:0">${esc(L.noClassesToday)}</p>`}
+  </section>`;
+}
+function createClass(fields) {
+  const id = uid();
+  const used = classesList().map(c => c.color);
+  write('classes', id, Object.assign({
+    title: T().newClass, code: '', type: '', day: Math.min(todayDow(), 5), start: '09:00', end: '10:00', room: '', lecturer: '',
+    color: LABEL_KEYS.find(c => !used.includes(c)) || 'c5', planId: '', createdAt: Date.now()
+  }, fields));
+  return id;
+}
+function patchClass(id, patch) {
+  const c = state.classes[id]; if (!c) return;
+  write('classes', id, Object.assign(clone(c), patch));
+}
+let openClassId = null;
+function openClass(id, focusTitle) {
+  const c = state.classes[id]; if (!c) return;
+  const L = T(), RO = state.readonly, dis = RO ? 'disabled' : '';
+  openTaskId = null; openPlanSettingsId = null; openClassId = id;
+  const plans = activePlans();
+  $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.classDetails)}">
+    <div class="sheet-head"><span class="dot bg-${classColor(c)}"></span><span>${esc(L.timetable)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
+    <input class="title-input" id="c-title" value="${esc(c.title)}" maxlength="120" ${dis} aria-label="${esc(L.cTitle)}">
+    <div class="fields">
+      <label class="field"><span>${esc(L.cDay)}</span><select class="input" id="c-day" ${dis}>${L.dayNames.map((n, i) => `<option value="${i + 1}" ${c.day === i + 1 ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label>
+      <label class="field"><span>${esc(L.cStart)}</span><input class="input" type="time" id="c-start" value="${esc(c.start)}" ${dis}></label>
+      <label class="field"><span>${esc(L.cEnd)}</span><input class="input" type="time" id="c-end" value="${esc(c.end)}" ${dis}></label>
+      <label class="field"><span>${esc(L.cCode)}</span><input class="input" id="c-code" value="${esc(c.code || '')}" maxlength="40" ${dis}></label>
+      <label class="field"><span>${esc(L.cType)}</span><input class="input" id="c-type" value="${esc(c.type || '')}" maxlength="40" list="class-types" ${dis}></label>
+      <label class="field"><span>${esc(L.cRoom)}</span><input class="input" id="c-room" value="${esc(c.room || '')}" maxlength="80" ${dis}></label>
+      <label class="field"><span>${esc(L.cLecturer)}</span><input class="input" id="c-lecturer" value="${esc(c.lecturer || '')}" maxlength="80" ${dis}></label>
+      <label class="field"><span>${esc(L.cPlan)}</span><select class="input" id="c-plan" ${dis}><option value="">${esc(L.cNoPlan)}</option>${plans.map(p => `<option value="${p.id}" ${c.planId === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>
+    </div>
+    <datalist id="class-types">${L.typeOpts.map(o => `<option value="${esc(o)}">`).join('')}</datalist>
+    <div><span class="section-label">${esc(L.color)}</span><div class="swatches">${LABEL_KEYS.map(k => `<button class="swatch bg-${k} ${classColor(c) === k ? 'on' : ''}" data-act="class-color" data-color="${k}" aria-label="${esc(L.color)} ${k}" ${dis}></button>`).join('')}</div></div>
+    <div class="sheet-foot">${c.planId && state.plans[c.planId] ? `<button class="btn" data-act="goto-plan" data-plan="${c.planId}">${esc(L.openPlan)}</button>` : ''}<span class="grow"></span>${!RO ? `<button class="btn danger" data-act="class-delete">${esc(L.deleteClass)}</button>` : ''}</div>
+  </div></div>`;
+  const ti = $('#c-title');
+  if (focusTitle && ti && !RO) { ti.focus(); ti.select(); } else $('.sheet [data-act="close"]').focus();
+}
+
 function myDayHTML() {
   const L = T(), td = today(), RO = state.readonly;
   const picked = allTasks().filter(t => t.myDay === td).sort(cmpTasks);
   const done = picked.filter(t => t.progress === 'done').length;
   const sugg = allTasks().filter(t => t.myDay !== td && t.progress !== 'done' && t.due && t.due <= addDays(td, 1)).sort(cmpTasks);
   return `<div class="head"><h1 class="myday-h1">${ICON_SUN}${esc(L.myDay)}</h1><span class="sub">${esc(fmtDate(td))} ${esc(weekday(td))} · ${esc(L.myDaySub)}</span></div>
+    ${todayClassesHTML()}
     <section class="panel">
       ${picked.length ? `<h2>${esc(L.myDay)} <small>${esc(L.myDayDone(done, picked.length))}</small></h2>${stackBar(picked, picked.length)}<div style="margin-top:8px">${picked.map(t => dayRowHTML(t, 'remove')).join('')}</div>` : `<p class="faint" style="margin:0;padding:12px 0">${esc(L.myDayEmpty)}</p>`}
     </section>
@@ -875,10 +1013,10 @@ function handleErr(e) {
   else toast(T().errNet);
 }
 function saveLocal() {
-  try { localStorage.setItem(LOCAL_KEY, JSON.stringify({ plans: state.plans, tasks: state.tasks })); } catch (e) {}
+  try { localStorage.setItem(LOCAL_KEY, JSON.stringify({ plans: state.plans, tasks: state.tasks, classes: state.classes })); } catch (e) {}
 }
 function write(col, id, data, quiet) {
-  const map = col === 'plans' ? state.plans : state.tasks;
+  const map = state[col] || (state[col] = {});
   if (data === null) delete map[id]; else map[id] = Object.assign({}, data, { id });
   if (!quiet) render();
   if (state.mode === 'local') { saveLocal(); return; }
@@ -996,6 +1134,10 @@ async function initStore() {
       const m = {}; snap.docs.forEach(d => { m[d.id] = Object.assign({}, d.data(), { id: d.id }); });
       state.tasks = m; state.tasksReady = true; render();
     }, onErr);
+    db.collection('classes').onSnapshot(snap => {
+      const m = {}; snap.docs.forEach(d => { m[d.id] = Object.assign({}, d.data(), { id: d.id }); });
+      state.classes = m; render();
+    }, onErr);
   } else {
     const cfg = window.PLANNER_FIREBASE;
     if (cfg && cfg.apiKey) {
@@ -1008,12 +1150,12 @@ async function initStore() {
 
 /* ---------- local mode ---------- */
 function readLocal() {
-  try { const saved = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null'); return saved && saved.plans ? { plans: saved.plans, tasks: saved.tasks || {} } : null; } catch (e) { return null; }
+  try { const saved = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null'); return saved && saved.plans ? { plans: saved.plans, tasks: saved.tasks || {}, classes: saved.classes || {} } : null; } catch (e) { return null; }
 }
 function startLocal() {
   state.mode = 'local';
   const saved = readLocal();
-  state.plans = saved ? saved.plans : {}; state.tasks = saved ? saved.tasks : {};
+  state.plans = saved ? saved.plans : {}; state.tasks = saved ? saved.tasks : {}; state.classes = saved ? saved.classes : {};
   state.plansReady = state.tasksReady = true;
   render();
 }
@@ -1045,13 +1187,13 @@ async function initCloud(cfg) {
     } else {
       cloud.user = null;
       if (lsGet(LOCAL_ONLY_KEY)) startLocal();
-      else { state.mode = 'signin'; state.plans = {}; state.tasks = {}; state.plansReady = state.tasksReady = true; render(); }
+      else { state.mode = 'signin'; state.plans = {}; state.tasks = {}; state.classes = {}; state.plansReady = state.tasksReady = true; render(); }
     }
   });
 }
 const cloudCol = (uid, name) => cloud.fs.collection('users').doc(uid).collection(name);
 function subscribeCloud(uid) {
-  state.mode = 'cloud'; state.plans = {}; state.tasks = {}; state.plansReady = state.tasksReady = false;
+  state.mode = 'cloud'; state.plans = {}; state.tasks = {}; state.classes = {}; state.plansReady = state.tasksReady = false;
   render();
   const onErr = e => { handleErr(e); };
   cloud.unsub.push(cloudCol(uid, 'plans').onSnapshot(snap => {
@@ -1061,6 +1203,10 @@ function subscribeCloud(uid) {
   cloud.unsub.push(cloudCol(uid, 'tasks').onSnapshot(snap => {
     const m = {}; snap.docs.forEach(d => { m[d.id] = Object.assign({}, d.data(), { id: d.id }); });
     state.tasks = m; state.tasksReady = true; render();
+  }, onErr));
+  cloud.unsub.push(cloudCol(uid, 'classes').onSnapshot(snap => {
+    const m = {}; snap.docs.forEach(d => { m[d.id] = Object.assign({}, d.data(), { id: d.id }); });
+    state.classes = m; render();
   }, onErr));
 }
 function cloudWrite(col, id, data) {
@@ -1114,7 +1260,7 @@ function restoreFocus(f) {
 function render() {
   document.documentElement.lang = ui.lang === 'zh' ? 'zh-CN' : 'en';
   document.documentElement.setAttribute('data-theme', ui.theme === 'dark' ? 'dark' : 'light');
-  if (ui.planId !== 'hub' && ui.planId !== 'myday' && state.plansReady && !state.plans[ui.planId]) ui.planId = 'hub';
+  if (ui.planId !== 'hub' && ui.planId !== 'myday' && ui.planId !== 'timetable' && state.plansReady && !state.plans[ui.planId]) ui.planId = 'hub';
   const f = captureFocus();
   renderRail();
   renderMain();
@@ -1141,6 +1287,7 @@ function renderRail() {
       <nav class="nav">
         <button class="nav-item ${ui.planId === 'hub' ? 'active' : ''}" data-act="goto" data-plan="hub"><span class="dot hub"></span><span class="name">${esc(L.overview)}</span>${hubOverdue ? `<span class="badge">${hubOverdue}</span>` : ''}</button>
         ${state.mode !== 'signin' ? (() => { const n = allTasks().filter(t => t.myDay === today() && t.progress !== 'done').length; return `<button class="nav-item ${ui.planId === 'myday' ? 'active' : ''}" data-act="goto" data-plan="myday"><span style="display:grid;place-items:center;width:10px;color:var(--warn)">${ICON_SUN.replace('<svg', '<svg width="14" height="14"')}</span><span class="name">${esc(L.myDay)}</span>${n ? `<span class="count" style="font-size:12px;font-weight:800;color:var(--muted)">${n}</span>` : ''}</button>`; })() : ''}
+        ${state.mode !== 'signin' ? `<button class="nav-item ${ui.planId === 'timetable' ? 'active' : ''}" data-act="goto" data-plan="timetable"><span style="display:grid;place-items:center;width:10px;color:var(--info)">${ICON_TT}</span><span class="name">${esc(L.timetable)}</span></button>` : ''}
       </nav>
     </div>
     <div>
@@ -1173,6 +1320,7 @@ function renderMain() {
   if (!state.plansReady || !state.tasksReady) { main.innerHTML = `<div class="loading">${esc(L.loading)}</div>`; return; }
   if (state.mode === 'signin') { main.classList.remove('selecting'); main.innerHTML = signinHTML(); return; }
   if (ui.planId === 'myday') { main.classList.remove('selecting'); main.innerHTML = myDayHTML(); return; }
+  if (ui.planId === 'timetable') { main.classList.remove('selecting'); main.innerHTML = timetableHTML(); return; }
   if (ui.planId === 'hub') { main.classList.remove('selecting'); main.innerHTML = migrateBannerHTML() + (hubQ.trim() ? hubHeadHTML() + searchResultsHTML() : hubHTML()); return; }
   const plan = state.plans[ui.planId];
   const RO = state.readonly;
@@ -1577,6 +1725,7 @@ let openPlanSettingsId = null;
 
 function closeDialog() {
   if (openTaskId) flushTaskDialog();
+  if (openClassId) { const ti = $('#c-title'); const c = state.classes[openClassId]; if (ti && c && ti.value.trim() && ti.value.trim() !== c.title && !state.readonly) patchClass(openClassId, { title: ti.value.trim() }); openClassId = null; }
   closeBackup();
   openTaskId = null; openPlanSettingsId = null;
   $('#dialog-root').innerHTML = '';
@@ -1678,7 +1827,7 @@ let pendingImport = null, importError = '', importConfirm = false;
 const validId = id => typeof id === 'string' && /^[A-Za-z0-9_\-.~:@+]{1,200}$/.test(id) && id !== '.' && id !== '..';
 function backupData() {
   const strip = m => Object.fromEntries(Object.entries(m).map(([id, v]) => { const c = clone(v); delete c.id; return [id, c]; }));
-  return { app: 'planner', version: 1, exportedAt: new Date().toISOString(), plans: strip(state.plans), tasks: strip(state.tasks) };
+  return { app: 'planner', version: 1, exportedAt: new Date().toISOString(), plans: strip(state.plans), tasks: strip(state.tasks), classes: strip(state.classes || {}) };
 }
 async function exportData() {
   const L = T();
@@ -1734,13 +1883,28 @@ function parseBackup(text) {
       myDay: date(t.myDay), createdAt: +t.createdAt || Date.now(), updatedAt: Date.now(), completedAt: +t.completedAt || null
     };
   }
-  return { plans, tasks };
+  const classes = {};
+  if (d.classes && typeof d.classes === 'object') {
+    for (const [rid, c] of Object.entries(d.classes)) {
+      if (!c || typeof c !== 'object') continue;
+      const day = +c.day;
+      if (!(day >= 1 && day <= 7) || !validTime(c.start) || !validTime(c.end) || toMin(c.end) <= toMin(c.start)) continue;
+      classes[validId(rid) ? rid : uid()] = {
+        title: str(c.title, 120) || 'Class', code: str(c.code, 40), type: str(c.type, 40), day, start: c.start, end: c.end,
+        room: str(c.room, 80), lecturer: str(c.lecturer, 80), color: LABEL_KEYS.includes(c.color) ? c.color : 'c5',
+        planId: c.planId && idMap[c.planId] ? idMap[c.planId] : '', createdAt: +c.createdAt || Date.now()
+      };
+    }
+  }
+  return { plans, tasks, classes };
 }
 function applyImport(data, replace) {
   if (replace) {
     Object.keys(state.tasks).forEach(id => write('tasks', id, null, true));
     Object.keys(state.plans).forEach(id => write('plans', id, null, true));
+    Object.keys(state.classes || {}).forEach(id => write('classes', id, null, true));
   }
+  Object.entries(data.classes || {}).forEach(([id, c]) => write('classes', id, c, true));
   Object.entries(data.plans).forEach(([id, p]) => write('plans', id, p, true));
   Object.entries(data.tasks).forEach(([id, t]) => write('tasks', id, t, true));
   render();
@@ -1748,7 +1912,7 @@ function applyImport(data, replace) {
 function openBackup() {
   const L = T(), RO = state.readonly;
   openTaskId = null; openPlanSettingsId = null;
-  const np = pendingImport ? Object.keys(pendingImport.plans).length : 0, nt = pendingImport ? Object.keys(pendingImport.tasks).length : 0;
+  const np = pendingImport ? Object.keys(pendingImport.plans).length : 0, nt = pendingImport ? Object.keys(pendingImport.tasks).length : 0, nc = pendingImport ? Object.keys(pendingImport.classes || {}).length : 0;
   $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.backup)}">
     <div class="sheet-head"><span>${esc(L.backup)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
     <section class="bk">
@@ -1761,7 +1925,7 @@ function openBackup() {
       <p>${esc(L.importP)}</p>
       <div class="row"><label class="btn" for="imp-file">${esc(L.chooseFile)}</label><input type="file" id="imp-file" accept=".json,application/json" hidden></div>
       ${importError ? `<div class="err">${esc(importError)}</div>` : ''}
-      ${pendingImport ? `<div class="sum">${esc(L.importSummary(np, nt))}</div>
+      ${pendingImport ? `<div class="sum">${esc(L.importSummary(np, nt))}${nc ? ' ' + esc(L.classesN(nc)) : ''}</div>
         ${importConfirm ? `<div class="confirm"><span class="grow">${esc(L.replaceQ)}</span><button class="btn" data-act="import-cancel">${esc(L.cancel)}</button><button class="btn danger solid" data-act="import-replace">${esc(L.replace)}</button></div>`
         : `<div class="row"><button class="btn primary" data-act="import-merge">${esc(L.merge)}</button><button class="btn danger" data-act="import-replace-ask">${esc(L.replace)}</button></div><p style="font-size:12px">${esc(L.mergeHint)}</p>`}` : ''}
     </section>`}
@@ -1800,6 +1964,11 @@ document.addEventListener('click', e => {
     case 'theme': ui.theme = el.dataset.themeVal; savePrefs(); render(); break;
     case 'backup': closeBackup(); openBackup(); break;
     case 'undo': undoDelete(); break;
+    case 'class-new': if (!RO) { const id = createClass({}); openClass(id, true); } break;
+    case 'class-open': openClass(el.dataset.id); break;
+    case 'class-color': if (!RO && openClassId) { patchClass(openClassId, { color: el.dataset.color }); openClass(openClassId); } break;
+    case 'class-delete': if (!RO && openClassId) { const id = openClassId; openClassId = null; $('#dialog-root').innerHTML = ''; deleteWithUndo([], [], L.classDeleted, [id]); } break;
+    case 'goto-plan': closeDialog(); ui.planId = el.dataset.plan; savePrefs(); render(); break;
     case 'grade-remove': if (!RO) patchTask(el.dataset.id, { inGrades: false, weight: null, score: null }); break;
     case 'myday-add': if (!RO) patchTask(el.dataset.id, { myDay: today() }); break;
     case 'myday-remove': if (!RO) patchTask(el.dataset.id, { myDay: '' }); break;
@@ -1827,10 +1996,10 @@ document.addEventListener('click', e => {
     case 'sign-in': signIn(); break;
     case 'use-local': lsSet(LOCAL_ONLY_KEY, '1'); startLocal(); break;
     case 'sign-out': if (cloud.auth) { exitSelect(); closeDialog(); cloud.auth.signOut(); } break;
-    case 'migrate': { const d = pendingLocalData(); if (d) { applyImport(parseBackup(JSON.stringify({ app: 'planner', plans: d.plans, tasks: d.tasks })) || { plans: {}, tasks: {} }, false); lsSet(MIGRATED_KEY, '1'); render(); toast(L.uploaded); } break; }
+    case 'migrate': { const d = pendingLocalData(); if (d) { applyImport(parseBackup(JSON.stringify({ app: 'planner', plans: d.plans, tasks: d.tasks, classes: d.classes || {} })) || { plans: {}, tasks: {}, classes: {} }, false); lsSet(MIGRATED_KEY, '1'); render(); toast(L.uploaded); } break; }
     case 'migrate-skip': lsSet(MIGRATED_KEY, '1'); render(); break;
     case 'export': exportData(); break;
-    case 'import-merge': if (pendingImport && !RO) { const d = pendingImport; applyImport(d, false); closeDialog(); toast(L.imported(Object.keys(d.plans).length, Object.keys(d.tasks).length)); } break;
+    case 'import-merge': if (pendingImport && !RO) { const d = pendingImport; applyImport(d, false); closeDialog(); toast(L.imported(Object.keys(d.plans).length, Object.keys(d.tasks).length) + (Object.keys(d.classes || {}).length ? ' · ' + L.classesN(Object.keys(d.classes).length) : '')); } break;
     case 'import-replace-ask': importConfirm = true; openBackup(); break;
     case 'import-cancel': importConfirm = false; openBackup(); break;
     case 'import-replace': if (pendingImport && !RO) { const d = pendingImport; applyImport(d, true); closeDialog(); ui.planId = 'hub'; savePrefs(); render(); toast(L.imported(Object.keys(d.plans).length, Object.keys(d.tasks).length)); } break;
@@ -1958,6 +2127,7 @@ document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z') && undoState && !(e.target.closest && e.target.closest('input, textarea'))) { e.preventDefault(); undoDelete(); return; }
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-act="sel-card"]')) { e.preventDefault(); e.target.click(); return; }
   if (e.key === 'Enter' && e.target.matches('[data-act="open-task"]') && !e.target.matches('button')) { openTask(e.target.dataset.id); return; }
+  if (e.key === 'Enter' && e.target.matches('.class-row')) { openClass(e.target.dataset.id); return; }
   if (e.key === 'Enter' && e.target.classList.contains('qa')) {
     e.preventDefault();
     const title = e.target.value.trim(); if (!title) return;
@@ -1979,6 +2149,7 @@ document.addEventListener('keydown', e => {
     if (state.readonly) return;
     e.preventDefault();
     if (inPlan) { const id = createTask(ui.planId, { bucketId: state.plans[ui.planId].buckets[0]?.id }); if (id) openTask(id, true); }
+    else if (ui.planId === 'timetable') { const id = createClass({}); openClass(id, true); }
     else { const f = $('#new-plan-form'); if (f) { f.hidden = false; $('#new-plan-name').focus(); } }
   }
   else if (inPlan && ['1', '2', '3', '4', '5'].includes(k)) {
@@ -2033,6 +2204,25 @@ document.addEventListener('change', e => {
     patchPlan(ui.planId, { gradeTarget: n == null ? null : Math.max(0, Math.min(100, n)) }); return;
   }
   if (id === 'grade-pick' && el.value && !state.readonly) { patchTask(el.value, { inGrades: true }); return; }
+  if (openClassId && /^c-/.test(id) && !state.readonly) {
+    const c = state.classes[openClassId]; if (!c) return;
+    if (id === 'c-title') { const v = el.value.trim(); if (v) patchClass(c.id, { title: v }); else el.value = c.title; }
+    else if (id === 'c-day') patchClass(c.id, { day: +el.value });
+    else if (id === 'c-start' || id === 'c-end') {
+      const st = id === 'c-start' ? el.value : c.start, en = id === 'c-end' ? el.value : c.end;
+      if (!validTime(st) || !validTime(en)) { el.value = id === 'c-start' ? c.start : c.end; return; }
+      // if the end is not after the start, make the class one hour long
+      const fixedEnd = toMin(en) > toMin(st) ? en : fromMin(Math.min(toMin(st) + 60, 23 * 60 + 59));
+      patchClass(c.id, { start: st, end: fixedEnd });
+      if (fixedEnd !== en) $('#c-end').value = fixedEnd;
+    }
+    else if (id === 'c-code') patchClass(c.id, { code: el.value.trim() });
+    else if (id === 'c-type') patchClass(c.id, { type: el.value.trim() });
+    else if (id === 'c-room') patchClass(c.id, { room: el.value.trim() });
+    else if (id === 'c-lecturer') patchClass(c.id, { lecturer: el.value.trim() });
+    else if (id === 'c-plan') { patchClass(c.id, { planId: el.value }); openClass(c.id); }
+    return;
+  }
   if (id === 'f-sort') { ui.boardSort = el.value === 'manual' ? 'manual' : 'due'; savePrefs(); render(); return; }
   if (state.readonly) return;
   const t = state.tasks[openTaskId];
