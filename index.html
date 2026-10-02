@@ -114,7 +114,8 @@ button { cursor: pointer; }
 .badge { font-size: 11px; font-weight: 800; background: var(--danger-soft); color: var(--danger); border-radius: 10px; padding: 0 7px; line-height: 18px; font-variant-numeric: tabular-nums; }
 .new-plan { display: flex; gap: 6px; padding: 4px 2px 0; }
 .new-plan input { flex: 1; min-width: 0; }
-.rail-foot { margin-top: auto; font-size: 12px; color: var(--muted); padding: 0 10px; display: flex; gap: 6px; align-items: flex-start; }
+.rail > nav:last-of-type { margin-top: auto; }
+.rail-foot { font-size: 12px; color: var(--muted); padding: 0 10px; display: flex; gap: 6px; align-items: flex-start; }
 .sync-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex: none; background: var(--warn); }
 .sync-dot.on { background: var(--ok); }
 
@@ -246,6 +247,21 @@ table.grid { width: 100%; border-collapse: collapse; min-width: 820px; }
 .cal-task.today { border-left-color: var(--warn); background: var(--warn-soft); }
 .cal-task.done { border-left-color: var(--ok); text-decoration: line-through; color: var(--muted); }
 .cal-task.week, .cal-task.tomorrow, .cal-task.nextweek, .cal-task.later { border-left-color: var(--info); background: var(--info-soft); }
+.cal.week-mode .day { min-height: 170px; }
+.cal .day.busy { background: color-mix(in srgb, var(--surface-solid) 62%, var(--warn-soft)); }
+.cal .cnt { font-size: 11px; font-weight: 800; color: var(--muted); padding-right: 4px; font-variant-numeric: tabular-nums; }
+.cal .day.busy .cnt { color: var(--warn); }
+.cal-task.pc { border-left-color: var(--pc); }
+.plan-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); font-weight: 700; margin: 2px 0 10px; }
+.plan-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.hub-cal .cal-bar { margin-bottom: 8px; }
+.hub-cal .cal-bar h2 { margin: 0; }
+.bk { display: flex; flex-direction: column; gap: 8px; padding: 14px 0; border-top: 1px solid var(--line); }
+.bk h3 { margin: 0; font-family: var(--font-display); font-size: 16px; }
+.bk p { margin: 0; color: var(--muted); }
+.bk .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bk .sum { background: var(--blue-soft); border-radius: 12px; padding: 10px 12px; font-weight: 700; }
+.bk .err { color: var(--danger); font-weight: 700; }
 .unsched { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
 .unsched h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 800; }
 .unsched .list { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -393,7 +409,13 @@ const I18N = {
     labels: { c1: 'Important', c2: 'Waiting on others', c3: 'Group', c4: 'Research', c5: 'Reading', c6: 'Personal' },
     dueGroups: { overdue: 'Overdue', today: 'Today', tomorrow: 'Tomorrow', week: 'This week', nextweek: 'Next week', later: 'Later', none: 'No due date' },
     defaultBuckets: ['To do', 'In progress', 'Waiting'], newTaskTitle: 'New task',
-    quickAdd: '+ Add task, press Enter', noTasks: 'No tasks yet', addBucket: 'Add bucket', add: 'Add', select: 'Select', selCancel: 'Cancel', selN: n => `${n} selected`, selAll: 'Select all', selClear: 'Clear', selHint: 'Click tasks to select them', markDoneSel: 'Mark complete', deleteSelQ: n => `Delete ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`, deletedN: n => `${n} task${n === 1 ? '' : 's'} deleted`, doneN: n => `${n} task${n === 1 ? '' : 's'} marked complete`, moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
+    quickAdd: '+ Add task, press Enter', noTasks: 'No tasks yet', addBucket: 'Add bucket', add: 'Add', repeat: 'Repeat', repeatOpts: { '': 'Does not repeat', daily: 'Daily', weekdays: 'Weekdays', weekly: 'Weekly', biweekly: 'Every 2 weeks', monthly: 'Monthly' }, repeatNext: d => `Next one added for ${d}`, repeatNextN: n => `${n} repeating task${n === 1 ? '' : 's'} added for next time`,
+    calendar: 'Calendar', calSub: 'Due dates from every plan', week: 'Week', month: 'Month', prevPeriod: 'Previous', nextPeriod: 'Next', dueCount: n => `${n} due`,
+    backup: 'Backup & restore', exportH: 'Export', exportP: 'Save all your plans and tasks to a file. Keep it somewhere safe, or use it to move your data to another computer.', exportBtn: 'Export backup file', exported: 'Backup file saved', exportFail: 'Could not save the file here.',
+    importH: 'Import', importP: 'Load plans and tasks from a backup file made by Planner.', chooseFile: 'Choose backup file', importSummary: (p, t) => `This file has ${p} plan${p === 1 ? '' : 's'} and ${t} task${t === 1 ? '' : 's'}.`,
+    merge: 'Add to my data', mergeHint: 'Keeps your current plans. Anything with the same ID is updated from the file.', replace: 'Replace everything', replaceQ: 'Delete all your current plans and tasks, then load the file? This cannot be undone.',
+    imported: (p, t) => `Imported ${p} plan${p === 1 ? '' : 's'} and ${t} task${t === 1 ? '' : 's'}`, badFile: 'This file is not a Planner backup. Choose a .json file exported from Planner.', orImport: 'Import a backup',
+    select: 'Select', selCancel: 'Cancel', selN: n => `${n} selected`, selAll: 'Select all', selClear: 'Clear', selHint: 'Click tasks to select them', markDoneSel: 'Mark complete', deleteSelQ: n => `Delete ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`, deletedN: n => `${n} task${n === 1 ? '' : 's'} deleted`, doneN: n => `${n} task${n === 1 ? '' : 's'} marked complete`, moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
     dueOverdue: (d, n) => `${d} · ${n} day${n === 1 ? '' : 's'} late`, dueToday: 'Due today', dueTomorrow: 'Due tomorrow',
     markDone: 'Mark complete', markUndone: 'Mark not complete',
     col: { title: 'Task', bucket: 'Bucket', progress: 'Progress', priority: 'Priority', start: 'Start', due: 'Due', assignee: 'Assigned to' },
@@ -426,7 +448,13 @@ const I18N = {
     labels: { c1: '重要', c2: '等待他人', c3: '小组', c4: '调研', c5: '阅读', c6: '个人' },
     dueGroups: { overdue: '已逾期', today: '今天', tomorrow: '明天', week: '本周', nextweek: '下周', later: '以后', none: '没有截止日期' },
     defaultBuckets: ['待办', '进行中', '等待中'], newTaskTitle: '新任务',
-    quickAdd: '+ 添加任务，回车保存', noTasks: '暂无任务', addBucket: '添加存储桶', add: '添加', select: '多选', selCancel: '取消', selN: n => `已选 ${n} 项`, selAll: '全选', selClear: '清空', selHint: '点任务即可选择', markDoneSel: '标记完成', deleteSelQ: n => `删除这 ${n} 项任务？此操作无法撤销。`, deletedN: n => `已删除 ${n} 项任务`, doneN: n => `${n} 项任务已标记完成`, moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
+    quickAdd: '+ 添加任务，回车保存', noTasks: '暂无任务', addBucket: '添加存储桶', add: '添加', repeat: '重复', repeatOpts: { '': '不重复', daily: '每天', weekdays: '工作日', weekly: '每周', biweekly: '每两周', monthly: '每月' }, repeatNext: d => `已添加下一次：${d}`, repeatNextN: n => `已为 ${n} 项重复任务添加下一次`,
+    calendar: '日历', calSub: '所有计划的截止日期', week: '周', month: '月', prevPeriod: '上一页', nextPeriod: '下一页', dueCount: n => `${n} 项到期`,
+    backup: '备份与还原', exportH: '导出', exportP: '把所有计划和任务保存成一个文件。可以留着备份，也可以拿到别的电脑上导入。', exportBtn: '导出备份文件', exported: '备份文件已保存', exportFail: '这里无法保存文件。',
+    importH: '导入', importP: '从 Planner 导出的备份文件载入计划和任务。', chooseFile: '选择备份文件', importSummary: (p, t) => `这个文件里有 ${p} 个计划，${t} 项任务。`,
+    merge: '加入现有数据', mergeHint: '保留你现在的计划。ID 相同的内容会用文件里的版本更新。', replace: '全部替换', replaceQ: '删除你现在所有的计划和任务，再载入这个文件？此操作无法撤销。',
+    imported: (p, t) => `已导入 ${p} 个计划，${t} 项任务`, badFile: '这不是 Planner 的备份文件。请选择从 Planner 导出的 .json 文件。', orImport: '从备份导入',
+    select: '多选', selCancel: '取消', selN: n => `已选 ${n} 项`, selAll: '全选', selClear: '清空', selHint: '点任务即可选择', markDoneSel: '标记完成', deleteSelQ: n => `删除这 ${n} 项任务？此操作无法撤销。`, deletedN: n => `已删除 ${n} 项任务`, doneN: n => `${n} 项任务已标记完成`, moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
     dueOverdue: (d, n) => `${d} · 逾期 ${n} 天`, dueToday: '今天到期', dueTomorrow: '明天到期',
     markDone: '标记为已完成', markUndone: '标记为未完成',
     col: { title: '任务名称', bucket: '存储桶', progress: '进度', priority: '优先级', start: '开始日期', due: '截止日期', assignee: '负责人' },
@@ -456,6 +484,8 @@ const AVATAR_COLORS = ['#d9588f', '#4f86d9', '#8a6ad6', '#2f9e7e', '#d07a3c', '#
 const ICON_MARK = '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 1.8l1.7 4.6 4.7 1.6-4.7 1.7L9 14.3l-1.7-4.6L2.6 8l4.7-1.6z"/></svg>';
 const ICON_SUN = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="2.6"/><path d="M7 1v1.4M7 11.6V13M1 7h1.4M11.6 7H13M2.8 2.8l1 1M10.2 10.2l1 1M2.8 11.2l1-1M10.2 3.8l1-1"/></svg>';
 const ICON_MOON = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M11.8 8.6A5 5 0 0 1 5.4 2.2a5 5 0 1 0 6.4 6.4z"/></svg>';
+const ICON_REPEAT = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5V5a2 2 0 0 1 2-2h5.5M8 1.5L9.5 3 8 4.5M10 6.5V7a2 2 0 0 1-2 2H2.5M4 10.5L2.5 9 4 7.5"/></svg>';
+const ICON_BACKUP = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1.5v7M4.2 5.8L7 8.6l2.8-2.8M2 9.5v1.5a1.5 1.5 0 0 0 1.5 1.5h7A1.5 1.5 0 0 0 12 11V9.5"/></svg>';
 const ICON_CHECK = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>';
 const ICON_CAL = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="2.5" width="9" height="8" rx="1.5"/><path d="M1.5 5h9M4 1.2v2.4M8 1.2v2.4"/></svg>';
 const ICON_LIST = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1.5 3l1 1 1.6-1.8M1.5 8l1 1 1.6-1.8M6 3.2h4.5M6 8.2h4.5"/></svg>';
@@ -480,9 +510,10 @@ const diffDays = (a, b) => Math.round((parse(b) - parse(a)) / 86400000);
 const state = { plans: {}, tasks: {}, plansReady: false, tasksReady: false, mode: 'local', readonly: false };
 const PREF_KEY = 'planner-prefs';
 const LOCAL_KEY = 'planner-data';
-let ui = { lang: 'en', theme: 'light', planId: 'hub', view: 'board', groupBy: 'bucket', filter: { q: '', due: 'all', pri: 'all', hideDone: false }, calMonth: today().slice(0, 7), sort: { key: 'due', dir: 1 } };
+let ui = { lang: 'en', theme: 'light', planId: 'hub', view: 'board', groupBy: 'bucket', filter: { q: '', due: 'all', pri: 'all', hideDone: false }, calMonth: today().slice(0, 7), hubCal: { mode: 'week', anchor: today() }, sort: { key: 'due', dir: 1 } };
 try { const p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null'); if (p) ui = Object.assign(ui, p, { filter: Object.assign(ui.filter, p.filter || {}) }); } catch (e) {}
 if (!I18N[ui.lang]) ui.lang = 'en';
+if (!ui.hubCal || !/^\d{4}-\d{2}-\d{2}$/.test(ui.hubCal.anchor || '')) ui.hubCal = { mode: 'week', anchor: today() };
 const savePrefs = () => { try { localStorage.setItem(PREF_KEY, JSON.stringify(ui)); } catch (e) {} };
 const T = () => I18N[ui.lang];
 // multi-select mode, not saved
@@ -593,11 +624,18 @@ async function drain(path) {
   }
   q.running = false;
 }
-function patchTask(id, patch) {
-  const t = state.tasks[id]; if (!t) return;
+function patchTask(id, patch, quiet) {
+  const t = state.tasks[id]; if (!t) return null;
   const next = Object.assign(clone(t), patch, { updatedAt: Date.now() });
   if (patch.progress) next.completedAt = patch.progress === 'done' ? (t.completedAt || Date.now()) : null;
-  write('tasks', id, next);
+  let spawned = null;
+  if (patch.progress === 'done' && t.progress !== 'done' && t.repeat && !t.repeatSpawned) {
+    next.repeatSpawned = true;
+    spawned = spawnNext(t);
+  }
+  write('tasks', id, next, quiet);
+  if (spawned && !quiet) toast(T().repeatNext(fmtDate(state.tasks[spawned].due)));
+  return spawned;
 }
 function patchPlan(id, patch) {
   const p = state.plans[id]; if (!p) return;
@@ -613,7 +651,33 @@ function moveBucket(planId, bucketId, to) {
   arr.splice(to, 0, b);
   patchPlan(planId, { buckets: arr });
 }
-function createTask(planId, fields) {
+/* repeating tasks */
+const REPEATS = ['', 'daily', 'weekdays', 'weekly', 'biweekly', 'monthly'];
+function stepDate(s, rep) {
+  if (rep === 'daily') return addDays(s, 1);
+  if (rep === 'weekdays') { let n = addDays(s, 1); while ([0, 6].includes(parse(n).getDay())) n = addDays(n, 1); return n; }
+  if (rep === 'weekly') return addDays(s, 7);
+  if (rep === 'biweekly') return addDays(s, 14);
+  if (rep === 'monthly') {
+    const d = parse(s), day = d.getDate();
+    const n = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+    n.setDate(Math.min(day, new Date(n.getFullYear(), n.getMonth() + 1, 0).getDate()));
+    return ymd(n);
+  }
+  return s;
+}
+function spawnNext(t) {
+  // next date after the current due date, skipping any dates already in the past
+  const td = today();
+  let due = stepDate(t.due || td, t.repeat), guard = 0;
+  while (due < td && guard++ < 2000) due = stepDate(due, t.repeat);
+  const start = t.start && t.due ? addDays(t.start, diffDays(t.due, due)) : '';
+  return createTask(t.planId, {
+    title: t.title, bucketId: t.bucketId, priority: t.priority, assignee: t.assignee || '', labels: (t.labels || []).slice(), notes: t.notes || '',
+    checklist: (t.checklist || []).map(c => ({ id: uid(), text: c.text, done: false })), repeat: t.repeat, start, due
+  }, true);
+}
+function createTask(planId, fields, quiet) {
   const plan = state.plans[planId]; if (!plan) return null;
   const id = uid();
   const t = Object.assign({
@@ -621,7 +685,7 @@ function createTask(planId, fields) {
     start: '', due: '', assignee: '', labels: [], notes: '', checklist: [], createdAt: Date.now(), updatedAt: Date.now(), completedAt: null
   }, fields);
   if (t.progress === 'done') t.completedAt = Date.now();
-  write('tasks', id, t);
+  write('tasks', id, t, quiet);
   return id;
 }
 function createPlan(name) {
@@ -719,6 +783,7 @@ function renderRail() {
         <button class="btn primary" type="submit">${esc(L.create)}</button>
       </form>
     </div>
+    <nav class="nav"><button class="nav-item" data-act="backup" style="color:var(--muted)">${ICON_BACKUP}<span class="name">${esc(L.backup)}</span></button></nav>
     <div class="rail-foot"><span class="sync-dot ${state.mode === 'db' ? 'on' : ''}"></span><span>${esc(state.mode === 'db' ? (RO ? L.syncRO : L.syncOn) : L.syncLocal)}</span></div>`;
 }
 
@@ -793,7 +858,7 @@ function cardHTML(t) {
   const cl = t.checklist || [];
   const clDone = cl.filter(c => c.done).length;
   const labels = (t.labels || []).filter(k => LABEL_KEYS.includes(k));
-  const showMeta = t.due || cl.length || t.assignee || t.priority === 'urgent' || t.priority === 'important' || t.progress === 'doing';
+  const showMeta = t.due || t.repeat || cl.length || t.assignee || t.priority === 'urgent' || t.priority === 'important' || t.progress === 'doing';
   const picked = sel.on && sel.ids.has(t.id);
   return `<article class="card ${t.progress === 'done' ? 'is-done' : ''} ${picked ? 'selected' : ''}" draggable="${!RO && !sel.on}" data-act="${sel.on ? 'sel-card' : 'open-task'}" data-id="${t.id}" tabindex="0" ${sel.on ? `aria-pressed="${picked}"` : ''}>
     ${labels.length ? `<div class="card-tags">${labels.map(k => `<span class="tag lbl-${k}">${esc(labelName(plan, k))}</span>`).join('')}</div>` : ''}
@@ -803,6 +868,7 @@ function cardHTML(t) {
     </div>
     ${showMeta ? `<div class="card-meta">
       ${dueChip(t)}
+      ${t.repeat ? `<span class="chip" title="${esc(L.repeat)}: ${esc(L.repeatOpts[t.repeat] || '')}">${ICON_REPEAT}</span>` : ''}
       ${t.priority === 'urgent' || t.priority === 'important' ? `<span class="chip pri-${t.priority}">${esc(L.priority[t.priority])}</span>` : ''}
       ${t.progress === 'doing' ? `<span class="chip doing">${esc(L.progress.doing)}</span>` : ''}
       ${cl.length ? `<span class="chip ${clDone === cl.length ? 'done' : ''}">${ICON_LIST}<span class="num">${clDone}/${cl.length}</span></span>` : ''}
@@ -877,19 +943,45 @@ function emptyFiltered() {
   return `<div class="empty"><h2>${esc(L.emptyFilterH)}</h2><p>${esc(L.emptyFilterP)}</p><button class="btn" data-act="clear-filter">${esc(L.clearFilter)}</button></div>`;
 }
 
+function monthCells(y, m) {
+  const first = new Date(y, m - 1, 1);
+  const d = new Date(first); d.setDate(1 - ((first.getDay() + 6) % 7));
+  const last = new Date(y, m, 0);
+  const cells = [];
+  while (d <= last || cells.length % 7 !== 0) { cells.push(ymd(d)); d.setDate(d.getDate() + 1); }
+  return cells;
+}
+function weekCells(anchor) {
+  const s0 = addDays(anchor, -((parse(anchor).getDay() + 6) % 7));
+  return Array.from({ length: 7 }, (_, i) => addDays(s0, i));
+}
+// opts: monthKey (dim days outside it), addable, planColors, counts, week
+function calGridHTML(cells, tasks, opts) {
+  const L = T(), td = today();
+  const byDay = {};
+  tasks.forEach(t => { if (t.due) (byDay[t.due] = byDay[t.due] || []).push(t); });
+  return `<div class="cal-wrap"><div class="cal ${opts.week ? 'week-mode' : ''}">
+    ${WEEKDAYS[ui.lang].map(w => `<div class="dow">${w}</div>`).join('')}
+    ${cells.map((c, i) => {
+      const list = (byDay[c] || []).sort(cmpTasks);
+      const open = list.filter(t => t.progress !== 'done').length;
+      const out = opts.monthKey && c.slice(0, 7) !== opts.monthKey;
+      return `<div class="day ${out ? 'out' : ''} ${c === td ? 'is-today' : ''} ${i % 7 >= 5 ? 'weekend' : ''} ${opts.counts && open >= 3 ? 'busy' : ''}">
+        <div class="day-head"><span class="n">${parse(c).getDate()}</span>${opts.counts && open ? `<span class="cnt" title="${esc(L.dueCount(open))}">${open}</span>` : ''}${opts.addable ? `<button class="icon-btn add" data-act="cal-add" data-date="${c}" aria-label="${esc(L.addOn(fmtDate(c)))}">${ICON_PLUS}</button>` : ''}</div>
+        ${list.map(t => {
+          const pl = state.plans[t.planId];
+          const pc = opts.planColors && pl ? ` pc" style="--pc: var(--${esc(pl.color)})` : '';
+          return `<button class="cal-task ${dueStatus(t)}${pc}" data-act="open-task" data-id="${t.id}" title="${esc(t.title)}${opts.planColors && pl ? ' · ' + esc(pl.name) : ''}">${esc(t.title)}</button>`;
+        }).join('')}
+      </div>`;
+    }).join('')}
+  </div></div>`;
+}
+
 function scheduleHTML(plan) {
   const RO = state.readonly, L = T();
   const tasks = applyFilter(tasksOf(plan.id));
   const [y, m] = ui.calMonth.split('-').map(Number);
-  const first = new Date(y, m - 1, 1);
-  const start = new Date(first); start.setDate(1 - ((first.getDay() + 6) % 7));
-  const last = new Date(y, m, 0);
-  const cells = [];
-  const d = new Date(start);
-  while (d <= last || cells.length % 7 !== 0) { cells.push(ymd(d)); d.setDate(d.getDate() + 1); }
-  const td = today();
-  const byDay = {};
-  tasks.forEach(t => { if (t.due) (byDay[t.due] = byDay[t.due] || []).push(t); });
   const unsched = tasks.filter(t => !t.due).sort(cmpTasks);
   return `<div style="display:flex;flex-direction:column;gap:12px">
     <div class="cal-bar">
@@ -899,18 +991,30 @@ function scheduleHTML(plan) {
       <button class="btn" data-act="cal-move" data-dir="1" aria-label="${esc(L.nextMonth)}">›</button>
       <span class="hint">${esc(L.byDue)}</span>
     </div>
-    <div class="cal-wrap"><div class="cal">
-      ${WEEKDAYS[ui.lang].map(w => `<div class="dow">${w}</div>`).join('')}
-      ${cells.map((c, i) => {
-        const list = (byDay[c] || []).sort(cmpTasks);
-        return `<div class="day ${c.slice(0, 7) === ui.calMonth ? '' : 'out'} ${c === td ? 'is-today' : ''} ${i % 7 >= 5 ? 'weekend' : ''}">
-          <div class="day-head"><span class="n">${parse(c).getDate()}</span>${!RO ? `<button class="icon-btn add" data-act="cal-add" data-date="${c}" aria-label="${esc(L.addOn(fmtDate(c)))}">${ICON_PLUS}</button>` : ''}</div>
-          ${list.map(t => `<button class="cal-task ${dueStatus(t)}" data-act="open-task" data-id="${t.id}" title="${esc(t.title)}">${esc(t.title)}</button>`).join('')}
-        </div>`;
-      }).join('')}
-    </div></div>
+    ${calGridHTML(monthCells(y, m), tasks, { monthKey: ui.calMonth, addable: !RO })}
     ${unsched.length ? `<div class="unsched"><h3>${esc(L.noDueN(unsched.length))}</h3><div class="list">${unsched.map(t => `<button class="cal-task ${t.progress === 'done' ? 'done' : ''}" data-act="open-task" data-id="${t.id}">${esc(t.title)}</button>`).join('')}</div></div>` : ''}
   </div>`;
+}
+
+function hubCalendarHTML() {
+  const L = T(), hc = ui.hubCal;
+  const week = hc.mode !== 'month';
+  let cells, title;
+  if (week) { cells = weekCells(hc.anchor); title = `${fmtDate(cells[0])} ${ui.lang === 'zh' ? '至' : '-'} ${fmtDate(cells[6])}`; }
+  else { const [y, m] = hc.anchor.split('-').map(Number); cells = monthCells(y, m); title = monthTitle(y, m); }
+  return `<section class="panel hub-cal">
+    <div class="cal-bar">
+      <h2>${esc(L.calendar)} <small>${esc(L.calSub)}</small></h2>
+      <span class="grow" style="flex:1"></span>
+      <div class="lang" role="group" aria-label="${esc(L.calendar)}"><button class="${week ? 'on' : ''}" data-act="hub-cal-mode" data-mode="week">${esc(L.week)}</button><button class="${week ? '' : 'on'}" data-act="hub-cal-mode" data-mode="month">${esc(L.month)}</button></div>
+      <button class="btn" data-act="hub-cal-move" data-dir="-1" aria-label="${esc(L.prevPeriod)}">‹</button>
+      <button class="btn" data-act="hub-cal-move" data-dir="0">${esc(L.today)}</button>
+      <button class="btn" data-act="hub-cal-move" data-dir="1" aria-label="${esc(L.nextPeriod)}">›</button>
+      <b style="min-width:150px;font-family:var(--font-display)">${esc(title)}</b>
+    </div>
+    <div class="plan-legend">${plansList().map(p => `<span><i class="dot bg-${esc(p.color)}"></i>${esc(p.name)}</span>`).join('')}</div>
+    ${calGridHTML(cells, allTasks(), { monthKey: week ? null : hc.anchor.slice(0, 7), planColors: true, counts: true, week })}
+  </section>`;
 }
 
 const statusOf = t => dueStatus(t) === 'overdue' ? 'overdue' : (t.progress || 'todo');
@@ -966,7 +1070,7 @@ function hubHTML() {
   const dayLine = `${fmtDate(td)} ${weekday(td)}`;
   if (!plans.length) {
     return `<div class="head"><h1>${esc(L.overview)}</h1><span class="sub">${esc(L.todayIs(dayLine))}</span></div>
-      <div class="empty"><h2>${esc(L.noPlansH)}</h2><p>${esc(L.noPlansP)}</p>${!RO ? `<button class="btn primary" data-act="new-plan-show">${esc(L.firstPlan)}</button>` : ''}</div>`;
+      <div class="empty"><h2>${esc(L.noPlansH)}</h2><p>${esc(L.noPlansP)}</p>${!RO ? `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn primary" data-act="new-plan-show">${esc(L.firstPlan)}</button><button class="btn" data-act="backup">${ICON_BACKUP}${esc(L.orImport)}</button></div>` : ''}</div>`;
   }
   const open = allTasks().filter(t => t.progress !== 'done');
   const eow = endOfWeek(td);
@@ -989,6 +1093,7 @@ function hubHTML() {
       <button class="stat info" data-act="hub-filter" data-due="week"><span class="k">${esc(L.statWeek)}</span><span class="v">${dueWeek.length}</span></button>
       <div class="stat"><span class="k">${esc(L.statDoing)}</span><span class="v">${doing.length}</span></div>
     </div>
+    ${hubCalendarHTML()}
     <div class="hub">
       <section class="panel"><h2>${esc(L.attention)} <small>${esc(L.attentionSub)}</small></h2>
         ${groups.length ? `<div class="due-list">${groups.map(([k, name, list]) => `<div class="due-group ${k === 'overdue' ? 'overdue' : ''}">${esc(name)} · ${list.length}</div>${list.map(t => {
@@ -1023,6 +1128,7 @@ let openPlanSettingsId = null;
 
 function closeDialog() {
   if (openTaskId) flushTaskDialog();
+  closeBackup();
   openTaskId = null; openPlanSettingsId = null;
   $('#dialog-root').innerHTML = '';
 }
@@ -1056,6 +1162,7 @@ function openTask(id, focusTitle) {
       <label class="field"><span>${esc(L.col.priority)}</span>${sel('t-priority', L.priority, t.priority || 'medium')}</label>
       <label class="field"><span>${esc(L.start)}</span><input class="input" type="date" id="t-start" value="${esc(t.start || '')}" ${dis}></label>
       <label class="field"><span>${esc(L.due)}</span><input class="input" type="date" id="t-due" value="${esc(t.due || '')}" ${dis}></label>
+      <label class="field"><span>${esc(L.repeat)}</span>${sel('t-repeat', L.repeatOpts, REPEATS.includes(t.repeat) ? t.repeat || '' : '')}</label>
       <label class="field"><span>${esc(L.assignee)}</span><input class="input" id="t-assignee" value="${esc(t.assignee || '')}" placeholder="${esc(L.personPh)}" maxlength="40" list="people" ${dis}></label>
     </div>
     <datalist id="people">${[...new Set(allTasks().map(x => x.assignee).filter(Boolean))].map(n => `<option value="${esc(n)}">`).join('')}</datalist>
@@ -1090,6 +1197,99 @@ function refreshChecklist() {
   $('#t-checklist').innerHTML = checklistHTML(t);
 }
 
+/* ---------- backup and restore ---------- */
+let pendingImport = null, importError = '', importConfirm = false;
+const validId = id => typeof id === 'string' && /^[A-Za-z0-9_\-.~:@+]{1,200}$/.test(id) && id !== '.' && id !== '..';
+function backupData() {
+  const strip = m => Object.fromEntries(Object.entries(m).map(([id, v]) => { const c = clone(v); delete c.id; return [id, c]; }));
+  return { app: 'planner', version: 1, exportedAt: new Date().toISOString(), plans: strip(state.plans), tasks: strip(state.tasks) };
+}
+async function exportData() {
+  const L = T();
+  const text = JSON.stringify(backupData(), null, 2);
+  const filename = `planner-backup-${today()}.json`;
+  if (window.claude && typeof window.claude.use === 'function') {
+    let dl = null;
+    try { dl = await window.claude.use('downloads'); } catch (e) {}
+    if (!dl) { toast(L.exportFail); return; }
+    try { await dl.save({ filename, data: text }); toast(L.exported); }
+    catch (e) { if (!e || e.code !== 'declined') toast(L.exportFail); }
+    return;
+  }
+  try {
+    const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    toast(L.exported);
+  } catch (e) { toast(L.exportFail); }
+}
+function parseBackup(text) {
+  let d;
+  try { d = JSON.parse(text); } catch (e) { return null; }
+  if (!d || d.app !== 'planner' || !d.plans || !d.tasks || typeof d.plans !== 'object' || typeof d.tasks !== 'object') return null;
+  const str = (v, n) => typeof v === 'string' ? v.slice(0, n) : '';
+  const date = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : '';
+  const idMap = {}, plans = {}, tasks = {};
+  for (const [rid, p] of Object.entries(d.plans)) {
+    if (!p || typeof p !== 'object') continue;
+    const id = validId(rid) ? rid : uid();
+    idMap[rid] = id;
+    const buckets = Array.isArray(p.buckets) ? p.buckets.filter(b => b && typeof b.name === 'string').slice(0, 50).map(b => ({ id: str(b.id, 60) || uid(), name: b.name.slice(0, 40) })) : [];
+    const labels = {};
+    if (p.labels && typeof p.labels === 'object') LABEL_KEYS.forEach(k => { if (typeof p.labels[k] === 'string' && p.labels[k]) labels[k] = p.labels[k].slice(0, 24); });
+    plans[id] = { name: str(p.name, 80) || 'Plan', color: LABEL_KEYS.includes(p.color) ? p.color : 'c1', createdAt: +p.createdAt || Date.now(), labels, buckets: buckets.length ? buckets : T().defaultBuckets.map(n => ({ id: uid(), name: n })) };
+  }
+  for (const [rid, t] of Object.entries(d.tasks)) {
+    if (!t || typeof t !== 'object' || !idMap[t.planId]) continue;
+    const id = validId(rid) ? rid : uid();
+    tasks[id] = {
+      planId: idMap[t.planId], title: str(t.title, 200) || 'Task', bucketId: str(t.bucketId, 60),
+      progress: ['todo', 'doing', 'done'].includes(t.progress) ? t.progress : 'todo',
+      priority: Object.keys(PRI_ORDER).includes(t.priority) ? t.priority : 'medium',
+      start: date(t.start), due: date(t.due), assignee: str(t.assignee, 40),
+      labels: Array.isArray(t.labels) ? t.labels.filter(k => LABEL_KEYS.includes(k)) : [],
+      notes: str(t.notes, 20000),
+      checklist: Array.isArray(t.checklist) ? t.checklist.filter(c => c && typeof c.text === 'string').slice(0, 200).map(c => ({ id: str(c.id, 60) || uid(), text: c.text.slice(0, 200), done: !!c.done })) : [],
+      repeat: REPEATS.includes(t.repeat) ? t.repeat : '', repeatSpawned: !!t.repeatSpawned,
+      createdAt: +t.createdAt || Date.now(), updatedAt: Date.now(), completedAt: +t.completedAt || null
+    };
+  }
+  return { plans, tasks };
+}
+function applyImport(data, replace) {
+  if (replace) {
+    Object.keys(state.tasks).forEach(id => write('tasks', id, null, true));
+    Object.keys(state.plans).forEach(id => write('plans', id, null, true));
+  }
+  Object.entries(data.plans).forEach(([id, p]) => write('plans', id, p, true));
+  Object.entries(data.tasks).forEach(([id, t]) => write('tasks', id, t, true));
+  render();
+}
+function openBackup() {
+  const L = T(), RO = state.readonly;
+  openTaskId = null; openPlanSettingsId = null;
+  const np = pendingImport ? Object.keys(pendingImport.plans).length : 0, nt = pendingImport ? Object.keys(pendingImport.tasks).length : 0;
+  $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.backup)}">
+    <div class="sheet-head"><span>${esc(L.backup)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
+    <section class="bk">
+      <h3>${esc(L.exportH)}</h3>
+      <p>${esc(L.exportP)}</p>
+      <div class="row"><button class="btn primary" data-act="export">${ICON_BACKUP}${esc(L.exportBtn)}</button><span class="faint">${esc(L.importSummary(plansList().length, Object.keys(state.tasks).length))}</span></div>
+    </section>
+    ${RO ? '' : `<section class="bk">
+      <h3>${esc(L.importH)}</h3>
+      <p>${esc(L.importP)}</p>
+      <div class="row"><label class="btn" for="imp-file">${esc(L.chooseFile)}</label><input type="file" id="imp-file" accept=".json,application/json" hidden></div>
+      ${importError ? `<div class="err">${esc(importError)}</div>` : ''}
+      ${pendingImport ? `<div class="sum">${esc(L.importSummary(np, nt))}</div>
+        ${importConfirm ? `<div class="confirm"><span class="grow">${esc(L.replaceQ)}</span><button class="btn" data-act="import-cancel">${esc(L.cancel)}</button><button class="btn danger solid" data-act="import-replace">${esc(L.replace)}</button></div>`
+        : `<div class="row"><button class="btn primary" data-act="import-merge">${esc(L.merge)}</button><button class="btn danger" data-act="import-replace-ask">${esc(L.replace)}</button></div><p style="font-size:12px">${esc(L.mergeHint)}</p>`}` : ''}
+    </section>`}
+  </div></div>`;
+}
+const closeBackup = () => { pendingImport = null; importError = ''; importConfirm = false; };
+
 /* ---------- plan settings dialog ---------- */
 function openPlanSettings(id) {
   const p = state.plans[id]; if (!p) return;
@@ -1119,6 +1319,21 @@ document.addEventListener('click', e => {
   switch (act) {
     case 'lang': ui.lang = el.dataset.lang; savePrefs(); render(); break;
     case 'theme': ui.theme = el.dataset.themeVal; savePrefs(); render(); break;
+    case 'backup': closeBackup(); openBackup(); break;
+    case 'export': exportData(); break;
+    case 'import-merge': if (pendingImport && !RO) { const d = pendingImport; applyImport(d, false); closeDialog(); toast(L.imported(Object.keys(d.plans).length, Object.keys(d.tasks).length)); } break;
+    case 'import-replace-ask': importConfirm = true; openBackup(); break;
+    case 'import-cancel': importConfirm = false; openBackup(); break;
+    case 'import-replace': if (pendingImport && !RO) { const d = pendingImport; applyImport(d, true); closeDialog(); ui.planId = 'hub'; savePrefs(); render(); toast(L.imported(Object.keys(d.plans).length, Object.keys(d.tasks).length)); } break;
+    case 'hub-cal-mode': ui.hubCal = { mode: el.dataset.mode, anchor: el.dataset.mode === 'month' ? ui.hubCal.anchor.slice(0, 7) + '-01' : ui.hubCal.anchor }; savePrefs(); render(); break;
+    case 'hub-cal-move': {
+      const dir = +el.dataset.dir, hc = ui.hubCal;
+      let anchor;
+      if (dir === 0) anchor = hc.mode === 'month' ? today().slice(0, 7) + '-01' : today();
+      else if (hc.mode === 'month') { const [y, m] = hc.anchor.split('-').map(Number); const d = new Date(y, m - 1 + dir, 1); anchor = ymd(d); }
+      else anchor = addDays(hc.anchor, 7 * dir);
+      ui.hubCal = { mode: hc.mode, anchor }; savePrefs(); render(); break;
+    }
     case 'bucket-move': if (!RO) moveBucket(ui.planId, el.dataset.bucket, +el.dataset.to); break;
     case 'goto': exitSelect(); ui.planId = el.dataset.plan; savePrefs(); render(); window.scrollTo(0, 0); break;
     case 'view': if (el.dataset.view !== 'board' && el.dataset.view !== 'grid') exitSelect(); ui.view = el.dataset.view; savePrefs(); render(); break;
@@ -1143,8 +1358,8 @@ document.addEventListener('click', e => {
     case 'sel-done': {
       if (RO) break;
       const ids = [...sel.ids].filter(id => state.tasks[id] && state.tasks[id].progress !== 'done');
-      ids.forEach(id => { const t = state.tasks[id]; write('tasks', id, Object.assign(clone(t), { progress: 'done', completedAt: Date.now(), updatedAt: Date.now() }), true); });
-      sel.ids.clear(); sel.confirm = false; render(); toast(L.doneN(ids.length)); break;
+      const spawned = ids.map(id => patchTask(id, { progress: 'done' }, true)).filter(Boolean).length;
+      sel.ids.clear(); sel.confirm = false; render(); toast(L.doneN(ids.length) + (spawned ? ' · ' + L.repeatNextN(spawned) : '')); break;
     }
     case 'new-plan-show': $('#new-plan-form').hidden = false; $('#new-plan-name').focus(); break;
     case 'toggle-done': {
@@ -1257,6 +1472,19 @@ document.addEventListener('input', e => {
 
 document.addEventListener('change', e => {
   const el = e.target, id = el.id;
+  if (id === 'imp-file') {
+    const file = el.files && el.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const data = parseBackup(String(reader.result || ''));
+      pendingImport = data; importConfirm = false;
+      importError = data ? '' : T().badFile;
+      openBackup();
+    };
+    reader.onerror = () => { pendingImport = null; importError = T().badFile; openBackup(); };
+    reader.readAsText(file);
+    return;
+  }
   if (id === 'f-due') { ui.filter.due = el.value; savePrefs(); render(); return; }
   if (id === 'f-pri') { ui.filter.pri = el.value; savePrefs(); render(); return; }
   if (id === 'f-done') { ui.filter.hideDone = el.checked; savePrefs(); render(); return; }
@@ -1271,6 +1499,7 @@ document.addEventListener('change', e => {
     else if (id === 't-start') patchTask(t.id, { start: el.value });
     else if (id === 't-due') { patchTask(t.id, { due: el.value }); openTask(t.id); }
     else if (id === 't-assignee') patchTask(t.id, { assignee: el.value.trim() });
+    else if (id === 't-repeat') patchTask(t.id, { repeat: el.value, repeatSpawned: false });
     else if (id === 't-notes') patchTask(t.id, { notes: el.value });
     else if (el.dataset.cl && el.type === 'text') {
       const v = el.value.trim();
