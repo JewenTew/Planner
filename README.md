@@ -7,7 +7,7 @@ Single HTML file. No build step, no server, no dependencies to install.
 ## Features
 
 - **Overview**: counts of overdue, due today and due this week across all plans, plus a list of tasks due in the next 14 days.
-- **Board**: columns by bucket, with drag and drop. Can also group by due date, progress or priority. Quick add at the top of each column.
+- **Board**: columns by bucket, with drag and drop. Reorder buckets by dragging the column title or with the arrow buttons. Can also group by due date, progress or priority. Quick add at the top of each column.
 - **Grid**: sortable table of all tasks.
 - **Schedule**: month calendar by due date.
 - **Charts**: progress by bucket, priority and person.

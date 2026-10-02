@@ -170,6 +170,15 @@ main { min-width: 0; padding-inline: 28px; padding-block: 22px 44px; display: fl
 .col-head h3 { margin: 0; font-family: var(--font-display); font-size: 15px; font-weight: 700; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .col-head .count { font-size: 12px; font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
 .col-head.overdue h3 { color: var(--danger); }
+.col-head[draggable="true"] { cursor: grab; }
+.col-move { display: flex; opacity: 0; }
+.col:hover .col-move, .col-move:focus-within { opacity: 1; }
+@media (hover: none) { .col-move { opacity: 1; } }
+.col-move .icon-btn { width: 22px; height: 22px; font-size: 16px; line-height: 1; font-weight: 700; }
+.col-move .icon-btn:disabled { opacity: .25; cursor: default; background: transparent; }
+.col.bucket-dragging { opacity: .45; }
+.col.drop-before { box-shadow: -5px 0 0 0 var(--accent-deep); }
+.col.drop-after { box-shadow: 5px 0 0 0 var(--accent-deep); }
 .qa { width: 100%; background: var(--surface); border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 10px; padding: 7px 10px; min-height: 36px; }
 .qa::placeholder { color: var(--muted); }
 .qa:focus { border-style: solid; border-color: var(--accent); outline: none; background: var(--surface-solid); }
@@ -372,7 +381,7 @@ const I18N = {
     labels: { c1: 'Important', c2: 'Waiting on others', c3: 'Group', c4: 'Research', c5: 'Reading', c6: 'Personal' },
     dueGroups: { overdue: 'Overdue', today: 'Today', tomorrow: 'Tomorrow', week: 'This week', nextweek: 'Next week', later: 'Later', none: 'No due date' },
     defaultBuckets: ['To do', 'In progress', 'Waiting'], newTaskTitle: 'New task',
-    quickAdd: '+ Add task, press Enter', noTasks: 'No tasks yet', addBucket: 'Add bucket', add: 'Add',
+    quickAdd: '+ Add task, press Enter', noTasks: 'No tasks yet', addBucket: 'Add bucket', add: 'Add', moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
     dueOverdue: (d, n) => `${d} · ${n} day${n === 1 ? '' : 's'} late`, dueToday: 'Due today', dueTomorrow: 'Due tomorrow',
     markDone: 'Mark complete', markUndone: 'Mark not complete',
     col: { title: 'Task', bucket: 'Bucket', progress: 'Progress', priority: 'Priority', start: 'Start', due: 'Due', assignee: 'Assigned to' },
@@ -405,7 +414,7 @@ const I18N = {
     labels: { c1: '重要', c2: '等待他人', c3: '小组', c4: '调研', c5: '阅读', c6: '个人' },
     dueGroups: { overdue: '已逾期', today: '今天', tomorrow: '明天', week: '本周', nextweek: '下周', later: '以后', none: '没有截止日期' },
     defaultBuckets: ['待办', '进行中', '等待中'], newTaskTitle: '新任务',
-    quickAdd: '+ 添加任务，回车保存', noTasks: '暂无任务', addBucket: '添加存储桶', add: '添加',
+    quickAdd: '+ 添加任务，回车保存', noTasks: '暂无任务', addBucket: '添加存储桶', add: '添加', moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
     dueOverdue: (d, n) => `${d} · 逾期 ${n} 天`, dueToday: '今天到期', dueTomorrow: '明天到期',
     markDone: '标记为已完成', markUndone: '标记为未完成',
     col: { title: '任务名称', bucket: '存储桶', progress: '进度', priority: '优先级', start: '开始日期', due: '截止日期', assignee: '负责人' },
@@ -578,6 +587,16 @@ function patchTask(id, patch) {
 function patchPlan(id, patch) {
   const p = state.plans[id]; if (!p) return;
   write('plans', id, Object.assign(clone(p), patch));
+}
+function moveBucket(planId, bucketId, to) {
+  const p = state.plans[planId]; if (!p) return;
+  const arr = p.buckets.slice();
+  const from = arr.findIndex(b => b.id === bucketId);
+  to = Math.max(0, Math.min(arr.length - 1, to));
+  if (from < 0 || from === to) return;
+  const [b] = arr.splice(from, 1);
+  arr.splice(to, 0, b);
+  patchPlan(planId, { buckets: arr });
 }
 function createTask(planId, fields) {
   const plan = state.plans[planId]; if (!plan) return null;
@@ -770,7 +789,7 @@ function boardColumns(plan) {
     return Object.entries(dates).map(([k, date]) => ({ key: k, name: L.dueGroups[k], match: t => dueGroup(t) === k, drop: date === null ? null : { due: date }, add: date === null ? null : { due: date }, cls: k === 'overdue' ? 'overdue' : '' }));
   }
   const ids = plan.buckets.map(b => b.id);
-  return plan.buckets.map((b, i) => ({ key: b.id, name: bName(b.name), match: t => t.bucketId === b.id || (i === 0 && !ids.includes(t.bucketId)), drop: { bucketId: b.id }, add: { bucketId: b.id } }));
+  return plan.buckets.map((b, i) => ({ key: b.id, bucketId: b.id, idx: i, total: plan.buckets.length, name: bName(b.name), match: t => t.bucketId === b.id || (i === 0 && !ids.includes(t.bucketId)), drop: { bucketId: b.id }, add: { bucketId: b.id } }));
 }
 
 function boardHTML(plan) {
@@ -778,8 +797,13 @@ function boardHTML(plan) {
   const tasks = applyFilter(tasksOf(plan.id));
   return `<div class="board">${boardColumns(plan).map(c => {
     const list = tasks.filter(c.match).sort(cmpTasks);
-    return `<section class="col" data-drop='${c.drop && !RO ? esc(JSON.stringify(c.drop)) : ''}'>
-      <div class="col-head ${c.cls || ''}"><h3>${esc(c.name)}</h3><span class="count">${list.length}</span></div>
+    const movable = c.bucketId && !RO;
+    return `<section class="col" data-drop='${c.drop && !RO ? esc(JSON.stringify(c.drop)) : ''}' ${c.bucketId ? `data-bucket-id="${esc(c.bucketId)}"` : ''}>
+      <div class="col-head ${c.cls || ''}" ${movable ? `draggable="true" data-bucket-id="${esc(c.bucketId)}" title="${esc(L.dragBucket)}"` : ''}>
+        <h3>${esc(c.name)}</h3>
+        ${movable && c.total > 1 ? `<span class="col-move"><button class="icon-btn" data-act="bucket-move" data-bucket="${esc(c.bucketId)}" data-to="${c.idx - 1}" aria-label="${esc(L.moveLeft)}" title="${esc(L.moveLeft)}" ${c.idx === 0 ? 'disabled' : ''}>‹</button><button class="icon-btn" data-act="bucket-move" data-bucket="${esc(c.bucketId)}" data-to="${c.idx + 1}" aria-label="${esc(L.moveRight)}" title="${esc(L.moveRight)}" ${c.idx === c.total - 1 ? 'disabled' : ''}>›</button></span>` : ''}
+        <span class="count">${list.length}</span>
+      </div>
       ${c.add && !RO ? `<input class="qa" id="qa-${esc(c.key)}" data-add='${esc(JSON.stringify(c.add))}' placeholder="${esc(L.quickAdd)}" maxlength="200" autocomplete="off">` : ''}
       ${list.map(cardHTML).join('')}
       ${!list.length ? `<div class="empty-col">${esc(L.noTasks)}</div>` : ''}
@@ -1062,6 +1086,7 @@ document.addEventListener('click', e => {
   switch (act) {
     case 'lang': ui.lang = el.dataset.lang; savePrefs(); render(); break;
     case 'theme': ui.theme = el.dataset.themeVal; savePrefs(); render(); break;
+    case 'bucket-move': if (!RO) moveBucket(ui.planId, el.dataset.bucket, +el.dataset.to); break;
     case 'goto': ui.planId = el.dataset.plan; savePrefs(); render(); window.scrollTo(0, 0); break;
     case 'view': ui.view = el.dataset.view; savePrefs(); render(); break;
     case 'new-plan-show': $('#new-plan-form').hidden = false; $('#new-plan-name').focus(); break;
@@ -1243,7 +1268,15 @@ document.addEventListener('submit', e => {
 
 /* drag and drop between board columns */
 let dragId = null;
+let dragBucket = null;
 document.addEventListener('dragstart', e => {
+  const head = e.target.closest && e.target.closest('.col-head[draggable="true"]');
+  if (head) {
+    dragBucket = head.dataset.bucketId; head.closest('.col').classList.add('bucket-dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', dragBucket); } catch (err) {}
+    return;
+  }
   const card = e.target.closest && e.target.closest('.card[draggable="true"]');
   if (!card) return;
   dragId = card.dataset.id; card.classList.add('dragging');
@@ -1251,16 +1284,40 @@ document.addEventListener('dragstart', e => {
   try { e.dataTransfer.setData('text/plain', dragId); } catch (err) {}
 });
 document.addEventListener('dragend', () => {
-  dragId = null;
-  document.querySelectorAll('.dragging, .drop-ok').forEach(n => n.classList.remove('dragging', 'drop-ok'));
+  dragId = null; dragBucket = null;
+  document.querySelectorAll('.dragging, .drop-ok, .bucket-dragging, .drop-before, .drop-after').forEach(n => n.classList.remove('dragging', 'drop-ok', 'bucket-dragging', 'drop-before', 'drop-after'));
 });
+const dropSide = (col, e) => { const r = col.getBoundingClientRect(); return e.clientX < r.left + r.width / 2 ? 'before' : 'after'; };
 document.addEventListener('dragover', e => {
+  if (dragBucket) {
+    const target = e.target.closest && e.target.closest('.col[data-bucket-id]');
+    document.querySelectorAll('.drop-before, .drop-after').forEach(n => { if (n !== target) n.classList.remove('drop-before', 'drop-after'); });
+    if (!target) return;
+    e.preventDefault();
+    const side = dropSide(target, e);
+    target.classList.toggle('drop-before', side === 'before');
+    target.classList.toggle('drop-after', side === 'after');
+    return;
+  }
   const col = e.target.closest && e.target.closest('.col');
   document.querySelectorAll('.drop-ok').forEach(n => { if (n !== col) n.classList.remove('drop-ok'); });
   if (!dragId || !col || !col.dataset.drop) return;
   e.preventDefault(); col.classList.add('drop-ok');
 });
 document.addEventListener('drop', e => {
+  if (dragBucket) {
+    const target = e.target.closest && e.target.closest('.col[data-bucket-id]');
+    const id = dragBucket; dragBucket = null;
+    if (!target) return;
+    e.preventDefault();
+    const p = state.plans[ui.planId]; if (!p) return;
+    const ids = p.buckets.map(b => b.id);
+    const from = ids.indexOf(id);
+    let to = ids.indexOf(target.dataset.bucketId) + (dropSide(target, e) === 'after' ? 1 : 0);
+    if (from < to) to -= 1;
+    moveBucket(p.id, id, to);
+    return;
+  }
   const col = e.target.closest && e.target.closest('.col');
   if (!dragId || !col || !col.dataset.drop) return;
   e.preventDefault();
