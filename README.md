@@ -12,6 +12,10 @@ Single HTML file. No build step, no server, no dependencies to install.
 - **Schedule**: month calendar by due date.
 - **Charts**: progress by bucket, priority and person.
 - **Task details**: bucket, progress, priority, start and due date, assigned person, labels, notes, checklist.
+- **Links**: attach links (assignment brief, Google Drive, Teams) to a task and open them in one click.
+- **Custom order**: drag cards up and down inside a column (Sort: Custom).
+- **Archive plans**: hide finished classes or projects without deleting them; restore any time.
+- **Keyboard shortcuts**: N new task, / search, 1 to 4 switch views, Esc close, ? show the list.
 - **Repeating tasks**: daily, weekdays, weekly, every 2 weeks or monthly. Completing one adds the next.
 - **Backup and restore**: export everything to a `.json` file and import it on another computer or browser.
 - Search and filters (due date, priority, hide completed).

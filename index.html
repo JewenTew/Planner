@@ -280,6 +280,23 @@ table.grid { width: 100%; border-collapse: collapse; min-width: 820px; }
 .signin .btn.primary { min-height: 42px; padding: 8px 22px; font-size: 15px; }
 .banner { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: var(--blue-soft); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; font-weight: 600; }
 .banner .grow { flex: 1; min-width: 200px; }
+.link-list { display: flex; flex-direction: column; gap: 4px; }
+.link-row { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-solid); min-width: 0; }
+.link-row a { display: inline-flex; align-items: center; gap: 6px; color: var(--ink); font-weight: 700; text-decoration: none; min-width: 0; flex: 1; }
+.link-row a:hover span { text-decoration: underline; }
+.link-row a span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.link-row a svg { flex: none; color: var(--accent-deep); }
+.link-row .host { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
+.link-add { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.link-add #link-url { flex: 2 1 220px; min-width: 0; }
+.link-add #link-name { flex: 1 1 120px; min-width: 0; }
+.nav-item.archived { opacity: .6; }
+.nav-item.arch-toggle { color: var(--muted); font-size: 13px; }
+.card.ins-before { box-shadow: 0 -3px 0 0 var(--accent-deep), var(--shadow); }
+.card.ins-after { box-shadow: 0 3px 0 0 var(--accent-deep), var(--shadow); }
+kbd { font-family: var(--font-body); font-weight: 800; font-size: 12px; background: var(--surface-2); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 1px 7px; white-space: nowrap; }
+.sc-list { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; align-items: center; }
+@media (max-width: 760px) { .desk-only { display: none !important; } }
 .unsched { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
 .unsched h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 800; }
 .unsched .list { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -437,6 +454,10 @@ const I18N = {
     signOut: 'Sign out', signInSync: 'Sign in to sync', syncCloud: n => `Synced to the cloud as ${n}.`,
     migrateQ: (p, t) => `This browser has ${p} plan${p === 1 ? '' : 's'} and ${t} task${t === 1 ? '' : 's'} saved before you signed in. Upload them to your account?`, upload: 'Upload', notNow: 'Not now', uploaded: 'Uploaded to your account',
     cloudFail: 'Could not connect to the cloud. Using this browser only for now.', signInFail: 'Sign-in did not finish. Please try again.', errCloudPerm: 'The cloud refused to save. Check the Firestore security rules.',
+    linksH: 'Links', linkUrlPh: 'Paste a link, e.g. https://drive.google.com/...', linkNamePh: 'Name (optional)', badLink: 'That does not look like a web link. It should start with https://', deleteLink: 'Remove link', linksN: n => `${n} link${n === 1 ? '' : 's'}`,
+    archive: 'Archive plan', unarchive: 'Restore plan', archivedN: n => `Archived (${n})`, archivedNote: 'This plan is archived. It is hidden from the sidebar list and the overview.', archivedToast: 'Plan archived. Find it under Archived in the sidebar.', unarchivedToast: 'Plan restored',
+    sortBy: 'Sort', sortOpts: { due: 'By due date', manual: 'Custom (drag)' }, sortSwitched: 'Switched to custom order. Drag cards to arrange them.',
+    shortcuts: 'Keyboard shortcuts', scList: [['N', 'New task (on Overview: new plan)'], ['/', 'Search'], ['1  2  3  4', 'Board, Grid, Schedule, Charts'], ['Esc', 'Close a window, or leave Select'], ['?', 'Show this list']],
     select: 'Select', selCancel: 'Cancel', selN: n => `${n} selected`, selAll: 'Select all', selClear: 'Clear', selHint: 'Click tasks to select them', markDoneSel: 'Mark complete', deleteSelQ: n => `Delete ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`, deletedN: n => `${n} task${n === 1 ? '' : 's'} deleted`, doneN: n => `${n} task${n === 1 ? '' : 's'} marked complete`, moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
     dueOverdue: (d, n) => `${d} · ${n} day${n === 1 ? '' : 's'} late`, dueToday: 'Due today', dueTomorrow: 'Due tomorrow',
     markDone: 'Mark complete', markUndone: 'Mark not complete',
@@ -480,6 +501,10 @@ const I18N = {
     signOut: '退出登录', signInSync: '登录以同步', syncCloud: n => `已同步到云端（${n}）。`,
     migrateQ: (p, t) => `这个浏览器里有 ${p} 个计划、${t} 项任务是登录前建的。要上传到你的账号吗？`, upload: '上传', notNow: '暂不', uploaded: '已上传到你的账号',
     cloudFail: '无法连接云端，暂时只保存在这个浏览器里。', signInFail: '登录没有完成，请再试一次。', errCloudPerm: '云端拒绝保存，请检查 Firestore 安全规则。',
+    linksH: '链接', linkUrlPh: '贴上链接，例如 https://drive.google.com/...', linkNamePh: '名称（可选）', badLink: '这看起来不是网址，应以 https:// 开头。', deleteLink: '删除链接', linksN: n => `${n} 个链接`,
+    archive: '归档计划', unarchive: '取消归档', archivedN: n => `已归档（${n}）`, archivedNote: '这个计划已归档，不会显示在左边栏的计划列表和概览里。', archivedToast: '计划已归档，可以在左边栏的“已归档”里找到。', unarchivedToast: '计划已恢复',
+    sortBy: '排序', sortOpts: { due: '按截止日期', manual: '自定义（拖动）' }, sortSwitched: '已切换为自定义排序，可以拖动卡片调整顺序。',
+    shortcuts: '键盘快捷键', scList: [['N', '新建任务（在概览页：新建计划）'], ['/', '搜索'], ['1  2  3  4', '看板、表格、日程、图表'], ['Esc', '关闭窗口，或退出多选'], ['?', '显示这个列表']],
     select: '多选', selCancel: '取消', selN: n => `已选 ${n} 项`, selAll: '全选', selClear: '清空', selHint: '点任务即可选择', markDoneSel: '标记完成', deleteSelQ: n => `删除这 ${n} 项任务？此操作无法撤销。`, deletedN: n => `已删除 ${n} 项任务`, doneN: n => `${n} 项任务已标记完成`, moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
     dueOverdue: (d, n) => `${d} · 逾期 ${n} 天`, dueToday: '今天到期', dueTomorrow: '明天到期',
     markDone: '标记为已完成', markUndone: '标记为未完成',
@@ -514,6 +539,9 @@ const ICON_REPEAT = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" 
 const ICON_BACKUP = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 1.5v7M4.2 5.8L7 8.6l2.8-2.8M2 9.5v1.5a1.5 1.5 0 0 0 1.5 1.5h7A1.5 1.5 0 0 0 12 11V9.5"/></svg>';
 const ICON_GOOGLE = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72A5.41 5.41 0 0 1 3.68 9c0-.6.1-1.18.29-1.72V4.95H.96A9 9 0 0 0 0 9c0 1.45.35 2.83.96 4.05l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>';
 const ICON_USER = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="5" r="2.5"/><path d="M2.5 12.5a4.5 4.5 0 0 1 9 0"/></svg>';
+const ICON_LINK = '<svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5.8 8.2a2.6 2.6 0 0 0 3.7 0l2-2a2.6 2.6 0 0 0-3.7-3.7l-.8.8M8.2 5.8a2.6 2.6 0 0 0-3.7 0l-2 2a2.6 2.6 0 0 0 3.7 3.7l.8-.8"/></svg>';
+const ICON_ARCHIVE = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="1.5" y="2" width="11" height="3" rx="1"/><path d="M2.5 5v6a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V5M5.5 7.5h3"/></svg>';
+const ICON_KEYS = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="1" y="3" width="12" height="8" rx="1.5"/><path d="M3.5 5.5h.01M6 5.5h.01M8.5 5.5h.01M11 5.5h.01M4 8.5h6"/></svg>';
 const ICON_CHECK = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>';
 const ICON_CAL = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="2.5" width="9" height="8" rx="1.5"/><path d="M1.5 5h9M4 1.2v2.4M8 1.2v2.4"/></svg>';
 const ICON_LIST = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M1.5 3l1 1 1.6-1.8M1.5 8l1 1 1.6-1.8M6 3.2h4.5M6 8.2h4.5"/></svg>';
@@ -538,7 +566,7 @@ const diffDays = (a, b) => Math.round((parse(b) - parse(a)) / 86400000);
 const state = { plans: {}, tasks: {}, plansReady: false, tasksReady: false, mode: 'local', readonly: false };
 const PREF_KEY = 'planner-prefs';
 const LOCAL_KEY = 'planner-data';
-let ui = { lang: 'en', theme: 'light', planId: 'hub', view: 'board', groupBy: 'bucket', filter: { q: '', due: 'all', pri: 'all', hideDone: false }, calMonth: today().slice(0, 7), hubCal: { mode: 'week', anchor: today() }, sort: { key: 'due', dir: 1 } };
+let ui = { lang: 'en', theme: 'light', planId: 'hub', view: 'board', groupBy: 'bucket', filter: { q: '', due: 'all', pri: 'all', hideDone: false }, calMonth: today().slice(0, 7), hubCal: { mode: 'week', anchor: today() }, boardSort: 'due', showArchived: false, sort: { key: 'due', dir: 1 } };
 try { const p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null'); if (p) ui = Object.assign(ui, p, { filter: Object.assign(ui.filter, p.filter || {}) }); } catch (e) {}
 if (!I18N[ui.lang]) ui.lang = 'en';
 if (!ui.hubCal || !/^\d{4}-\d{2}-\d{2}$/.test(ui.hubCal.anchor || '')) ui.hubCal = { mode: 'week', anchor: today() };
@@ -603,7 +631,26 @@ function cmpTasks(a, b) {
 
 const plansList = () => Object.values(state.plans).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
 const tasksOf = planId => Object.values(state.tasks).filter(t => t.planId === planId);
-const allTasks = () => Object.values(state.tasks).filter(t => state.plans[t.planId]);
+const activePlans = () => plansList().filter(p => !p.archived);
+const archivedPlans = () => plansList().filter(p => p.archived);
+// tasks in archived plans stay out of the overview, calendar and badges
+const allTasks = () => Object.values(state.tasks).filter(t => state.plans[t.planId] && !state.plans[t.planId].archived);
+const orderOf = t => (t && typeof t.order === 'number') ? t.order : (t && t.createdAt) || 0;
+function cmpManual(a, b) {
+  const da = a.progress === 'done' ? 1 : 0, db = b.progress === 'done' ? 1 : 0;
+  if (da !== db) return da - db;
+  return orderOf(a) - orderOf(b);
+}
+function normalizeOrder(planId) {
+  tasksOf(planId).sort(cmpTasks).forEach((t, i) => write('tasks', t.id, Object.assign(clone(t), { order: i * 1000 }), true));
+}
+function normalizeUrl(raw) {
+  let v = String(raw || '').trim();
+  if (!v) return null;
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(v)) v = 'https://' + v;
+  try { const u = new URL(v); return (u.protocol === 'https:' || u.protocol === 'http:') && u.hostname.includes('.') ? u.href : null; } catch (e) { return null; }
+}
+const hostOf = url => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
 
 /* ---------- store ---------- */
 let db = null;
@@ -872,7 +919,8 @@ function render() {
 
 function renderRail() {
   const RO = state.readonly, L = T();
-  const plans = plansList();
+  const plans = activePlans();
+  const archived = archivedPlans();
   const hubOverdue = allTasks().filter(t => dueStatus(t) === 'overdue').length;
   $('#rail').innerHTML = `
     <div class="brand">
@@ -897,12 +945,15 @@ function renderRail() {
         }).join('')}
         ${!RO && state.mode !== 'signin' ? `<button class="nav-item" data-act="new-plan-show" style="color:var(--muted)">${ICON_PLUS}<span class="name">${esc(L.newPlan)}</span></button>` : ''}
       </nav>
+      ${archived.length ? `<button class="nav-item arch-toggle" data-act="toggle-archived" aria-expanded="${!!ui.showArchived}">${ICON_ARCHIVE}<span class="name">${esc(L.archivedN(archived.length))}</span><span>${ui.showArchived ? '▾' : '▸'}</span></button>
+        ${ui.showArchived ? archived.map(p => `<button class="nav-item archived ${ui.planId === p.id ? 'active' : ''}" data-act="goto" data-plan="${p.id}"><span class="dot bg-${esc(p.color)}"></span><span class="name">${esc(p.name)}</span></button>`).join('') : ''}` : ''}
       <form class="new-plan" id="new-plan-form" hidden>
         <input class="input" id="new-plan-name" placeholder="${esc(L.planNamePh)}" maxlength="80" autocomplete="off">
         <button class="btn primary" type="submit">${esc(L.create)}</button>
       </form>
     </div>
     <nav class="nav">
+      <button class="nav-item desk-only" data-act="shortcuts" style="color:var(--muted)">${ICON_KEYS}<span class="name">${esc(L.shortcuts)}</span><kbd>?</kbd></button>
       ${state.mode !== 'signin' ? `<button class="nav-item" data-act="backup" style="color:var(--muted)">${ICON_BACKUP}<span class="name">${esc(L.backup)}</span></button>` : ''}
       ${state.mode === 'cloud' ? `<button class="nav-item" data-act="sign-out" style="color:var(--muted)" title="${esc(cloud.user ? cloud.user.email : '')}">${ICON_USER}<span class="name">${esc(L.signOut)}</span></button>` : ''}
       ${state.mode === 'local' && cloud.available ? `<button class="nav-item" data-act="sign-in" style="color:var(--muted)">${ICON_USER}<span class="name">${esc(L.signInSync)}</span></button>` : ''}
@@ -922,8 +973,9 @@ function renderMain() {
       <h1><span class="dot bg-${esc(plan.color)}"></span>${esc(plan.name)}</h1>
       <span class="sub">${esc(L.openN(tasksOf(plan.id).filter(t => t.progress !== 'done').length))}</span>
       <span class="spacer"></span>
-      ${!RO ? `<button class="btn primary" data-act="new-task">${ICON_PLUS}${esc(L.newTask)}</button><button class="btn" data-act="plan-settings">${ICON_GEAR}${esc(L.planSettings)}</button>` : ''}
+      ${!RO ? `<button class="btn primary" data-act="new-task" title="N">${ICON_PLUS}${esc(L.newTask)}</button><button class="btn" data-act="plan-settings">${ICON_GEAR}${esc(L.planSettings)}</button>` : ''}
     </div>
+    ${plan.archived ? `<div class="banner"><span class="grow">${esc(L.archivedNote)}</span>${!RO ? `<button class="btn" data-act="unarchive" data-plan="${plan.id}">${ICON_ARCHIVE}${esc(L.unarchive)}</button>` : ''}</div>` : ''}
     <div class="tabs" role="tablist">${Object.entries(L.views).map(([k, v]) => `<button class="tab ${ui.view === k ? 'active' : ''}" role="tab" aria-selected="${ui.view === k}" data-act="view" data-view="${k}">${esc(v)}</button>`).join('')}</div>
     ${ui.view !== 'charts' ? toolbarHTML() : ''}
     <div id="view">${ui.view === 'board' ? boardHTML(plan) : ui.view === 'grid' ? gridHTML(plan) : ui.view === 'schedule' ? scheduleHTML(plan) : chartsHTML(plan)}</div>
@@ -954,6 +1006,7 @@ function toolbarHTML() {
     <label class="chk"><input type="checkbox" id="f-done" ${f.hideDone ? 'checked' : ''}>${esc(L.hideDone)}</label>
     <span class="grow"></span>
     ${!state.readonly && (ui.view === 'board' || ui.view === 'grid') ? `<button class="btn ${sel.on ? 'on' : ''}" data-act="sel-toggle">${esc(L.select)}</button>` : ''}
+    ${ui.view === 'board' ? `<label class="chk">${esc(L.sortBy)} <select class="input" id="f-sort">${opt(L.sortOpts, ui.boardSort === 'manual' ? 'manual' : 'due')}</select></label>` : ''}
     ${ui.view === 'board' ? `<label class="chk">${esc(L.groupBy)} <select class="input" id="f-group">${opt(L.groupOpts, ui.groupBy)}</select></label>` : ''}
   </div>`;
 }
@@ -982,7 +1035,8 @@ function cardHTML(t) {
   const cl = t.checklist || [];
   const clDone = cl.filter(c => c.done).length;
   const labels = (t.labels || []).filter(k => LABEL_KEYS.includes(k));
-  const showMeta = t.due || t.repeat || cl.length || t.assignee || t.priority === 'urgent' || t.priority === 'important' || t.progress === 'doing';
+  const nLinks = (t.links || []).length;
+  const showMeta = t.due || t.repeat || nLinks || cl.length || t.assignee || t.priority === 'urgent' || t.priority === 'important' || t.progress === 'doing';
   const picked = sel.on && sel.ids.has(t.id);
   return `<article class="card ${t.progress === 'done' ? 'is-done' : ''} ${picked ? 'selected' : ''}" draggable="${!RO && !sel.on}" data-act="${sel.on ? 'sel-card' : 'open-task'}" data-id="${t.id}" tabindex="0" ${sel.on ? `aria-pressed="${picked}"` : ''}>
     ${labels.length ? `<div class="card-tags">${labels.map(k => `<span class="tag lbl-${k}">${esc(labelName(plan, k))}</span>`).join('')}</div>` : ''}
@@ -995,6 +1049,7 @@ function cardHTML(t) {
       ${t.repeat ? `<span class="chip" title="${esc(L.repeat)}: ${esc(L.repeatOpts[t.repeat] || '')}">${ICON_REPEAT}</span>` : ''}
       ${t.priority === 'urgent' || t.priority === 'important' ? `<span class="chip pri-${t.priority}">${esc(L.priority[t.priority])}</span>` : ''}
       ${t.progress === 'doing' ? `<span class="chip doing">${esc(L.progress.doing)}</span>` : ''}
+      ${nLinks ? `<span class="chip" title="${esc(L.linksN(nLinks))}">${ICON_LINK}<span class="num">${nLinks}</span></span>` : ''}
       ${cl.length ? `<span class="chip ${clDone === cl.length ? 'done' : ''}">${ICON_LIST}<span class="num">${clDone}/${cl.length}</span></span>` : ''}
       ${avatar(t.assignee)}
     </div>` : ''}
@@ -1018,7 +1073,7 @@ function boardHTML(plan) {
   const RO = state.readonly, L = T();
   const tasks = applyFilter(tasksOf(plan.id));
   return `<div class="board">${boardColumns(plan).map(c => {
-    const list = tasks.filter(c.match).sort(cmpTasks);
+    const list = tasks.filter(c.match).sort(ui.boardSort === 'manual' ? cmpManual : cmpTasks);
     const movable = c.bucketId && !RO;
     return `<section class="col" data-drop='${c.drop && !RO ? esc(JSON.stringify(c.drop)) : ''}' ${c.bucketId ? `data-bucket-id="${esc(c.bucketId)}"` : ''}>
       <div class="col-head ${c.cls || ''}" ${movable ? `draggable="true" data-bucket-id="${esc(c.bucketId)}" title="${esc(L.dragBucket)}"` : ''}>
@@ -1136,7 +1191,7 @@ function hubCalendarHTML() {
       <button class="btn" data-act="hub-cal-move" data-dir="1" aria-label="${esc(L.nextPeriod)}">›</button>
       <b style="min-width:150px;font-family:var(--font-display)">${esc(title)}</b>
     </div>
-    <div class="plan-legend">${plansList().map(p => `<span><i class="dot bg-${esc(p.color)}"></i>${esc(p.name)}</span>`).join('')}</div>
+    <div class="plan-legend">${activePlans().map(p => `<span><i class="dot bg-${esc(p.color)}"></i>${esc(p.name)}</span>`).join('')}</div>
     ${calGridHTML(cells, allTasks(), { monthKey: week ? null : hc.anchor.slice(0, 7), planColors: true, counts: true, week })}
   </section>`;
 }
@@ -1195,7 +1250,7 @@ function migrateBannerHTML() {
 
 function hubHTML() {
   const RO = state.readonly, L = T();
-  const plans = plansList();
+  const plans = activePlans();
   const td = today();
   const dayLine = `${fmtDate(td)} ${weekday(td)}`;
   if (!plans.length) {
@@ -1299,6 +1354,7 @@ function openTask(id, focusTitle) {
     ${t.due ? `<div>${dueChip(t)}</div>` : ''}
     <div><span class="section-label">${esc(L.labelsH)}</span><div class="label-picks">${LABEL_KEYS.map(k => `<button class="label-pick lbl-${k} ${(t.labels || []).includes(k) ? 'on' : ''}" data-act="toggle-label" data-label="${k}" ${dis}><i></i>${esc(labelName(plan, k))}</button>`).join('')}</div></div>
     <div><label class="section-label" for="t-notes">${esc(L.notesH)}</label><textarea class="input" id="t-notes" placeholder="${esc(L.notesPh)}" ${dis}>${esc(t.notes || '')}</textarea></div>
+    <div><span class="section-label">${esc(L.linksH)}</span><div id="t-links">${linksHTML(t)}</div></div>
     <div><span class="section-label">${esc(L.checklistH)}</span><div id="t-checklist">${checklistHTML(t)}</div></div>
     <div class="sheet-foot" id="t-foot">${taskFootHTML(t)}</div>
   </div></div>`;
@@ -1321,6 +1377,29 @@ function checklistHTML(t) {
     </div>`).join('')}
     ${!RO ? `<form id="cl-add" style="display:flex;gap:6px;margin-top:4px"><input class="input" id="cl-new" placeholder="${esc(L.addItem)}" maxlength="200" style="flex:1;min-width:0" autocomplete="off"><button class="btn" type="submit">${esc(L.add)}</button></form>` : ''}
   </div>`;
+}
+function linksHTML(t) {
+  const RO = state.readonly, L = T();
+  const links = t.links || [];
+  return `<div class="link-list">${links.map(l => `<div class="link-row">
+      <a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer" title="${esc(l.url)}">${ICON_LINK}<span>${esc(l.title || hostOf(l.url) || l.url)}</span></a>
+      ${l.title ? `<span class="host">${esc(hostOf(l.url))}</span>` : ''}
+      ${!RO ? `<button class="icon-btn" data-act="link-del" data-link="${esc(l.id)}" aria-label="${esc(L.deleteLink)}">${ICON_X}</button>` : ''}
+    </div>`).join('')}</div>
+    ${!RO ? `<form id="link-add" class="link-add"><input class="input" id="link-url" placeholder="${esc(L.linkUrlPh)}" maxlength="2000" autocomplete="off" inputmode="url"><input class="input" id="link-name" placeholder="${esc(L.linkNamePh)}" maxlength="80" autocomplete="off"><button class="btn" type="submit">${esc(L.add)}</button></form>` : ''}`;
+}
+function refreshLinks() {
+  const t = state.tasks[openTaskId]; if (!t) return;
+  $('#t-links').innerHTML = linksHTML(t);
+}
+function openShortcuts() {
+  const L = T();
+  openTaskId = null; openPlanSettingsId = null;
+  $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.shortcuts)}" style="height:auto;max-height:100%;align-self:flex-start">
+    <div class="sheet-head"><span>${esc(L.shortcuts)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
+    <div class="sc-list">${L.scList.map(([k, d]) => `<span>${k.split('  ').map(x => `<kbd>${esc(x)}</kbd>`).join(' ')}</span><span>${esc(d)}</span>`).join('')}</div>
+  </div></div>`;
+  $('.sheet [data-act="close"]').focus();
 }
 function refreshChecklist() {
   const t = state.tasks[openTaskId]; if (!t) return;
@@ -1368,7 +1447,7 @@ function parseBackup(text) {
     const buckets = Array.isArray(p.buckets) ? p.buckets.filter(b => b && typeof b.name === 'string').slice(0, 50).map(b => ({ id: str(b.id, 60) || uid(), name: b.name.slice(0, 40) })) : [];
     const labels = {};
     if (p.labels && typeof p.labels === 'object') LABEL_KEYS.forEach(k => { if (typeof p.labels[k] === 'string' && p.labels[k]) labels[k] = p.labels[k].slice(0, 24); });
-    plans[id] = { name: str(p.name, 80) || 'Plan', color: LABEL_KEYS.includes(p.color) ? p.color : 'c1', createdAt: +p.createdAt || Date.now(), labels, buckets: buckets.length ? buckets : T().defaultBuckets.map(n => ({ id: uid(), name: n })) };
+    plans[id] = { name: str(p.name, 80) || 'Plan', color: LABEL_KEYS.includes(p.color) ? p.color : 'c1', createdAt: +p.createdAt || Date.now(), archived: !!p.archived, labels, buckets: buckets.length ? buckets : T().defaultBuckets.map(n => ({ id: uid(), name: n })) };
   }
   for (const [rid, t] of Object.entries(d.tasks)) {
     if (!t || typeof t !== 'object' || !idMap[t.planId]) continue;
@@ -1382,6 +1461,8 @@ function parseBackup(text) {
       notes: str(t.notes, 20000),
       checklist: Array.isArray(t.checklist) ? t.checklist.filter(c => c && typeof c.text === 'string').slice(0, 200).map(c => ({ id: str(c.id, 60) || uid(), text: c.text.slice(0, 200), done: !!c.done })) : [],
       repeat: REPEATS.includes(t.repeat) ? t.repeat : '', repeatSpawned: !!t.repeatSpawned,
+      links: Array.isArray(t.links) ? t.links.slice(0, 50).map(l => l && normalizeUrl(l.url) ? { id: str(l.id, 60) || uid(), url: normalizeUrl(l.url), title: str(l.title, 80) } : null).filter(Boolean) : [],
+      ...(typeof t.order === 'number' && isFinite(t.order) ? { order: t.order } : {}),
       createdAt: +t.createdAt || Date.now(), updatedAt: Date.now(), completedAt: +t.completedAt || null
     };
   }
@@ -1435,7 +1516,7 @@ function openPlanSettings(id) {
       <form id="p-bucket-add" class="r"><input class="input" id="p-bucket-new" placeholder="${esc(L.newBucketPh)}" maxlength="40" autocomplete="off"><button class="btn" type="submit">${esc(L.add)}</button></form>
     </div></div>
     <div><span class="section-label">${esc(L.labelNames)}</span><div class="label-names">${LABEL_KEYS.map(k => `<label class="lbl-${k}"><i></i><input class="input" data-labelname="${k}" value="${esc(labelName(p, k))}" maxlength="24"></label>`).join('')}</div></div>
-    <div class="sheet-foot" id="p-foot"><span>${esc(L.totalN(n))}</span><span class="grow"></span><button class="btn danger" data-act="plan-delete-ask">${esc(L.deletePlan)}</button></div>
+    <div class="sheet-foot" id="p-foot"><span>${esc(L.totalN(n))}</span><span class="grow"></span><button class="btn" data-act="${p.archived ? 'unarchive' : 'archive'}" data-plan="${p.id}">${ICON_ARCHIVE}${esc(p.archived ? L.unarchive : L.archive)}</button><button class="btn danger" data-act="plan-delete-ask">${esc(L.deletePlan)}</button></div>
   </div></div>`;
 }
 const confirmHTML = (msg, cancelAct, okAct) => `<div class="confirm"><span class="grow">${esc(msg)}</span><button class="btn" data-act="${cancelAct}">${esc(T().cancel)}</button><button class="btn danger solid" data-act="${okAct}">${esc(T().del)}</button></div>`;
@@ -1450,6 +1531,15 @@ document.addEventListener('click', e => {
     case 'lang': ui.lang = el.dataset.lang; savePrefs(); render(); break;
     case 'theme': ui.theme = el.dataset.themeVal; savePrefs(); render(); break;
     case 'backup': closeBackup(); openBackup(); break;
+    case 'shortcuts': openShortcuts(); break;
+    case 'toggle-archived': ui.showArchived = !ui.showArchived; savePrefs(); render(); break;
+    case 'archive': if (!RO) { patchPlan(el.dataset.plan, { archived: true }); closeDialog(); ui.planId = 'hub'; savePrefs(); render(); toast(L.archivedToast); } break;
+    case 'unarchive': if (!RO) { patchPlan(el.dataset.plan, { archived: false }); closeDialog(); ui.planId = el.dataset.plan; savePrefs(); render(); toast(L.unarchivedToast); } break;
+    case 'link-del': {
+      const t = state.tasks[openTaskId]; if (!t || RO) break;
+      patchTask(t.id, { links: (t.links || []).filter(l => l.id !== el.dataset.link) });
+      refreshLinks(); break;
+    }
     case 'sign-in': signIn(); break;
     case 'use-local': lsSet(LOCAL_ONLY_KEY, '1'); startLocal(); break;
     case 'sign-out': if (cloud.auth) { exitSelect(); closeDialog(); cloud.auth.signOut(); } break;
@@ -1521,7 +1611,7 @@ document.addEventListener('click', e => {
     case 'hub-filter': {
       const due = el.dataset.due, td = today();
       const hit = t => due === 'overdue' ? dueStatus(t) === 'overdue' : due === 'today' ? dueStatus(t) === 'today' : (t.progress !== 'done' && t.due && t.due >= td && t.due <= endOfWeek(td));
-      const first = plansList().find(p => tasksOf(p.id).some(hit));
+      const first = activePlans().find(p => tasksOf(p.id).some(hit));
       if (!first) { toast(L.noMatch); break; }
       ui.planId = first.id; ui.view = 'grid'; ui.filter = { q: '', due, pri: 'all', hideDone: false }; savePrefs(); render();
       break;
@@ -1593,6 +1683,25 @@ document.addEventListener('keydown', e => {
     createTask(ui.planId, Object.assign({ title }, add));
     // keep focus in the same quick-add box for rapid entry
     const id = e.target.id; requestAnimationFrame(() => document.getElementById(id)?.focus());
+    return;
+  }
+  // single-key shortcuts, only when not typing and no window is open
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
+  if ($('#dialog-root').firstChild || state.mode === 'signin' || !state.plansReady) return;
+  const k = e.key, inPlan = ui.planId !== 'hub' && state.plans[ui.planId];
+  if (k === '?') { e.preventDefault(); openShortcuts(); }
+  else if (k === '/') { const q = $('#f-q'); if (q) { e.preventDefault(); q.focus(); q.select(); } }
+  else if (k === 'n' || k === 'N') {
+    if (state.readonly) return;
+    e.preventDefault();
+    if (inPlan) { const id = createTask(ui.planId, { bucketId: state.plans[ui.planId].buckets[0]?.id }); if (id) openTask(id, true); }
+    else { const f = $('#new-plan-form'); if (f) { f.hidden = false; $('#new-plan-name').focus(); } }
+  }
+  else if (inPlan && ['1', '2', '3', '4'].includes(k)) {
+    const v = ['board', 'grid', 'schedule', 'charts'][+k - 1];
+    if (v !== 'board' && v !== 'grid') exitSelect();
+    ui.view = v; savePrefs(); render();
   }
 });
 
@@ -1624,6 +1733,7 @@ document.addEventListener('change', e => {
   if (id === 'f-pri') { ui.filter.pri = el.value; savePrefs(); render(); return; }
   if (id === 'f-done') { ui.filter.hideDone = el.checked; savePrefs(); render(); return; }
   if (id === 'f-group') { ui.groupBy = el.value; savePrefs(); render(); return; }
+  if (id === 'f-sort') { ui.boardSort = el.value === 'manual' ? 'manual' : 'due'; savePrefs(); render(); return; }
   if (state.readonly) return;
   const t = state.tasks[openTaskId];
   if (t) {
@@ -1680,6 +1790,14 @@ document.addEventListener('submit', e => {
     patchPlan(p.id, { buckets: [...p.buckets, { id: uid(), name }] });
     openPlanSettings(p.id);
     $('#p-bucket-new').focus();
+  } else if (f.id === 'link-add') {
+    const t = state.tasks[openTaskId]; if (!t) return;
+    const url = normalizeUrl($('#link-url').value);
+    if (!url) { toast(T().badLink); $('#link-url').focus(); return; }
+    const title = $('#link-name').value.trim().slice(0, 80);
+    patchTask(t.id, { links: [...(t.links || []), { id: uid(), url, title }] });
+    refreshLinks();
+    $('#link-url').focus();
   } else if (f.id === 'cl-add') {
     const text = $('#cl-new').value.trim(); if (!text) return;
     const t = state.tasks[openTaskId]; if (!t) return;
@@ -1708,7 +1826,7 @@ document.addEventListener('dragstart', e => {
 });
 document.addEventListener('dragend', () => {
   dragId = null; dragBucket = null;
-  document.querySelectorAll('.dragging, .drop-ok, .bucket-dragging, .drop-before, .drop-after').forEach(n => n.classList.remove('dragging', 'drop-ok', 'bucket-dragging', 'drop-before', 'drop-after'));
+  document.querySelectorAll('.dragging, .drop-ok, .bucket-dragging, .drop-before, .drop-after, .ins-before, .ins-after').forEach(n => n.classList.remove('dragging', 'drop-ok', 'bucket-dragging', 'drop-before', 'drop-after', 'ins-before', 'ins-after'));
 });
 const dropSide = (col, e) => { const r = col.getBoundingClientRect(); return e.clientX < r.left + r.width / 2 ? 'before' : 'after'; };
 document.addEventListener('dragover', e => {
@@ -1724,9 +1842,17 @@ document.addEventListener('dragover', e => {
   }
   const col = e.target.closest && e.target.closest('.col');
   document.querySelectorAll('.drop-ok').forEach(n => { if (n !== col) n.classList.remove('drop-ok'); });
+  const over = dragId && e.target.closest ? e.target.closest('.card') : null;
+  document.querySelectorAll('.ins-before, .ins-after').forEach(n => { if (n !== over) n.classList.remove('ins-before', 'ins-after'); });
   if (!dragId || !col || !col.dataset.drop) return;
   e.preventDefault(); col.classList.add('drop-ok');
+  if (over && over.dataset.id !== dragId && col.contains(over)) {
+    const side = cardSide(over, e);
+    over.classList.toggle('ins-before', side === 'before');
+    over.classList.toggle('ins-after', side === 'after');
+  }
 });
+const cardSide = (card, e) => { const r = card.getBoundingClientRect(); return e.clientY < r.top + r.height / 2 ? 'before' : 'after'; };
 document.addEventListener('drop', e => {
   if (dragBucket) {
     const target = e.target.closest && e.target.closest('.col[data-bucket-id]');
@@ -1745,7 +1871,20 @@ document.addEventListener('drop', e => {
   if (!dragId || !col || !col.dataset.drop) return;
   e.preventDefault();
   const id = dragId; dragId = null;
-  patchTask(id, JSON.parse(col.dataset.drop));
+  const patch = JSON.parse(col.dataset.drop);
+  const over = e.target.closest('.card');
+  if (over && over.dataset.id !== id && col.contains(over)) {
+    // dropped onto a card: place it before or after that card
+    if (ui.boardSort !== 'manual') { normalizeOrder(ui.planId); ui.boardSort = 'manual'; savePrefs(); toast(T().sortSwitched); }
+    const ids = [...col.querySelectorAll('.card')].map(c => c.dataset.id).filter(x => x !== id);
+    const idx = ids.indexOf(over.dataset.id) + (cardSide(over, e) === 'after' ? 1 : 0);
+    const o = x => orderOf(state.tasks[x]);
+    const prev = ids[idx - 1], next = ids[idx];
+    patch.order = prev && next ? (o(prev) + o(next)) / 2 : prev ? o(prev) + 1000 : next ? o(next) - 1000 : Date.now();
+  } else if (col.contains(document.querySelector(`.card[data-id="${id}"]`))) {
+    return; // dropped on empty space in its own column
+  }
+  patchTask(id, patch);
 });
 
 /* refresh "today" math when the date rolls over */
