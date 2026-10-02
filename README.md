@@ -14,6 +14,7 @@ Single HTML file. No build step, no server, no dependencies to install.
 - **Grades**: give assignments, quizzes and exams a weight and a score to see your current grade, what you have earned so far, and the average you need on the rest to reach a target.
 - **Task details**: bucket, progress, priority, start and due date, assigned person, labels, notes, checklist.
 - **Timetable**: a weekly class timetable (day, time, room, lecturer, colour per course) with week-by-week navigation. One-time make-up classes have a date and appear only on that day. A weekly class can be moved or cancelled for a single day without changing other weeks. Make-up, moved and cancelled classes show in My Day and in the daily reminder. Today's classes also show in My Day. A timetable can be imported as a backup file with a `classes` section.
+- **Semester**: set the first and last day and any breaks; the timetable shows the teaching week (Week 5 of 14, skipping break weeks), and weekly classes only appear on teaching days.
 - **My Day**: pick tasks from any plan to work on today; the list clears itself every night.
 - **Search all plans** from the Overview.
 - **Undo**: deleting tasks or a plan shows an Undo button for 10 seconds (or press Ctrl + Z).
