@@ -1,6 +1,6 @@
 // Network first, so a new version shows up as soon as you are online.
 // The cached copy is only used when offline.
-const CACHE = 'planner-v10';
+const CACHE = 'planner-v11';
 const FILES = ['./', './index.html', './firebase-config.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {

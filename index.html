@@ -370,6 +370,21 @@ table.grades { min-width: 760px; }
 .brk-rows { display: flex; flex-direction: column; gap: 8px; }
 .brk-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) auto; gap: 6px; align-items: center; }
 @media (max-width: 560px) { .brk-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; } .brk-row .bn { grid-column: 1 / -1; } }
+.sheet.wide { width: min(920px, 100%); }
+.tti-drop { border: 2px dashed color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 14px; padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; background: var(--surface-2); }
+.tti-drop img { max-height: 120px; max-width: 220px; border-radius: 8px; border: 1px solid var(--line); }
+.tti-status { font-weight: 700; }
+.tti-status.err { color: var(--danger); }
+.tti-prog { height: 6px; border-radius: 999px; background: var(--surface-2); overflow: hidden; width: 220px; }
+.tti-prog i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .2s; }
+table.tti { width: 100%; border-collapse: collapse; min-width: 760px; }
+.tti th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 800; padding: 6px; border-bottom: 1px solid var(--line); }
+.tti td { padding: 4px; border-bottom: 1px solid var(--line); }
+.tti td .input { width: 100%; min-height: 30px; padding: 3px 6px; }
+.tti td select.input { min-width: 104px; }
+.tti td input[type="time"].input { min-width: 112px; }
+.tti tr.off td { opacity: .45; }
+.tti tr.guess td.endc .input { border-color: var(--warn); background: var(--warn-soft); }
 .unsched { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
 .unsched h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 800; }
 .unsched .list { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -564,6 +579,14 @@ const I18N = {
     breaksH: 'Breaks (no classes)', breakNamePh: 'e.g. Mid-term break', addBreak: 'Add break', clearSem: 'Clear semester', semCleared: 'Semester settings cleared',
     semHint: 'Weekly classes only show between the first and last day, and not during breaks. Week numbers skip break weeks. Make-up and moved classes always show.',
     semOrder: 'The last day is before the first day. Check the dates.', semTotal: n => `${n} teaching week${n === 1 ? '' : 's'}`,
+    ttImport: 'Import from picture', ttImportH: 'Import timetable from a picture', ttPick: 'Choose picture', ttPasteHint: 'or press Ctrl + V to paste a screenshot',
+    ttReading: 'Reading the picture…', ttFirstTime: 'The first time takes a little longer while the text reader downloads.', ttAsking: 'Claude is reading the picture…',
+    ttFound: n => `Found ${n} class${n === 1 ? '' : 'es'}. Check them, fix anything that is wrong, then import.`, ttNone: 'No classes found. Try a clearer screenshot, or add the rows by hand.',
+    ttFail: 'Could not read the picture. Try again, or add the rows by hand.', ttNoAI: 'Reading pictures is not available in this view.',
+    ttGuessHint: 'Highlighted end times were not in the picture and were guessed (2 hours). Please check them.',
+    ttCols: { use: 'Use', day: 'Day', start: 'Starts', end: 'Ends', code: 'Code', type: 'Type', room: 'Room' },
+    ttAddRow: 'Add a row', ttAdd: 'Add to timetable', ttReplace: 'Replace weekly classes', ttReplaceQ: n => `Remove the ${n} weekly class${n === 1 ? '' : 'es'} now in the timetable and use these instead? Make-up and moved classes are kept.`,
+    ttImported: n => `Imported ${n} class${n === 1 ? '' : 'es'}`, ttPrivacy: 'The picture is read on this device and is not uploaded.',
     select: 'Select', selCancel: 'Cancel', selN: n => `${n} selected`, selAll: 'Select all', selClear: 'Clear', selHint: 'Click tasks to select them', markDoneSel: 'Mark complete', deleteSelQ: n => `Delete ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`, deletedN: n => `${n} task${n === 1 ? '' : 's'} deleted`, doneN: n => `${n} task${n === 1 ? '' : 's'} marked complete`, moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
     dueOverdue: (d, n) => `${d} · ${n} day${n === 1 ? '' : 's'} late`, dueToday: 'Due today', dueTomorrow: 'Due tomorrow',
     markDone: 'Mark complete', markUndone: 'Mark not complete',
@@ -644,6 +667,14 @@ const I18N = {
     breaksH: '假期（不上课）', breakNamePh: '例如：期中假期', addBreak: '添加假期', clearSem: '清除学期设置', semCleared: '学期设置已清除',
     semHint: '每周的课只会在开始到结束日期之间显示，假期不显示。周数不计算假期周。补课和改时间的课一定会显示。',
     semOrder: '结束日期早于开始日期，请检查日期。', semTotal: n => `共 ${n} 个教学周`,
+    ttImport: '从图片导入', ttImportH: '从图片导入课程表', ttPick: '选择图片', ttPasteHint: '或按 Ctrl + V 贴上截图',
+    ttReading: '正在识别图片…', ttFirstTime: '第一次使用需要下载识别组件，会慢一点。', ttAsking: 'Claude 正在看图…',
+    ttFound: n => `找到 ${n} 节课。请检查，有错的地方直接改，然后导入。`, ttNone: '没有找到课程。试试更清楚的截图，或手动添加。',
+    ttFail: '无法识别这张图片。请再试一次，或手动添加。', ttNoAI: '这个版本无法识别图片。',
+    ttGuessHint: '标黄的结束时间图片里没有，是猜的（2 小时），请检查。',
+    ttCols: { use: '导入', day: '星期', start: '开始', end: '结束', code: '代码', type: '类型', room: '教室' },
+    ttAddRow: '添加一行', ttAdd: '加入课程表', ttReplace: '替换每周课程', ttReplaceQ: n => `删除课程表里现有的 ${n} 节每周课程，改用这些？补课和改时间的课会保留。`,
+    ttImported: n => `已导入 ${n} 节课`, ttPrivacy: '图片只在这台设备上识别，不会上传。',
     select: '多选', selCancel: '取消', selN: n => `已选 ${n} 项`, selAll: '全选', selClear: '清空', selHint: '点任务即可选择', markDoneSel: '标记完成', deleteSelQ: n => `删除这 ${n} 项任务？此操作无法撤销。`, deletedN: n => `已删除 ${n} 项任务`, doneN: n => `${n} 项任务已标记完成`, moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
     dueOverdue: (d, n) => `${d} · 逾期 ${n} 天`, dueToday: '今天到期', dueTomorrow: '明天到期',
     markDone: '标记为已完成', markUndone: '标记为未完成',
@@ -991,8 +1022,8 @@ function timetableHTML() {
   const L = T(), RO = state.readonly;
   const all = classesList();
   const weeklyN = all.filter(c => !c.date).length;
-  const head = `<div class="head"><h1 style="gap:10px">${ICON_TT.replace('width="14" height="14"', 'width="22" height="22"')}${esc(L.timetable)}</h1><span class="sub">${esc(L.timetableSub)}${weeklyN ? ' · ' + esc(L.classesN(weeklyN)) : ''}</span><span class="spacer"></span><button class="btn" data-act="sem-open">${ICON_GEAR}${esc(L.semSettings)}</button>${!RO ? `<button class="btn" data-act="makeup-new">${ICON_PLUS}${esc(L.addMakeup)}</button><button class="btn primary" data-act="class-new" title="N">${ICON_PLUS}${esc(L.addClass)}</button>` : ''}</div>`;
-  if (!all.length) return head + `<div class="empty"><h2>${esc(L.ttEmptyH)}</h2><p>${esc(L.ttEmptyP)}</p>${!RO ? `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn primary" data-act="class-new">${ICON_PLUS}${esc(L.addClass)}</button><button class="btn" data-act="backup">${ICON_BACKUP}${esc(L.orImport)}</button></div>` : ''}</div>`;
+  const head = `<div class="head"><h1 style="gap:10px">${ICON_TT.replace('width="14" height="14"', 'width="22" height="22"')}${esc(L.timetable)}</h1><span class="sub">${esc(L.timetableSub)}${weeklyN ? ' · ' + esc(L.classesN(weeklyN)) : ''}</span><span class="spacer"></span><button class="btn" data-act="sem-open">${ICON_GEAR}${esc(L.semSettings)}</button>${!RO ? `<button class="btn" data-act="tti-open">${esc(L.ttImport)}</button>` : ''}${!RO ? `<button class="btn" data-act="makeup-new">${ICON_PLUS}${esc(L.addMakeup)}</button><button class="btn primary" data-act="class-new" title="N">${ICON_PLUS}${esc(L.addClass)}</button>` : ''}</div>`;
+  if (!all.length) return head + `<div class="empty"><h2>${esc(L.ttEmptyH)}</h2><p>${esc(L.ttEmptyP)}</p>${!RO ? `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn primary" data-act="class-new">${ICON_PLUS}${esc(L.addClass)}</button><button class="btn" data-act="tti-open">${esc(L.ttImport)}</button><button class="btn" data-act="backup">${ICON_BACKUP}${esc(L.orImport)}</button></div>` : ''}</div>`;
   const td = today();
   const week = weekCells(ttAnchor || td);
   const shown = week.map(d => ({ d, list: classesOn(d), cx: cancelledOn(d) }));
@@ -1047,6 +1078,265 @@ function todayClassesHTML() {
     ${all.length ? all.map(c => classRowHTML(c, false, cx.includes(c))).join('') : `<p class="faint" style="margin:0">${esc(L.noClassesToday)}</p>`}
   </section>`;
 }
+/* ---------- timetable from a picture ---------- */
+const TESS_SRC = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+let ttImport = null; // { status: 'idle'|'reading'|'done'|'error', img, rows, msg, progress, confirm }
+const DAY_WORDS = [['monday', 'mon'], ['tuesday', 'tue', 'tues'], ['wednesday', 'wed'], ['thursday', 'thu', 'thur', 'thurs'], ['friday', 'fri'], ['saturday', 'sat'], ['sunday', 'sun']];
+const DAY_SHORT = ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'];
+function dayOfWord(w) {
+  const t = String(w).toLowerCase().replace(/[^a-z]/g, '');
+  if (t.length < 3) return 0;
+  for (let i = 0; i < 7; i++) if (DAY_WORDS[i].includes(t) || (t.length >= 6 && DAY_WORDS[i][0].startsWith(t))) return i + 1;
+  return 0;
+}
+// times as the text reader sees them: colons may be missing and some digits read as letters (S for 5, O for 0)
+const T_NUM = /([0-9OoSIl]{1,2})\s*[:.]?\s*([0-9OoSIl]{2})/.source;
+const T_AP = /\s*(?:([AaPp])\.?\s*[MmIir]?\.?)?/.source;
+const TIME_RANGE = new RegExp(T_NUM + T_AP + /\s*(?:-|–|—|~|to)\s*/.source + T_NUM + T_AP);
+const TIME_ONE = new RegExp(T_NUM + /\s*([AaPp])\.?\s*[MmIir]/.source);
+const fixDigits = v => String(v).replace(/[Oo]/g, '0').replace(/S/g, '5').replace(/[Il]/g, '1');
+function hm24(h, m, ap) {
+  h = +fixDigits(h); m = +fixDigits(m);
+  if (!(h <= 24 && m < 60)) return NaN;
+  if (ap) { ap = ap.toLowerCase(); if (ap === 'p' && h < 12) h += 12; if (ap === 'a' && h === 12) h = 0; }
+  return h * 60 + m;
+}
+function parseRange(text) {
+  const r = String(text).match(TIME_RANGE); if (!r) return null;
+  let ap1 = r[3], ap2 = r[6] || r[3];
+  if (!ap1 && ap2) ap1 = hm24(r[1], r[2], ap2) < hm24(r[4], r[5], ap2) ? ap2 : (ap2.toLowerCase() === 'p' ? 'a' : 'p');
+  let st = hm24(r[1], r[2], ap1), en = hm24(r[4], r[5], ap2);
+  // no AM/PM at all: read 1:00 to 7:59 as afternoon
+  if (!r[3] && !r[6]) { if (+fixDigits(r[1]) < 8) st += 720; if (+fixDigits(r[4]) < 8 || en <= st) en += 720; }
+  if (!(st >= 0 && en > st && en <= 1440)) return null;
+  return { start: fromMin(st), end: fromMin(en), at: r.index, len: r[0].length };
+}
+const CODE_CLEAN = /^[A-Z]{2,4}\d{3,4}[A-Z]?$/;
+const LETTERISH = { '8': 'S', '5': 'S', '0': 'O', '1': 'I', '6': 'G', '2': 'Z' };
+// a course code such as CS6314; fixes letters read as digits (C86344 -> CS6344)
+function findCode(text) {
+  // the reader sometimes turns S into $ and C into €
+  const toks = String(text).replace(/\$/g, 'S').replace(/€/g, 'C').split(/[^A-Za-z0-9]+/).filter(t => t.length >= 5 && t.length <= 8 && /\d{3}/.test(t) && /^[A-Za-z]/.test(t)).map(t => t.toUpperCase());
+  const clean = toks.find(t => CODE_CLEAN.test(t)); if (clean) return clean;
+  for (const u of toks) {
+    const m = u.match(/^([A-Z0-9]{2,4}?)(\d{3,4}[A-Z]?)$/);
+    if (m) { const fixed = [...m[1]].map(ch => LETTERISH[ch] || ch).join(''); if (/^[A-Z]{2,4}$/.test(fixed)) return fixed + m[2]; }
+  }
+  return '';
+}
+function typeOf(text) {
+  const t = String(text).toLowerCase();
+  if (/\btut[a-z]*/.test(t)) return 'Tutorial';
+  if (/\blec[a-z]*/.test(t)) return 'Lecture';
+  if (/\blab(oratory)?\b/.test(t)) return 'Lab';
+  if (/\bprac[a-z]*/.test(t)) return 'Practical';
+  if (/\bsemin[a-z]*/.test(t)) return 'Seminar';
+  if (/\bworksh[a-z]*/.test(t)) return 'Workshop';
+  return '';
+}
+// course code, type and room from a piece of text such as "C CS6314 Tutorial Room: CQAR2002-FCI CA E. IT Mgt Lab Status: Enrolled"
+function classBits(text) {
+  let t = String(text).replace(/status\s*[:.]?.*$/i, '').trim();
+  let room = '';
+  const rm = t.match(/\broom\s*[:.;]?\s*(.*)$/i);
+  if (rm) { room = rm[1].trim(); t = t.slice(0, rm.index); }
+  return { code: findCode(t), type: typeOf(t), room: room.replace(/\s{2,}/g, ' ').slice(0, 80) };
+}
+function ttRow(day, range, bits, guessedEnd) {
+  return { include: true, day, start: range.start, end: range.end, code: bits.code, type: bits.type, room: bits.room, guessedEnd: !!guessedEnd };
+}
+function dedupeRows(rows) {
+  const seen = new Set();
+  return rows.filter(r => { const k = [r.day, r.start, r.end, r.code, r.type].join('|'); if (seen.has(k)) return false; seen.add(k); return true; })
+    .sort((a, b) => a.day - b.day || toMin(a.start) - toMin(b.start));
+}
+// Turn OCR words and lines into classes. Handles a week grid (day names across the top)
+// and a list (a day heading, then one line per class).
+function parseTimetableOCR(data) {
+  const words = (data.words || []).filter(w => w.text && w.text.trim()).map(w => ({ text: w.text.trim(), x: (w.bbox.x0 + w.bbox.x1) / 2, y: (w.bbox.y0 + w.bbox.y1) / 2, h: w.bbox.y1 - w.bbox.y0, x0: w.bbox.x0, x1: w.bbox.x1 }));
+  const heads = words.filter(w => dayOfWord(w.text));
+  let best = null;
+  heads.forEach(h => { const row = heads.filter(o => Math.abs(o.y - h.y) < Math.max(12, h.h)); if (!best || row.length > best.length) best = row; });
+  const rows = [];
+  if (best && new Set(best.map(w => dayOfWord(w.text))).size >= 3) {
+    // week grid: put every word under its day column, then rebuild lines per column
+    const cols = [...new Map(best.map(w => [dayOfWord(w.text), w])).values()].sort((a, b) => a.x - b.x);
+    const gap = cols.length > 1 ? (cols[cols.length - 1].x - cols[0].x) / (cols.length - 1) : 200;
+    const headY = Math.max(...cols.map(c => c.y));
+    cols.forEach(col => {
+      const mine = words.filter(w => w.y > headY + col.h && Math.abs(w.x - col.x) < gap / 2).sort((a, b) => a.y - b.y || a.x - b.x);
+      const lines = [];
+      mine.forEach(w => { const ln = lines.find(l => Math.abs(l.y - w.y) < Math.max(6, w.h * 0.6)); if (ln) { ln.words.push(w); ln.y = (ln.y + w.y) / 2; } else lines.push({ y: w.y, words: [w] }); });
+      lines.forEach(l => { l.text = l.words.sort((a, b) => a.x - b.x).map(w => w.text).join(' '); });
+      lines.sort((a, b) => a.y - b.y);
+      const timeIdx = lines.map((l, i) => parseRange(l.text) ? i : -1).filter(i => i >= 0);
+      timeIdx.forEach((ti, k) => {
+        const range = parseRange(lines[ti].text);
+        const before = lines[ti].text.slice(0, range.at).trim();
+        const title = before || (ti > 0 && !parseRange(lines[ti - 1].text) && (k === 0 || ti - 1 > timeIdx[k - 1]) ? lines[ti - 1].text : '');
+        const stop = k + 1 < timeIdx.length ? timeIdx[k + 1] - 1 : lines.length;
+        const after = lines.slice(ti + 1, Math.max(ti + 1, stop)).map(l => l.text).join(' ');
+        const bits = classBits(title + ' ' + lines[ti].text.slice(range.at + range.len) + ' ' + after);
+        if (!bits.code) Object.assign(bits, { code: classBits(title).code });
+        rows.push(ttRow(dayOfWord(col.text), range, bits));
+      });
+    });
+  } else {
+    // list: day headings followed by class lines
+    // rebuild full-width rows from word positions (the reader may split one row into several blocks)
+    const rowsW = [];
+    words.slice().sort((a, b) => a.y - b.y || a.x - b.x).forEach(w => { const ln = rowsW.find(l => Math.abs(l.y - w.y) < Math.max(6, w.h * 0.6)); if (ln) ln.words.push(w); else rowsW.push({ y: w.y, words: [w] }); });
+    const lines = rowsW.sort((a, b) => a.y - b.y).map(l => l.words.sort((a, b) => a.x - b.x).map(w => w.text).join(' '));
+    let day = 0;
+    lines.forEach((text, i) => {
+      const first = text.split(' ')[0];
+      if (dayOfWord(first) && !parseRange(text) && !TIME_ONE.test(text)) { day = dayOfWord(first); return; }
+      let d = day;
+      const short = text.match(/\b(Mo|Tu|We|Th|Fr|Sa|Su)\b\s*\d/);
+      if (short) d = DAY_SHORT.indexOf(short[1].toLowerCase()) + 1;
+      const inline = text.split(' ').map(dayOfWord).find(Boolean);
+      if (!d && inline) d = inline;
+      let range = parseRange(text), guessed = false;
+      if (!range) {
+        const one = text.match(TIME_ONE); if (!one) return;
+        const st = hm24(one[1], one[2], one[3]);
+        if (!(st >= 0 && st < 1440)) return;
+        range ={ start: fromMin(st), end: fromMin(Math.min(st + 120, 1439)), at: one.index, len: one[0].length }; guessed = true;
+      }
+      if (!d) return;
+      let bits = classBits(text.slice(0, range.at) + ' ' + text.slice(range.at + range.len));
+      // the code may have wrapped onto the next line; only borrow it when that line is not a class or day heading of its own
+      const nextLine = lines[i + 1] || '';
+      if (!bits.code && nextLine && !parseRange(nextLine) && !TIME_ONE.test(nextLine) && !dayOfWord(nextLine.split(' ')[0])) bits.code = classBits(nextLine).code;
+      rows.push(ttRow(d, range, bits, guessed));
+    });
+  }
+  return dedupeRows(rows);
+}
+async function readWithOCR(file) {
+  await loadScript(TESS_SRC);
+  // enlarge small screenshots, which helps the text reader
+  const bmp = await createImageBitmap(file);
+  const scale = bmp.width < 1800 ? 2 : 1;
+  const canvas = document.createElement('canvas');
+  canvas.width = bmp.width * scale; canvas.height = bmp.height * scale;
+  const cx = canvas.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, canvas.width, canvas.height);
+  cx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+  // black and white: text black, coloured cells and grid lines white (light text on dark pictures is flipped)
+  const img = cx.getImageData(0, 0, canvas.width, canvas.height), px = img.data;
+  let sum = 0; for (let i = 0; i < px.length; i += 16) sum += 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+  const dark = sum / (px.length / 16) < 110;
+  for (let i = 0; i < px.length; i += 4) {
+    const l = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+    px[i] = px[i + 1] = px[i + 2] = (dark ? l > 140 : l < 150) ? 0 : 255;
+  }
+  cx.putImageData(img, 0, 0);
+  const worker = await Tesseract.createWorker('eng', 1, { logger: m => { if (m.status === 'recognizing text' && ttImport) { ttImport.progress = m.progress; const bar = $('#tti-bar'); if (bar) bar.style.width = (m.progress * 100).toFixed(0) + '%'; } } });
+  try { const { data } = await worker.recognize(canvas); return parseTimetableOCR(data); }
+  finally { worker.terminate(); }
+}
+async function readWithClaude(file) {
+  const sample = await window.claude.use('sample');
+  const caps = sample ? await sample.limits().catch(() => null) : null;
+  if (!caps || !caps.images) throw new Error('no-ai');
+  const res = await sample.json('The picture is a university class timetable (a week grid or a list). List every class session in it. '
+    + 'Answer with JSON only: {"classes":[{"day":1,"start":"13:00","end":"15:00","code":"CS6314","type":"Lecture","room":"CQAR1006-FCI Tutorial ROOM"}]}. '
+    + 'day: 1 = Monday ... 7 = Sunday. start and end in 24-hour HH:MM; use null for end if the picture does not show it. '
+    + 'code: the course code. type: Lecture, Tutorial, Lab and so on. room: the room text. Leave out status words such as Enrolled.', { images: file, modelTier: 'default' });
+  const list = Array.isArray(res && res.classes) ? res.classes : [];
+  return dedupeRows(list.map(c => {
+    const day = +c.day, st = validTime(c.start) ? c.start : null;
+    if (!(day >= 1 && day <= 7) || !st) return null;
+    const guessed = !validTime(c.end) || toMin(c.end) <= toMin(st);
+    const en = guessed ? fromMin(Math.min(toMin(st) + 120, 1439)) : c.end;
+    return { include: true, day, start: st, end: en, code: String(c.code || '').slice(0, 40), type: String(c.type || '').slice(0, 40), room: String(c.room || '').slice(0, 80), guessedEnd: guessed };
+  }).filter(Boolean));
+}
+async function runTtImport(file) {
+  if (!file || !/^image\//.test(file.type)) return;
+  const L = T();
+  if (ttImport && ttImport.img) URL.revokeObjectURL(ttImport.img);
+  ttImport = { status: 'reading', img: URL.createObjectURL(file), rows: [], progress: 0, msg: window.claude ? L.ttAsking : L.ttReading };
+  openTtImport();
+  try {
+    const rows = window.claude ? await readWithClaude(file) : await readWithOCR(file);
+    if (!ttImport) return;
+    ttImport.rows = rows; ttImport.status = 'done';
+    ttImport.msg = rows.length ? L.ttFound(rows.length) : L.ttNone;
+  } catch (e) {
+    if (!ttImport) return;
+    console.warn('timetable import', e);
+    ttImport.status = 'error'; ttImport.msg = e && e.message === 'no-ai' ? L.ttNoAI : L.ttFail;
+  }
+  if ($('#tti-sheet')) openTtImport();
+}
+function openTtImport() {
+  const L = T(), ti = ttImport || (ttImport = { status: 'idle', rows: [], progress: 0 });
+  openTaskId = null; openPlanSettingsId = null; openClassId = null;
+  const weeklyN = classesList().filter(c => !c.date).length;
+  const opt = (n, cur) => L.dayNames.map((d, i) => `<option value="${i + 1}" ${cur === i + 1 ? 'selected' : ''}>${esc(d)}</option>`).join('');
+  $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet wide" id="tti-sheet" role="dialog" aria-modal="true" aria-label="${esc(L.ttImportH)}">
+    <div class="sheet-head"><span>${esc(L.ttImportH)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
+    <div class="tti-drop">
+      ${ti.img ? `<img src="${ti.img}" alt="">` : ''}
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><label class="btn primary" for="tti-file">${esc(L.ttPick)}</label><span class="faint">${esc(L.ttPasteHint)}</span></div>
+        <input type="file" id="tti-file" accept="image/*" hidden>
+        ${!window.claude ? `<span class="faint" style="font-size:12px">${esc(L.ttPrivacy)}</span>` : ''}
+        ${ti.status === 'reading' ? `<span class="tti-status">${esc(ti.msg)}</span>${!window.claude ? `<div class="tti-prog"><i id="tti-bar" style="width:${(ti.progress * 100).toFixed(0)}%"></i></div><span class="faint" style="font-size:12px">${esc(L.ttFirstTime)}</span>` : ''}` : ''}
+        ${ti.status === 'done' || ti.status === 'error' ? `<span class="tti-status ${ti.status === 'error' ? 'err' : ''}">${esc(ti.msg)}</span>` : ''}
+      </div>
+    </div>
+    ${ti.status === 'done' || ti.status === 'error' || ti.rows.length ? `
+      ${ti.rows.some(r => r.guessedEnd) ? `<p class="warn-line" style="margin:0">${esc(L.ttGuessHint)}</p>` : ''}
+      <div style="overflow-x:auto"><table class="tti">
+        <thead><tr>${['use', 'day', 'start', 'end', 'code', 'type', 'room'].map(k => `<th>${esc(L.ttCols[k])}</th>`).join('')}<th></th></tr></thead>
+        <tbody>${ti.rows.map((r, i) => `<tr class="${r.include ? '' : 'off'} ${r.guessedEnd ? 'guess' : ''}">
+          <td><input type="checkbox" data-ri="${i}" data-rf="include" ${r.include ? 'checked' : ''}></td>
+          <td><select class="input" data-ri="${i}" data-rf="day">${opt(i, r.day)}</select></td>
+          <td><input class="input" type="time" data-ri="${i}" data-rf="start" value="${esc(r.start)}"></td>
+          <td class="endc"><input class="input" type="time" data-ri="${i}" data-rf="end" value="${esc(r.end)}"></td>
+          <td><input class="input" data-ri="${i}" data-rf="code" value="${esc(r.code)}" maxlength="40"></td>
+          <td><input class="input" data-ri="${i}" data-rf="type" value="${esc(r.type)}" maxlength="40" list="class-types-imp"></td>
+          <td><input class="input" data-ri="${i}" data-rf="room" value="${esc(r.room)}" maxlength="80"></td>
+          <td><button class="icon-btn" data-act="tti-del" data-ri="${i}" aria-label="${esc(L.del)}">${ICON_X}</button></td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+      <datalist id="class-types-imp">${L.typeOpts.map(o => `<option value="${esc(o)}">`).join('')}</datalist>
+      <div><button class="btn" data-act="tti-add-row">${ICON_PLUS}${esc(L.ttAddRow)}</button></div>
+      <div class="sheet-foot">
+        ${ti.confirm ? `<div class="confirm"><span class="grow">${esc(L.ttReplaceQ(weeklyN))}</span><button class="btn" data-act="tti-replace-cancel">${esc(L.cancel)}</button><button class="btn danger solid" data-act="tti-replace">${esc(L.ttReplace)}</button></div>`
+        : `<span class="grow"></span>${weeklyN ? `<button class="btn" data-act="tti-replace-ask" ${ti.rows.some(r => r.include) ? '' : 'disabled'}>${esc(L.ttReplace)}</button>` : ''}<button class="btn primary" data-act="tti-add" ${ti.rows.some(r => r.include) ? '' : 'disabled'}>${esc(L.ttAdd)}</button>`}
+      </div>` : ''}
+  </div></div>`;
+}
+function applyTtImport(replace) {
+  const L = T();
+  const rows = (ttImport ? ttImport.rows : []).filter(r => r.include && r.day >= 1 && r.day <= 7 && validTime(r.start) && validTime(r.end) && toMin(r.end) > toMin(r.start));
+  const existing = classesList();
+  if (replace) existing.filter(c => !c.date).forEach(c => write('classes', c.id, null, true));
+  // keep one colour per course code, reusing the colour a course already has
+  const colorOf = {};
+  existing.forEach(c => { if (c.code && !colorOf[c.code]) colorOf[c.code] = c.color; });
+  let next = 0;
+  const pick = code => {
+    if (code && colorOf[code]) return colorOf[code];
+    const used = Object.values(colorOf);
+    const col = LABEL_KEYS.find(k => !used.includes(k)) || LABEL_KEYS[next++ % LABEL_KEYS.length];
+    if (code) colorOf[code] = col;
+    return col;
+  };
+  rows.forEach(r => write('classes', uid(), {
+    title: r.code || r.type || L.newClass, code: r.code.trim(), type: r.type.trim(), date: '', day: r.day, start: r.start, end: r.end,
+    room: r.room.trim(), lecturer: '', color: pick(r.code.trim()), planId: '', createdAt: Date.now()
+  }, true));
+  closeTtImport();
+  closeDialog();
+  render();
+  toast(L.ttImported(rows.length));
+}
+function closeTtImport() { if (ttImport && ttImport.img) URL.revokeObjectURL(ttImport.img); ttImport = null; }
+
 function createClass(fields) {
   const id = uid();
   const used = classesList().map(c => c.color);
@@ -1891,6 +2181,7 @@ let openPlanSettingsId = null;
 
 function closeDialog() {
   if (openTaskId) flushTaskDialog();
+  if ($('#tti-sheet')) closeTtImport();
   if (openClassId) { const ti = $('#c-title'); const c = state.classes[openClassId]; if (ti && c && ti.value.trim() && ti.value.trim() !== c.title && !state.readonly) patchClass(openClassId, { title: ti.value.trim() }); openClassId = null; }
   closeBackup();
   openTaskId = null; openPlanSettingsId = null;
@@ -2146,6 +2437,13 @@ document.addEventListener('click', e => {
     case 'class-new': if (!RO) { const id = createClass({}); openClass(id, true); } break;
     case 'makeup-new': if (!RO) { const d = ttAnchor && ttAnchor > today() ? ttAnchor : today(); const id = createClass({ date: d, day: dowOf(d) }); openClass(id, true); } break;
     case 'sem-open': openSemester(); break;
+    case 'tti-open': closeTtImport(); openTtImport(); break;
+    case 'tti-del': if (ttImport) { ttImport.rows.splice(+el.dataset.ri, 1); openTtImport(); } break;
+    case 'tti-add-row': if (ttImport) { ttImport.rows.push({ include: true, day: 1, start: '09:00', end: '11:00', code: '', type: '', room: '', guessedEnd: false }); if (ttImport.status === 'idle') ttImport.status = 'done'; openTtImport(); } break;
+    case 'tti-add': if (!RO) applyTtImport(false); break;
+    case 'tti-replace-ask': if (ttImport) { ttImport.confirm = true; openTtImport(); } break;
+    case 'tti-replace-cancel': if (ttImport) { ttImport.confirm = false; openTtImport(); } break;
+    case 'tti-replace': if (!RO) applyTtImport(true); break;
     case 'sem-add-break': if (!RO) { const s = state.settings.semester || {}; patchSemester({ breaks: [...(s.breaks || []), { id: uid(), name: '', start: '', end: '' }] }); openSemester(); } break;
     case 'sem-del-break': if (!RO) { const s = state.settings.semester || {}; patchSemester({ breaks: (s.breaks || []).filter(b => b.id !== el.dataset.brk) }); openSemester(); } break;
     case 'sem-clear': if (!RO) { write('settings', 'semester', null); closeDialog(); toast(L.semCleared); } break;
@@ -2443,6 +2741,16 @@ document.addEventListener('change', e => {
     if (id !== 's-name' && !(el.dataset && el.dataset.bf === 'name')) openSemester();
     return;
   }
+  if (id === 'tti-file') { const f = el.files && el.files[0]; if (f) runTtImport(f); return; }
+  if (el.dataset && el.dataset.rf && ttImport) {
+    const r = ttImport.rows[+el.dataset.ri]; if (!r) return;
+    const f = el.dataset.rf;
+    if (f === 'include') { r.include = el.checked; el.closest('tr').classList.toggle('off', !el.checked); const any = ttImport.rows.some(x => x.include); document.querySelectorAll('[data-act="tti-add"], [data-act="tti-replace-ask"]').forEach(b => { b.disabled = !any; }); }
+    else if (f === 'day') r.day = +el.value;
+    else if (f === 'start' || f === 'end') { if (validTime(el.value)) { r[f] = el.value; if (f === 'end') { r.guessedEnd = false; el.closest('tr').classList.remove('guess'); } } else el.value = r[f]; }
+    else r[f] = el.value;
+    return;
+  }
   if (id === 'f-sort') { ui.boardSort = el.value === 'manual' ? 'manual' : 'due'; savePrefs(); render(); return; }
   if (state.readonly) return;
   const t = state.tasks[openTaskId];
@@ -2482,6 +2790,14 @@ document.addEventListener('change', e => {
       if (!v) el.value = T().labels[k];
     }
   }
+});
+
+document.addEventListener('paste', e => {
+  if (!$('#tti-sheet') || state.readonly) return;
+  const item = [...(e.clipboardData ? e.clipboardData.items : [])].find(i => i.kind === 'file' && /^image\//.test(i.type));
+  if (!item) return;
+  e.preventDefault();
+  runTtImport(item.getAsFile());
 });
 
 document.addEventListener('submit', e => {
