@@ -579,9 +579,9 @@ const I18N = {
     breaksH: 'Breaks (no classes)', breakNamePh: 'e.g. Mid-term break', addBreak: 'Add break', clearSem: 'Clear semester', semCleared: 'Semester settings cleared',
     semHint: 'Weekly classes only show between the first and last day, and not during breaks. Week numbers skip break weeks. Make-up and moved classes always show.',
     semOrder: 'The last day is before the first day. Check the dates.', semTotal: n => `${n} teaching week${n === 1 ? '' : 's'}`,
-    ttImport: 'Import from picture', ttImportH: 'Import timetable from a picture', ttPick: 'Choose picture', ttPasteHint: 'or press Ctrl + V to paste a screenshot',
+    ttClear: 'Clear timetable', ttCleared: n => `Removed ${n} class${n === 1 ? '' : 'es'}`, ttImport: 'Import from picture', ttImportH: 'Import timetable from a picture', ttPick: 'Choose picture', ttPasteHint: 'or press Ctrl + V to paste a screenshot',
     ttReading: 'Reading the picture…', ttFirstTime: 'The first time takes a little longer while the text reader downloads.', ttAsking: 'Claude is reading the picture…',
-    ttFound: n => `Found ${n} class${n === 1 ? '' : 'es'}. Check them, fix anything that is wrong, then import.`, ttNone: 'No classes found. Try a clearer screenshot, or add the rows by hand.',
+    ttFound: n => `Found ${n} class${n === 1 ? '' : 'es'}. Check them, fix anything that is wrong, then import.`, ttNone: 'No classes found. The text is probably too small: zoom the page in (Ctrl and +) and screenshot only the timetable (Windows + Shift + S). Or add the rows by hand.',
     ttFail: 'Could not read the picture. Try again, or add the rows by hand.', ttNoAI: 'Reading pictures is not available in this view.',
     ttGuessHint: 'Highlighted end times were not in the picture and were guessed (2 hours). Please check them.',
     ttCols: { use: 'Use', day: 'Day', start: 'Starts', end: 'Ends', code: 'Code', type: 'Type', room: 'Room' },
@@ -667,9 +667,9 @@ const I18N = {
     breaksH: '假期（不上课）', breakNamePh: '例如：期中假期', addBreak: '添加假期', clearSem: '清除学期设置', semCleared: '学期设置已清除',
     semHint: '每周的课只会在开始到结束日期之间显示，假期不显示。周数不计算假期周。补课和改时间的课一定会显示。',
     semOrder: '结束日期早于开始日期，请检查日期。', semTotal: n => `共 ${n} 个教学周`,
-    ttImport: '从图片导入', ttImportH: '从图片导入课程表', ttPick: '选择图片', ttPasteHint: '或按 Ctrl + V 贴上截图',
+    ttClear: '清空课程表', ttCleared: n => `已清空 ${n} 节课`, ttImport: '从图片导入', ttImportH: '从图片导入课程表', ttPick: '选择图片', ttPasteHint: '或按 Ctrl + V 贴上截图',
     ttReading: '正在识别图片…', ttFirstTime: '第一次使用需要下载识别组件，会慢一点。', ttAsking: 'Claude 正在看图…',
-    ttFound: n => `找到 ${n} 节课。请检查，有错的地方直接改，然后导入。`, ttNone: '没有找到课程。试试更清楚的截图，或手动添加。',
+    ttFound: n => `找到 ${n} 节课。请检查，有错的地方直接改，然后导入。`, ttNone: '没有找到课程，可能是字太小。请把网页放大（Ctrl 和 +），再只截课程表那一块（Windows + Shift + S）。也可以手动添加。',
     ttFail: '无法识别这张图片。请再试一次，或手动添加。', ttNoAI: '这个版本无法识别图片。',
     ttGuessHint: '标黄的结束时间图片里没有，是猜的（2 小时），请检查。',
     ttCols: { use: '导入', day: '星期', start: '开始', end: '结束', code: '代码', type: '类型', room: '教室' },
@@ -1022,7 +1022,7 @@ function timetableHTML() {
   const L = T(), RO = state.readonly;
   const all = classesList();
   const weeklyN = all.filter(c => !c.date).length;
-  const head = `<div class="head"><h1 style="gap:10px">${ICON_TT.replace('width="14" height="14"', 'width="22" height="22"')}${esc(L.timetable)}</h1><span class="sub">${esc(L.timetableSub)}${weeklyN ? ' · ' + esc(L.classesN(weeklyN)) : ''}</span><span class="spacer"></span><button class="btn" data-act="sem-open">${ICON_GEAR}${esc(L.semSettings)}</button>${!RO ? `<button class="btn" data-act="tti-open">${esc(L.ttImport)}</button>` : ''}${!RO ? `<button class="btn" data-act="makeup-new">${ICON_PLUS}${esc(L.addMakeup)}</button><button class="btn primary" data-act="class-new" title="N">${ICON_PLUS}${esc(L.addClass)}</button>` : ''}</div>`;
+  const head = `<div class="head"><h1 style="gap:10px">${ICON_TT.replace('width="14" height="14"', 'width="22" height="22"')}${esc(L.timetable)}</h1><span class="sub">${esc(L.timetableSub)}${weeklyN ? ' · ' + esc(L.classesN(weeklyN)) : ''}</span><span class="spacer"></span>${!RO && all.length ? `<button class="btn danger" data-act="tt-clear">${esc(L.ttClear)}</button>` : ''}<button class="btn" data-act="sem-open">${ICON_GEAR}${esc(L.semSettings)}</button>${!RO ? `<button class="btn" data-act="tti-open">${esc(L.ttImport)}</button>` : ''}${!RO ? `<button class="btn" data-act="makeup-new">${ICON_PLUS}${esc(L.addMakeup)}</button><button class="btn primary" data-act="class-new" title="N">${ICON_PLUS}${esc(L.addClass)}</button>` : ''}</div>`;
   if (!all.length) return head + `<div class="empty"><h2>${esc(L.ttEmptyH)}</h2><p>${esc(L.ttEmptyP)}</p>${!RO ? `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn primary" data-act="class-new">${ICON_PLUS}${esc(L.addClass)}</button><button class="btn" data-act="tti-open">${esc(L.ttImport)}</button><button class="btn" data-act="backup">${ICON_BACKUP}${esc(L.orImport)}</button></div>` : ''}</div>`;
   const td = today();
   const week = weekCells(ttAnchor || td);
@@ -1213,27 +1213,50 @@ function parseTimetableOCR(data) {
   }
   return dedupeRows(rows);
 }
-async function readWithOCR(file) {
-  await loadScript(TESS_SRC);
-  // enlarge small screenshots, which helps the text reader
-  const bmp = await createImageBitmap(file);
-  const scale = bmp.width < 1800 ? 2 : 1;
+// enlarge the picture and make it black and white: text black, coloured cells and grid lines white.
+// cut is the brightness below which a pixel counts as text (light text on dark pictures is flipped).
+function ocrCanvas(bmp, scale, cut) {
   const canvas = document.createElement('canvas');
-  canvas.width = bmp.width * scale; canvas.height = bmp.height * scale;
-  const cx = canvas.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, canvas.width, canvas.height);
+  canvas.width = Math.round(bmp.width * scale); canvas.height = Math.round(bmp.height * scale);
+  const cx = canvas.getContext('2d');
+  cx.imageSmoothingQuality = 'high';
+  cx.fillStyle = '#fff'; cx.fillRect(0, 0, canvas.width, canvas.height);
   cx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
-  // black and white: text black, coloured cells and grid lines white (light text on dark pictures is flipped)
   const img = cx.getImageData(0, 0, canvas.width, canvas.height), px = img.data;
-  let sum = 0; for (let i = 0; i < px.length; i += 16) sum += 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
-  const dark = sum / (px.length / 16) < 110;
+  let sum = 0, n = 0;
+  for (let i = 0; i < px.length; i += 64) { sum += 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]; n++; }
+  const dark = sum / n < 110;
   for (let i = 0; i < px.length; i += 4) {
     const l = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
-    px[i] = px[i + 1] = px[i + 2] = (dark ? l > 140 : l < 150) ? 0 : 255;
+    px[i] = px[i + 1] = px[i + 2] = (dark ? l > 255 - cut : l < cut) ? 0 : 255;
   }
   cx.putImageData(img, 0, 0);
-  const worker = await Tesseract.createWorker('eng', 1, { logger: m => { if (m.status === 'recognizing text' && ttImport) { ttImport.progress = m.progress; const bar = $('#tti-bar'); if (bar) bar.style.width = (m.progress * 100).toFixed(0) + '%'; } } });
-  try { const { data } = await worker.recognize(canvas); return parseTimetableOCR(data); }
-  finally { worker.terminate(); }
+  return canvas;
+}
+async function readWithOCR(file) {
+  await loadScript(TESS_SRC);
+  const bmp = await createImageBitmap(file);
+  // aim for about 3000 px across so small text becomes readable (never shrink, at most 4x, and keep the canvas a sane size)
+  const fit = s => Math.min(s, 4, Math.sqrt(40e6 / (bmp.width * bmp.height)));
+  const base = fit(Math.max(1, 3000 / bmp.width));
+  // if a pass finds too little, try again much larger (for screenshots of a zoomed-out page) or with a different black-and-white cut
+  const passes = [[base, 150], [fit(Math.max(base * 2, 3)), 185], [fit(4), 200]];
+  let pass = 0;
+  const worker = await Tesseract.createWorker('eng', 1, { logger: m => {
+    if (m.status !== 'recognizing text' || !ttImport) return;
+    ttImport.progress = (pass + m.progress) / passes.length;
+    const bar = $('#tti-bar'); if (bar) bar.style.width = (ttImport.progress * 100).toFixed(0) + '%';
+  } });
+  try {
+    let best = [];
+    for (pass = 0; pass < passes.length; pass++) {
+      const { data } = await worker.recognize(ocrCanvas(bmp, passes[pass][0], passes[pass][1]));
+      const rows = parseTimetableOCR(data);
+      if (rows.length > best.length) best = rows;
+      if (rows.length >= 3) break;
+    }
+    return best;
+  } finally { worker.terminate(); }
 }
 async function readWithClaude(file) {
   const sample = await window.claude.use('sample');
@@ -2438,6 +2461,7 @@ document.addEventListener('click', e => {
     case 'makeup-new': if (!RO) { const d = ttAnchor && ttAnchor > today() ? ttAnchor : today(); const id = createClass({ date: d, day: dowOf(d) }); openClass(id, true); } break;
     case 'sem-open': openSemester(); break;
     case 'tti-open': closeTtImport(); openTtImport(); break;
+    case 'tt-clear': if (!RO) { const ids = Object.keys(state.classes || {}); if (ids.length) deleteWithUndo([], [], L.ttCleared(ids.length), ids); } break;
     case 'tti-del': if (ttImport) { ttImport.rows.splice(+el.dataset.ri, 1); openTtImport(); } break;
     case 'tti-add-row': if (ttImport) { ttImport.rows.push({ include: true, day: 1, start: '09:00', end: '11:00', code: '', type: '', room: '', guessedEnd: false }); if (ttImport.status === 'idle') ttImport.status = 'done'; openTtImport(); } break;
     case 'tti-add': if (!RO) applyTtImport(false); break;
