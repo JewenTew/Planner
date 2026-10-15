@@ -1091,9 +1091,9 @@ function dayOfWord(w) {
 }
 // times as the text reader sees them: colons may be missing and some digits read as letters (S for 5, O for 0)
 const T_NUM = /([0-9OoSIl]{1,2})\s*[:.]?\s*([0-9OoSIl]{2})/.source;
-const T_AP = /\s*(?:([AaPp])\.?\s*[MmIir]?\.?)?/.source;
+const T_AP = /\s*(?:([AaPp])\.?\s*[MmIiNnRr14]{0,2}\.?)?/.source;
 const TIME_RANGE = new RegExp(T_NUM + T_AP + /\s*(?:-|–|—|~|to)\s*/.source + T_NUM + T_AP);
-const TIME_ONE = new RegExp(T_NUM + /\s*([AaPp])\.?\s*[MmIir]/.source);
+const TIME_ONE = new RegExp(T_NUM + /\s*([AaPp])\.?\s*[MmIiNnRr14]/.source);
 const fixDigits = v => String(v).replace(/[Oo]/g, '0').replace(/S/g, '5').replace(/[Il]/g, '1');
 function hm24(h, m, ap) {
   h = +fixDigits(h); m = +fixDigits(m);
@@ -1116,11 +1116,14 @@ const LETTERISH = { '8': 'S', '5': 'S', '0': 'O', '1': 'I', '6': 'G', '2': 'Z' }
 // a course code such as CS6314; fixes letters read as digits (C86344 -> CS6344)
 function findCode(text) {
   // the reader sometimes turns S into $ and C into €
-  const toks = String(text).replace(/\$/g, 'S').replace(/€/g, 'C').split(/[^A-Za-z0-9]+/).filter(t => t.length >= 5 && t.length <= 8 && /\d{3}/.test(t) && /^[A-Za-z]/.test(t)).map(t => t.toUpperCase());
-  const clean = toks.find(t => CODE_CLEAN.test(t)); if (clean) return clean;
+  const toks = String(text).replace(/\$/g, 'S').replace(/€/g, 'C').split(/[^A-Za-z0-9]+/)
+    .filter(t => t.length >= 5 && t.length <= 9 && /\d{3}/.test(t)).map(t => t.toUpperCase());
+  const clean = toks.find(t => /^[A-Z]/.test(t) && CODE_CLEAN.test(t)); if (clean) return clean;
+  // one stray character in front, e.g. 0OB6223 -> OB6223
+  const trimmed = toks.map(t => t.slice(1)).find(t => CODE_CLEAN.test(t)); if (trimmed) return trimmed;
   for (const u of toks) {
     const m = u.match(/^([A-Z0-9]{2,4}?)(\d{3,4}[A-Z]?)$/);
-    if (m) { const fixed = [...m[1]].map(ch => LETTERISH[ch] || ch).join(''); if (/^[A-Z]{2,4}$/.test(fixed)) return fixed + m[2]; }
+    if (m && /^[A-Z]/.test(u)) { const fixed = [...m[1]].map(ch => LETTERISH[ch] || ch).join(''); if (/^[A-Z]{2,4}$/.test(fixed)) return fixed + m[2]; }
   }
   return '';
 }
