@@ -400,6 +400,29 @@ table.tti { width: 100%; border-collapse: collapse; min-width: 760px; }
 .set-link { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); background: var(--surface-solid); border-radius: 12px; padding: 10px 12px; text-align: left; width: 100%; font-weight: 700; }
 .set-link:hover { border-color: var(--accent); }
 .set-link .faint { margin-left: auto; font-size: 12px; font-weight: 600; }
+.mk.ex { color: var(--surface-solid); background: var(--danger); }
+.tt-block.exam { border-left-color: var(--danger); border-left-width: 5px; background: color-mix(in srgb, var(--danger-soft) 70%, var(--surface-solid)); }
+.cal-task.exam { border-left-color: var(--danger); background: var(--danger-soft); font-weight: 800; }
+.att { display: inline-flex; gap: 4px; }
+.att button { border: 1px solid var(--line); background: var(--surface-solid); border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 800; color: var(--muted); }
+.att button.p.on { background: var(--ok); border-color: var(--ok); color: var(--surface-solid); }
+.att button.a.on { background: var(--danger); border-color: var(--danger); color: var(--surface-solid); }
+.attm { font-style: normal; font-weight: 900; font-size: 11px; }
+.attm.p { color: var(--ok); } .attm.a { color: var(--danger); }
+.att-rows { display: flex; flex-direction: column; gap: 10px; }
+.att-row { display: grid; grid-template-columns: 110px minmax(0, 1fr) 54px auto; gap: 10px; align-items: center; font-size: 13px; font-weight: 700; }
+.att-row .bar { height: 10px; }
+.att-row .pct { text-align: right; font-variant-numeric: tabular-nums; }
+.att-row.warn .pct { color: var(--warn); } .att-row.low .pct { color: var(--danger); }
+.att-row .bar i.ok { background: var(--ok); } .att-row.warn .bar i.ok { background: var(--warn); } .att-row.low .bar i.ok { background: var(--danger); }
+.att-row .faint { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.exam-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 6px; border-top: 1px solid var(--line); cursor: pointer; border-radius: 8px; border-left: 4px solid var(--lc); }
+.exam-row:first-of-type { border-top: 0; }
+.exam-row:hover { background: var(--surface-2); }
+.exam-row .t { font-weight: 800; }
+.exam-row .p { font-size: 12px; color: var(--muted); font-weight: 600; }
+.course-strip { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; font-weight: 700; color: var(--muted); }
+.course-strip .chip { font-size: 12px; }
 .unsched { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
 .unsched h3 { margin: 0 0 8px; font-size: 13px; color: var(--muted); font-weight: 800; }
 .unsched .list { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -602,6 +625,13 @@ const I18N = {
     ttCols: { use: 'Use', day: 'Day', start: 'Starts', end: 'Ends', code: 'Code', type: 'Type', room: 'Room' },
     ttAddRow: 'Add a row', ttAdd: 'Add to timetable', ttReplace: 'Replace weekly classes', ttReplaceQ: n => `Remove the ${n} weekly class${n === 1 ? '' : 'es'} now in the timetable and use these instead? Make-up and moved classes are kept.`,
     ttImported: n => `Imported ${n} class${n === 1 ? '' : 'es'}`, ttPrivacy: 'The picture is read on this device and is not uploaded.',
+    exam: 'Exam', addExam: 'Add exam', newExam: 'New exam', examDetails: 'Exam details', examTypes: ['Final', 'Midterm', 'Quiz', 'Test'],
+    examHint: 'Fill in the course code so the exam joins the right course.', deleteExam: 'Delete exam', examsH: 'Exam countdown', examsSub: 'Upcoming exams',
+    remindExams: n => `${n} exam${n === 1 ? '' : 's'} today`, remindSoonExams: n => `${n} exam${n === 1 ? '' : 's'} in the next 3 days`, soonExamsH: 'Exams in the next 3 days',
+    coursePlans: 'Create a plan for each course', coursePlansDone: (m, l) => `Created ${m} plan${m === 1 ? '' : 's'} and linked ${l} class${l === 1 ? '' : 'es'}`, coursePlansNone: 'Add course codes to your classes first.',
+    attendance: 'Attendance', attSub: n => `below ${n}% turns red`, present: 'Present', absent: 'Absent', attCount: (p, t) => `${p} of ${t} attended`,
+    attHint: 'Mark attendance in My Day, or click a class in the timetable to fill in earlier days.', attH: d => `Attendance: ${d}`,
+    attLow: (code, r, min) => `${code} attendance is ${r}%, below ${min}%.`, attMinL: 'Minimum attendance %', eachWeek: 'Each week',
     select: 'Select', selCancel: 'Cancel', selN: n => `${n} selected`, selAll: 'Select all', selClear: 'Clear', selHint: 'Click tasks to select them', markDoneSel: 'Mark complete', deleteSelQ: n => `Delete ${n} task${n === 1 ? '' : 's'}? This cannot be undone.`, deletedN: n => `${n} task${n === 1 ? '' : 's'} deleted`, doneN: n => `${n} task${n === 1 ? '' : 's'} marked complete`, moveLeft: 'Move left', moveRight: 'Move right', dragBucket: 'Drag to move this bucket',
     dueOverdue: (d, n) => `${d} · ${n} day${n === 1 ? '' : 's'} late`, dueToday: 'Due today', dueTomorrow: 'Due tomorrow',
     markDone: 'Mark complete', markUndone: 'Mark not complete',
@@ -690,6 +720,13 @@ const I18N = {
     ttCols: { use: '导入', day: '星期', start: '开始', end: '结束', code: '代码', type: '类型', room: '教室' },
     ttAddRow: '添加一行', ttAdd: '加入课程表', ttReplace: '替换每周课程', ttReplaceQ: n => `删除课程表里现有的 ${n} 节每周课程，改用这些？补课和改时间的课会保留。`,
     ttImported: n => `已导入 ${n} 节课`, ttPrivacy: '图片只在这台设备上识别，不会上传。',
+    exam: '考试', addExam: '添加考试', newExam: '新考试', examDetails: '考试详情', examTypes: ['期末考', '期中考', '小测', '测验'],
+    examHint: '填上课程代码，考试就会连到对应的科目。', deleteExam: '删除考试', examsH: '考试倒计时', examsSub: '接下来的考试',
+    remindExams: n => `今天有 ${n} 场考试`, remindSoonExams: n => `未来 3 天有 ${n} 场考试`, soonExamsH: '未来 3 天的考试',
+    coursePlans: '为每门课建立计划', coursePlansDone: (m, l) => `已建立 ${m} 个计划，连接了 ${l} 节课`, coursePlansNone: '请先在课程里填上课程代码。',
+    attendance: '出席率', attSub: n => `低于 ${n}% 会变红`, present: '出席', absent: '缺席', attCount: (p, t) => `出席 ${p} / 共 ${t} 节`,
+    attHint: '在“我的一天”标记出席，或在课程表点那节课补记以前的。', attH: d => `出席记录：${d}`,
+    attLow: (code, r, min) => `${code} 出席率 ${r}%，低于 ${min}%。`, attMinL: '最低出席率 %', eachWeek: '每周',
     select: '多选', selCancel: '取消', selN: n => `已选 ${n} 项`, selAll: '全选', selClear: '清空', selHint: '点任务即可选择', markDoneSel: '标记完成', deleteSelQ: n => `删除这 ${n} 项任务？此操作无法撤销。`, deletedN: n => `已删除 ${n} 项任务`, doneN: n => `${n} 项任务已标记完成`, moveLeft: '左移', moveRight: '右移', dragBucket: '拖动可移动这个存储桶',
     dueOverdue: (d, n) => `${d} · 逾期 ${n} 天`, dueToday: '今天到期', dueTomorrow: '明天到期',
     markDone: '标记为已完成', markUndone: '标记为未完成',
@@ -894,23 +931,25 @@ function maybeRemind() {
   if (last === td) { remindedThisLoad = true; return; }
   const list = dueNow();
   const mk = classesOn(td).filter(c => c.date), cx = cancelledOn(td);
-  if ((!list.length && !mk.length && !cx.length) || $('#dialog-root').firstChild) return;
+  const soon = upcomingExams().filter(c => c.date > td && c.date <= addDays(td, 3));
+  if ((!list.length && !mk.length && !cx.length && !soon.length) || $('#dialog-root').firstChild) return;
   remindedThisLoad = true;
   try { localStorage.setItem(REMIND_KEY, td); } catch (e) {}
   const L = T(), od = list.filter(t => t.due < td).length, dt = list.length - od;
   if (document.visibilityState === 'hidden' && !window.claude && 'Notification' in window && Notification.permission === 'granted') {
-    try { const n = new Notification('Planner', { body: [list.length ? L.remindSub(od, dt) : '', mk.length ? L.remindMakeup(mk.length) : '', cx.length ? L.remindCancelled(cx.length) : ''].filter(Boolean).join(' · '), icon: 'icons/icon-192.png', tag: 'planner-' + td }); n.onclick = () => { window.focus(); n.close(); }; } catch (e) {}
+    try { const n = new Notification('Planner', { body: [list.length ? L.remindSub(od, dt) : '', mk.filter(isExam).length ? L.remindExams(mk.filter(isExam).length) : '', mk.filter(c => !isExam(c)).length ? L.remindMakeup(mk.filter(c => !isExam(c)).length) : '', cx.length ? L.remindCancelled(cx.length) : '', soon.length ? L.remindSoonExams(soon.length) : ''].filter(Boolean).join(' · '), icon: 'icons/icon-192.png', tag: 'planner-' + td }); n.onclick = () => { window.focus(); n.close(); }; } catch (e) {}
   }
-  openReminder(list, mk, cx);
+  openReminder(list, mk, cx, soon);
 }
-function openReminder(list, mk = [], cx = []) {
+function openReminder(list, mk = [], cx = [], soon = []) {
   const L = T(), td = today();
   const od = list.filter(t => t.due < td).sort(cmpTasks), dt = list.filter(t => t.due === td).sort(cmpTasks);
   const canAsk = !window.claude && 'Notification' in window && Notification.permission === 'default';
   openTaskId = null; openPlanSettingsId = null;
   $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.remindH)}">
     <div class="sheet-head"><span>${esc(L.remindH)} · ${esc(fmtDate(td))}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
-    <h2 style="margin:0;font-family:var(--font-display)">${esc([list.length ? L.remindSub(od.length, dt.length) : '', mk.length ? L.remindMakeup(mk.length) : '', cx.length ? L.remindCancelled(cx.length) : ''].filter(Boolean).join(' · '))}</h2>
+    <h2 style="margin:0;font-family:var(--font-display)">${esc([list.length ? L.remindSub(od.length, dt.length) : '', mk.filter(isExam).length ? L.remindExams(mk.filter(isExam).length) : '', mk.filter(c => !isExam(c)).length ? L.remindMakeup(mk.filter(c => !isExam(c)).length) : '', cx.length ? L.remindCancelled(cx.length) : '', soon.length ? L.remindSoonExams(soon.length) : ''].filter(Boolean).join(' · '))}</h2>
+    ${soon.length ? `<div><div class="remind-group overdue">${esc(L.soonExamsH)}</div>${soon.map(examRowHTML).join('')}</div>` : ''}
     ${mk.length || cx.length ? `<div><div class="remind-group">${esc(L.makeupToday)}</div>${mk.concat(cx).sort((a, b) => toMin(a.start) - toMin(b.start)).map(c => classRowHTML(c, false, cx.includes(c))).join('')}</div>` : ''}
     <div>
       ${od.length ? `<div class="remind-group overdue">${esc(L.dueGroups.overdue)}</div>${od.map(t => dayRowHTML(t, null)).join('')}` : ''}
@@ -1003,6 +1042,7 @@ function openSemester() {
       <label class="field"><span>${esc(L.semStart)}</span><input class="input" type="date" id="s-start" value="${esc(s.start || '')}" ${dis}></label>
       <label class="field"><span>${esc(L.semEnd)}</span><input class="input" type="date" id="s-end" value="${esc(s.end || '')}" ${dis}></label>
     </div>
+    <label class="field" style="max-width:220px"><span>${esc(L.attMinL)}</span><input class="input" type="number" min="0" max="100" id="s-attmin" value="${esc(String(attMin()))}" ${dis}></label>
     ${isDate(s.start) && isDate(s.end) && s.start > s.end ? `<p class="warn-line" style="margin:0">${esc(L.semOrder)}</p>` : ''}
     ${sem ? `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${weekPillHTML(today())}<span class="faint" style="font-size:12px">${esc(L.semTotal(semWeek(sem.start).total || 0))}</span></div>` : ''}
     <div><span class="section-label">${esc(L.breaksH)}</span><div class="brk-rows">
@@ -1018,8 +1058,78 @@ function openSemester() {
     <div class="sheet-foot"><span class="grow"></span>${!RO && state.settings.semester ? `<button class="btn danger" data-act="sem-clear">${esc(L.clearSem)}</button>` : ''}</div>
   </div></div>`;
 }
+const isExam = c => !!c && c.kind === 'exam';
+const courseKey = c => String(c.code || c.title || '').trim().toUpperCase();
+const examName = c => [c.code || c.title, c.type || T().exam].filter(Boolean).join(' ');
+const upcomingExams = () => classesList().filter(c => isExam(c) && c.date >= today()).sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : toMin(a.start) - toMin(b.start));
+function examRowHTML(c) {
+  return `<div class="exam-row lbl-${classColor(c)}" data-act="class-open" data-id="${esc(c.id)}" data-date="${esc(c.date)}" tabindex="0">
+    <div style="min-width:0"><div class="t">${esc(examName(c))}</div><div class="p">${esc(fmtDate(c.date))} ${esc(weekday(c.date))} · ${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}${c.room ? ' · ' + esc(c.room) : ''}</div></div>
+    ${countdownHTML({ due: c.date })}
+  </div>`;
+}
+const attMin = () => { const sm = state.settings && state.settings.semester; return sm && +sm.attMin > 0 ? +sm.attMin : 80; };
+// attendance per course: only marked sessions count; exams and cancelled days are left out
+function attendanceStats() {
+  const by = {};
+  classesList().forEach(c => {
+    if (isExam(c) || !c.att || typeof c.att !== 'object') return;
+    const k = courseKey(c); if (!k) return;
+    const g = by[k] || (by[k] = { key: k, name: c.code || c.title, color: classColor(c), planId: '', present: 0, absent: 0 });
+    if (c.planId && !g.planId) g.planId = c.planId;
+    Object.entries(c.att).forEach(([d, v]) => { if (!c.date && skipped(c, d)) return; if (v === 'present') g.present++; else if (v === 'absent') g.absent++; });
+  });
+  return Object.values(by).filter(g => g.present + g.absent > 0)
+    .map(g => Object.assign(g, { total: g.present + g.absent, rate: Math.round(g.present / (g.present + g.absent) * 100) }))
+    .sort((a, b) => a.key < b.key ? -1 : 1);
+}
+function attendanceHTML(list) {
+  const L = T(), min = attMin();
+  return `<div class="att-rows">${list.map(g => `<div class="att-row ${g.rate < min ? 'low' : g.rate < min + 5 ? 'warn' : ''}">
+    <span style="display:flex;gap:6px;align-items:center;min-width:0"><i class="dot bg-${g.color}"></i><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(g.name)}</span></span>
+    <div class="bar"><i class="ok" style="width:${g.rate}%"></i></div><span class="pct">${g.rate}%</span><span class="faint">${esc(L.attCount(g.present, g.total))}</span>
+  </div>`).join('')}</div>`;
+}
+function attButtonsHTML(c, d) {
+  const L = T(), v = c.att && c.att[d];
+  return `<span class="att"><button class="p ${v === 'present' ? 'on' : ''}" data-act="att" data-id="${esc(c.id)}" data-date="${esc(d)}" data-v="present">✓ ${esc(L.present)}</button><button class="a ${v === 'absent' ? 'on' : ''}" data-act="att" data-id="${esc(c.id)}" data-date="${esc(d)}" data-v="absent">✗ ${esc(L.absent)}</button></span>`;
+}
+// one plan per course code; reuses a linked plan or a plan already named after the code
+function linkCoursePlans() {
+  const L = T(), groups = {};
+  classesList().forEach(c => { const k = String(c.code || '').trim().toUpperCase(); if (k) (groups[k] = groups[k] || []).push(c); });
+  if (!Object.keys(groups).length) { toast(L.coursePlansNone); return; }
+  let made = 0, linked = 0;
+  Object.entries(groups).forEach(([k, list]) => {
+    let pid = (list.find(c => c.planId && state.plans[c.planId]) || {}).planId;
+    if (!pid) { const ex = plansList().find(p => p.name.trim().toUpperCase() === k); if (ex) pid = ex.id; }
+    if (!pid) {
+      pid = uid(); made++;
+      write('plans', pid, { name: list[0].code.trim(), color: classColor(list.find(c => !isExam(c)) || list[0]), createdAt: Date.now(), labels: {}, buckets: T().defaultBuckets.map(n => ({ id: uid(), name: n })) }, true);
+    }
+    list.forEach(c => { if (c.planId !== pid) { write('classes', c.id, Object.assign(clone(c), { planId: pid }), true); linked++; } });
+  });
+  render();
+  toast(L.coursePlansDone(made, linked));
+}
+// what a course plan shows under its title: weekly times, next exam, attendance
+function courseStripHTML(plan) {
+  const L = T();
+  const mine = classesList().filter(c => c.planId === plan.id || (!c.planId && courseKey(c) && courseKey(c) === plan.name.trim().toUpperCase()));
+  if (!mine.length) return '';
+  const weekly = mine.filter(c => !c.date).sort((a, b) => a.day - b.day || toMin(a.start) - toMin(b.start));
+  const exam = mine.filter(c => isExam(c) && c.date >= today()).sort((a, b) => a.date < b.date ? -1 : 1)[0];
+  const att = attendanceStats().find(g => mine.some(c => courseKey(c) === g.key));
+  const min = attMin();
+  return `<div class="course-strip">
+    ${weekly.length ? `<span>${esc(L.eachWeek)}:</span>${weekly.map(c => `<button class="chip" data-act="class-open" data-id="${esc(c.id)}">${esc(WEEKDAYS[ui.lang][c.day - 1])} ${esc(fmtTime(c.start))}${c.type ? ' ' + esc(c.type) : ''}</button>`).join('')}` : ''}
+    ${exam ? `<button class="chip ${diffDays(today(), exam.date) <= 7 ? 'overdue' : 'today'}" data-act="class-open" data-id="${esc(exam.id)}">${esc(exam.type || L.exam)} · ${esc(fmtDate(exam.date))} · ${esc(L.cd(diffDays(today(), exam.date)))}</button>` : ''}
+    ${att ? `<span class="chip ${att.rate < min ? 'overdue' : att.rate < min + 5 ? 'today' : 'done'}">${esc(L.attendance)} ${att.rate}%</span>` : ''}
+  </div>`;
+}
 function classTag(c, isCancelled) {
   const L = T();
+  if (isExam(c)) return `<em class="mk ex">${esc(c.type || L.exam)}</em>`;
   if (isCancelled) return `<em class="mk cx">${esc(L.cancelled)}</em>`;
   if (c.date) return c.replaces ? `<em class="mk moved">${esc(L.moved)}</em>` : `<em class="mk">${esc(L.makeup)}</em>`;
   return '';
@@ -1046,7 +1156,7 @@ function timetableHTML() {
   const L = T(), RO = state.readonly;
   const all = classesList();
   const weeklyN = all.filter(c => !c.date).length;
-  const head = `<div class="head"><h1 style="gap:10px">${ICON_TT.replace('width="14" height="14"', 'width="22" height="22"')}${esc(L.timetable)}</h1><span class="sub">${esc(L.timetableSub)}${weeklyN ? ' · ' + esc(L.classesN(weeklyN)) : ''}</span><span class="spacer"></span>${!RO ? menuHTML('tt-add', `${ICON_PLUS}${esc(L.addMenu)} ▾`, 'btn primary', [['class-new', ICON_TT, L.addClass], ['makeup-new', ICON_PLUS, L.addMakeup], '-', ['tti-open', ICON_IMAGE, L.ttImport]]) : ''}${menuHTML('tt-more', '⋯', 'btn more', [['sem-open', ICON_GEAR, L.semSettings]].concat(!RO && all.length ? ['-', ['tt-clear', ICON_TRASH, L.ttClear, 'danger']] : []), L.more)}</div>`;
+  const head = `<div class="head"><h1 style="gap:10px">${ICON_TT.replace('width="14" height="14"', 'width="22" height="22"')}${esc(L.timetable)}</h1><span class="sub">${esc(L.timetableSub)}${weeklyN ? ' · ' + esc(L.classesN(weeklyN)) : ''}</span><span class="spacer"></span>${!RO ? menuHTML('tt-add', `${ICON_PLUS}${esc(L.addMenu)} ▾`, 'btn primary', [['class-new', ICON_TT, L.addClass], ['makeup-new', ICON_PLUS, L.addMakeup], ['exam-new', ICON_LIST, L.addExam], '-', ['tti-open', ICON_IMAGE, L.ttImport]]) : ''}${menuHTML('tt-more', '⋯', 'btn more', [['sem-open', ICON_GEAR, L.semSettings]].concat(!RO && all.length ? [['course-plans', ICON_ARCHIVE, L.coursePlans], '-', ['tt-clear', ICON_TRASH, L.ttClear, 'danger']] : []), L.more)}</div>`;
   if (!all.length) return head + `<div class="empty"><h2>${esc(L.ttEmptyH)}</h2><p>${esc(L.ttEmptyP)}</p>${!RO ? `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn primary" data-act="class-new">${ICON_PLUS}${esc(L.addClass)}</button><button class="btn" data-act="tti-open">${esc(L.ttImport)}</button><button class="btn" data-act="backup">${ICON_BACKUP}${esc(L.orImport)}</button></div>` : ''}</div>`;
   const td = today();
   const week = weekCells(ttAnchor || td);
@@ -1059,7 +1169,7 @@ function timetableHTML() {
   const H = (endH - startH) * 60, base = startH * 60;
   const now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
   const hours = []; for (let h = startH; h <= endH; h++) hours.push(h);
-  const upcoming = all.filter(c => c.date && c.date >= td).sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : toMin(a.start) - toMin(b.start));
+  const upcoming = all.filter(c => c.date && !isExam(c) && c.date >= td).sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : toMin(a.start) - toMin(b.start));
   return head + `<div class="tt-bar">
       <button class="btn" data-act="tt-move" data-dir="-1" aria-label="${esc(L.prevWeek)}">‹</button>
       <button class="btn" data-act="tt-move" data-dir="0">${esc(L.thisWeek)}</button>
@@ -1076,13 +1186,16 @@ function timetableHTML() {
       ${d === td && nowM > base && nowM < base + H ? `<div class="tt-now" style="top:${nowM - base}px"></div>` : ''}
       ${layoutDay(list.concat(cx)).map(({ c, lane, lanes }) => {
         const st = toMin(c.start), en = toMin(c.end), isCx = cx.includes(c);
-        return `<button class="tt-block lbl-${classColor(c)} ${c.date ? 'oneoff' : ''} ${isCx ? 'cancelled' : ''}" data-act="class-open" data-id="${esc(c.id)}" data-date="${d}" style="top:${st - base + 1}px;height:${en - st - 2}px;left:calc(${(lane / lanes * 100).toFixed(3)}% + 3px);width:calc(${(100 / lanes).toFixed(3)}% - 6px)" title="${esc(c.title)} ${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}">
-          ${classTag(c, isCx)}<b>${esc(c.title)}</b><span>${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}</span>${classLine(c) ? `<span>${esc(classLine(c))}</span>` : ''}${c.lecturer ? `<span>${esc(c.lecturer)}</span>` : ''}
+        const mark = !isCx && c.att && c.att[d];
+        return `<button class="tt-block lbl-${classColor(c)} ${c.date ? 'oneoff' : ''} ${isExam(c) ? 'exam' : ''} ${isCx ? 'cancelled' : ''}" data-act="class-open" data-id="${esc(c.id)}" data-date="${d}" style="top:${st - base + 1}px;height:${en - st - 2}px;left:calc(${(lane / lanes * 100).toFixed(3)}% + 3px);width:calc(${(100 / lanes).toFixed(3)}% - 6px)" title="${esc(c.title)} ${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}">
+          ${classTag(c, isCx)}<b>${mark ? `<i class="attm ${mark === 'present' ? 'p' : 'a'}">${mark === 'present' ? '✓' : '✗'}</i> ` : ''}${esc(c.title)}</b><span>${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}</span>${classLine(c) ? `<span>${esc(classLine(c))}</span>` : ''}${c.lecturer ? `<span>${esc(c.lecturer)}</span>` : ''}
         </button>`;
       }).join('')}
     </div>`).join('')}
   </div></div>
-  ${upcoming.length ? `<section class="panel"><h2>${esc(L.upcomingMakeups)} <small>${esc(L.classesN(upcoming.length))}</small></h2>${upcoming.map(c => classRowHTML(c, true)).join('')}</section>` : ''}`;
+  ${upcomingExams().length ? `<section class="panel"><h2>${esc(L.examsSub)}</h2>${upcomingExams().map(examRowHTML).join('')}</section>` : ''}
+  ${upcoming.length ? `<section class="panel"><h2>${esc(L.upcomingMakeups)} <small>${esc(L.classesN(upcoming.length))}</small></h2>${upcoming.map(c => classRowHTML(c, true)).join('')}</section>` : ''}
+  <section class="panel"><h2>${esc(L.attendance)} <small>${esc(L.attSub(attMin()))}</small></h2>${attendanceStats().length ? attendanceHTML(attendanceStats()) : ''}<p class="faint" style="margin:${attendanceStats().length ? '10px' : '0'} 0 0;font-size:12px">${esc(L.attHint)}</p></section>`;
 }
 function classRowHTML(c, withDate, isCancelled) {
   const L = T(), now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
@@ -1090,7 +1203,7 @@ function classRowHTML(c, withDate, isCancelled) {
   return `<div class="class-row lbl-${classColor(c)} ${past ? 'past' : ''} ${isCancelled ? 'cancelled' : ''}" data-act="class-open" data-id="${esc(c.id)}" data-date="${withDate ? esc(c.date) : today()}" tabindex="0">
       <span class="tm">${withDate ? esc(fmtDate(c.date)) + ' ' + esc(weekday(c.date)) + '<br>' : ''}${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}</span>
       <div style="min-width:0"><div style="font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${classTag(c, isCancelled)}<span class="ttl">${esc(c.title)}</span></div>${classLine(c) || c.lecturer ? `<div class="p">${esc([classLine(c), c.lecturer].filter(Boolean).join(' · '))}</div>` : ''}</div>
-      <span></span>
+      ${!withDate && !isCancelled && !isExam(c) && !state.readonly ? attButtonsHTML(c, today()) : '<span></span>'}
     </div>`;
 }
 function todayClassesHTML() {
@@ -1414,8 +1527,12 @@ function openClass(id, focusTitle, occDate) {
   openTaskId = null; openPlanSettingsId = null; openClassId = id; openClassDate = occDate || null;
   const orig = c.replaces ? state.classes[c.replaces.id] : null;
   const plans = activePlans();
+  const exam = isExam(c);
+  const attDate = c.date || occDate;
+  const canMark = !exam && !RO && attDate && attDate <= today() && !(!c.date && skipped(c, attDate));
   $('#dialog-root').innerHTML = `<div class="overlay" data-act="overlay"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(L.classDetails)}">
-    <div class="sheet-head"><span class="dot bg-${classColor(c)}"></span><span>${esc(L.timetable)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
+    <div class="sheet-head"><span class="dot bg-${classColor(c)}"></span><span>${esc(exam ? L.examDetails : L.timetable)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
+    ${canMark ? `<div class="occ"><b>${esc(L.attH(fmtDate(attDate) + ' ' + weekday(attDate)))}</b><div class="row">${attButtonsHTML(c, attDate)}</div></div>` : ''}
     ${!c.date && occDate && !RO ? `<div class="occ"><b>${esc(L.occH(fmtDate(occDate) + ' ' + weekday(occDate)))}</b>
       <div class="row">${skipped(c, occDate) ? `<em class="mk cx">${esc(L.cancelled)}</em><button class="btn" data-act="occ-restore">${esc(L.occRestore)}</button>` : `<button class="btn primary" data-act="occ-move">${esc(L.occMove)}</button><button class="btn" data-act="occ-cancel">${esc(L.occCancel)}</button>`}</div>
       <span class="faint" style="font-size:12px">${esc(L.weeklyHint)}</span></div>` : ''}
@@ -1427,15 +1544,16 @@ function openClass(id, focusTitle, occDate) {
       <label class="field"><span>${esc(L.cStart)}</span><input class="input" type="time" id="c-start" value="${esc(c.start)}" ${dis}></label>
       <label class="field"><span>${esc(L.cEnd)}</span><input class="input" type="time" id="c-end" value="${esc(c.end)}" ${dis}></label>
       <label class="field"><span>${esc(L.cCode)}</span><input class="input" id="c-code" value="${esc(c.code || '')}" maxlength="40" ${dis}></label>
-      <label class="field"><span>${esc(L.cType)}</span><input class="input" id="c-type" value="${esc(c.type || '')}" maxlength="40" list="class-types" ${dis}></label>
+      <label class="field"><span>${esc(L.cType)}</span><input class="input" id="c-type" value="${esc(c.type || '')}" maxlength="40" list="${exam ? 'exam-types' : 'class-types'}" ${dis}></label>
       <label class="field"><span>${esc(L.cRoom)}</span><input class="input" id="c-room" value="${esc(c.room || '')}" maxlength="80" ${dis}></label>
       <label class="field"><span>${esc(L.cLecturer)}</span><input class="input" id="c-lecturer" value="${esc(c.lecturer || '')}" maxlength="80" ${dis}></label>
       <label class="field"><span>${esc(L.cPlan)}</span><select class="input" id="c-plan" ${dis}><option value="">${esc(L.cNoPlan)}</option>${plans.map(p => `<option value="${p.id}" ${c.planId === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>
     </div>
-    <p class="faint" style="margin:-6px 0 0;font-size:12px">${esc(L.cDateHint)}</p>
+    <p class="faint" style="margin:-6px 0 0;font-size:12px">${esc(exam ? L.examHint : L.cDateHint)}</p>
     <datalist id="class-types">${L.typeOpts.map(o => `<option value="${esc(o)}">`).join('')}</datalist>
+    <datalist id="exam-types">${L.examTypes.map(o => `<option value="${esc(o)}">`).join('')}</datalist>
     <div><span class="section-label">${esc(L.color)}</span><div class="swatches">${LABEL_KEYS.map(k => `<button class="swatch bg-${k} ${classColor(c) === k ? 'on' : ''}" data-act="class-color" data-color="${k}" aria-label="${esc(L.color)} ${k}" ${dis}></button>`).join('')}</div></div>
-    <div class="sheet-foot">${c.planId && state.plans[c.planId] ? `<button class="btn" data-act="goto-plan" data-plan="${c.planId}">${esc(L.openPlan)}</button>` : ''}<span class="grow"></span>${!RO ? `<button class="btn danger" data-act="class-delete">${esc(L.deleteClass)}</button>` : ''}</div>
+    <div class="sheet-foot">${c.planId && state.plans[c.planId] ? `<button class="btn" data-act="goto-plan" data-plan="${c.planId}">${esc(L.openPlan)}</button>` : ''}<span class="grow"></span>${!RO ? `<button class="btn danger" data-act="class-delete">${esc(exam ? L.deleteExam : L.deleteClass)}</button>` : ''}</div>
   </div></div>`;
   const ti = $('#c-title');
   if (focusTitle && ti && !RO) { ti.focus(); ti.select(); } else $('.sheet [data-act="close"]').focus();
@@ -1870,6 +1988,7 @@ function renderMain() {
       <span class="spacer"></span>
       ${!RO ? `<button class="btn primary" data-act="new-task" title="N">${ICON_PLUS}${esc(L.newTask)}</button><button class="btn" data-act="plan-settings">${ICON_GEAR}${esc(L.planSettings)}</button>` : ''}
     </div>
+    ${courseStripHTML(plan)}
     ${plan.archived ? `<div class="banner"><span class="grow">${esc(L.archivedNote)}</span>${!RO ? `<button class="btn" data-act="unarchive" data-plan="${plan.id}">${ICON_ARCHIVE}${esc(L.unarchive)}</button>` : ''}</div>` : ''}
     <div class="tabs" role="tablist">${Object.entries(L.views).map(([k, v]) => `<button class="tab ${ui.view === k ? 'active' : ''}" role="tab" aria-selected="${ui.view === k}" data-act="view" data-view="${k}">${esc(v)}</button>`).join('')}</div>
     ${ui.view !== 'charts' && ui.view !== 'grades' ? toolbarHTML() : ''}
@@ -2039,10 +2158,12 @@ function calGridHTML(cells, tasks, opts) {
     ${WEEKDAYS[ui.lang].map(w => `<div class="dow">${w}</div>`).join('')}
     ${cells.map((c, i) => {
       const list = (byDay[c] || []).sort(cmpTasks);
+      const exams = opts.exams ? opts.exams.filter(x => x.date === c) : [];
       const open = list.filter(t => t.progress !== 'done').length;
       const out = opts.monthKey && c.slice(0, 7) !== opts.monthKey;
       return `<div class="day ${out ? 'out' : ''} ${c === td ? 'is-today' : ''} ${i % 7 >= 5 ? 'weekend' : ''} ${opts.counts && open >= 3 ? 'busy' : ''}">
         <div class="day-head"><span class="n">${parse(c).getDate()}</span>${opts.counts && open ? `<span class="cnt" title="${esc(L.dueCount(open))}">${open}</span>` : ''}${opts.addable ? `<button class="icon-btn add" data-act="cal-add" data-date="${c}" aria-label="${esc(L.addOn(fmtDate(c)))}">${ICON_PLUS}</button>` : ''}</div>
+        ${exams.map(x => `<button class="cal-task exam" data-act="class-open" data-id="${esc(x.id)}" data-date="${esc(x.date)}" title="${esc(examName(x))} ${esc(fmtTime(x.start))}">${esc(examName(x))}</button>`).join('')}
         ${list.map(t => {
           const pl = state.plans[t.planId];
           const pc = opts.planColors && pl ? ` pc" style="--pc: var(--${esc(pl.color)})` : '';
@@ -2141,7 +2262,7 @@ function hubCalendarHTML() {
       <b style="min-width:150px;font-family:var(--font-display)">${esc(title)}</b>
     </div>
     <div class="plan-legend">${activePlans().map(p => `<span><i class="dot bg-${esc(p.color)}"></i>${esc(p.name)}</span>`).join('')}</div>
-    ${calGridHTML(cells, allTasks(), { monthKey: week ? null : hc.anchor.slice(0, 7), planColors: true, counts: true, week })}
+    ${calGridHTML(cells, allTasks(), { monthKey: week ? null : hc.anchor.slice(0, 7), planColors: true, counts: true, week, exams: classesList().filter(isExam) })}
   </section>`;
 }
 
@@ -2251,6 +2372,11 @@ function hubHTML() {
       <button class="stat info" data-act="hub-filter" data-due="week"><span class="k">${esc(L.statWeek)}</span><span class="v">${dueWeek.length}</span></button>
       <div class="stat"><span class="k">${esc(L.statDoing)}</span><span class="v">${doing.length}</span></div>
     </div>
+    ${(() => {
+      const min = attMin(), low = attendanceStats().filter(g => g.total >= 3 && g.rate < min);
+      return low.map(g => `<div class="banner" style="background:var(--danger-soft)"><span class="grow">${esc(L.attLow(g.name, g.rate, min))}</span><button class="btn" data-act="goto" data-plan="timetable">${esc(L.timetable)}</button></div>`).join('');
+    })()}
+    ${upcomingExams().length ? `<section class="panel"><h2>${esc(L.examsH)} <small>${esc(L.examsSub)}</small></h2>${upcomingExams().slice(0, 8).map(examRowHTML).join('')}</section>` : ''}
     ${hubCalendarHTML()}
     <div class="hub">
       <section class="panel"><h2>${esc(L.deadlines)} <small>${esc(L.deadlinesSub)}</small></h2>
@@ -2458,6 +2584,8 @@ function parseBackup(text) {
         title: str(c.title, 120) || 'Class', code: str(c.code, 40), type: str(c.type, 40), date, day, start: c.start, end: c.end,
         room: str(c.room, 80), lecturer: str(c.lecturer, 80), color: LABEL_KEYS.includes(c.color) ? c.color : 'c5',
         planId: c.planId && idMap[c.planId] ? idMap[c.planId] : '', createdAt: +c.createdAt || Date.now(),
+        kind: c.kind === 'exam' ? 'exam' : '',
+        att: c.att && typeof c.att === 'object' ? Object.fromEntries(Object.entries(c.att).filter(([d, v]) => isDate(d) && (v === 'present' || v === 'absent')).slice(0, 400)) : {},
         skip: Array.isArray(c.skip) ? c.skip.filter(isDate).slice(0, 300) : [],
         replaces: c.replaces && validId(c.replaces.id) && isDate(c.replaces.date) ? { id: c.replaces.id, date: c.replaces.date } : null
       };
@@ -2467,7 +2595,7 @@ function parseBackup(text) {
   const sm = d.settings && d.settings.semester;
   if (sm && typeof sm === 'object' && isDate(sm.start) && isDate(sm.end)) {
     settings.semester = {
-      name: str(sm.name, 80), start: sm.start, end: sm.end,
+      name: str(sm.name, 80), start: sm.start, end: sm.end, attMin: +sm.attMin > 0 && +sm.attMin <= 100 ? +sm.attMin : 80,
       breaks: Array.isArray(sm.breaks) ? sm.breaks.filter(b => b && typeof b === 'object').slice(0, 20).map(b => ({ id: str(b.id, 60) || uid(), name: str(b.name, 60), start: isDate(b.start) ? b.start : '', end: isDate(b.end) ? b.end : '' })) : []
     };
   }
@@ -2563,6 +2691,17 @@ document.addEventListener('click', e => {
     case 'sem-clear': if (!RO) { write('settings', 'semester', null); closeDialog(); toast(L.semCleared); } break;
     case 'tt-move': { const dir = +el.dataset.dir; ttAnchor = dir === 0 ? null : addDays(weekCells(ttAnchor || today())[0], 7 * dir); render(); break; }
     case 'class-open': openClass(el.dataset.id, false, el.dataset.date || null); break;
+    case 'exam-new': if (!RO) { const d = addDays(today(), 7); const id = createClass({ kind: 'exam', date: d, day: dowOf(d), title: L.newExam, type: L.examTypes[0], start: '09:00', end: '11:00', color: 'c1' }); openClass(id, true); } break;
+    case 'course-plans': if (!RO) linkCoursePlans(); break;
+    case 'att': {
+      if (RO) break;
+      const c = state.classes[el.dataset.id], d = el.dataset.date; if (!c || !isDate(d)) break;
+      const att = Object.assign({}, c.att || {});
+      if (att[d] === el.dataset.v) delete att[d]; else att[d] = el.dataset.v;
+      patchClass(c.id, { att });
+      if ($('.sheet') && openClassId === c.id) openClass(c.id);
+      break;
+    }
     case 'occ-cancel': {
       const c = state.classes[openClassId], d = openClassDate; if (!c || !d || RO) break;
       patchClass(c.id, { skip: [...new Set([...(c.skip || []), d])] });
@@ -2826,6 +2965,7 @@ document.addEventListener('change', e => {
     else if (id === 'c-day') patchClass(c.id, { day: +el.value });
     else if (id === 'c-date') {
       if (isDate(el.value)) patchClass(c.id, { date: el.value, day: dowOf(el.value) });
+      else if (isExam(c)) el.value = c.date;
       else patchClass(c.id, { date: '' });
       openClass(c.id);
     }
@@ -2837,14 +2977,21 @@ document.addEventListener('change', e => {
       patchClass(c.id, { start: st, end: fixedEnd });
       if (fixedEnd !== en) $('#c-end').value = fixedEnd;
     }
-    else if (id === 'c-code') patchClass(c.id, { code: el.value.trim() });
+    else if (id === 'c-code') {
+      // link to the course's plan when there is one: a plan named after the code, or the plan its other classes use
+      const code = el.value.trim(), k = code.toUpperCase();
+      const match = !c.planId && k ? (plansList().find(p => p.name.trim().toUpperCase() === k) || state.plans[(classesList().find(x => x.id !== c.id && courseKey(x) === k && x.planId) || {}).planId]) : null;
+      patchClass(c.id, Object.assign({ code }, match ? { planId: match.id } : {}));
+      if (match) openClass(c.id);
+    }
     else if (id === 'c-type') patchClass(c.id, { type: el.value.trim() });
     else if (id === 'c-room') patchClass(c.id, { room: el.value.trim() });
     else if (id === 'c-lecturer') patchClass(c.id, { lecturer: el.value.trim() });
     else if (id === 'c-plan') { patchClass(c.id, { planId: el.value }); openClass(c.id); }
     return;
   }
-  if (!state.readonly && (id === 's-name' || id === 's-start' || id === 's-end' || (el.dataset && el.dataset.brk))) {
+  if (!state.readonly && (id === 's-name' || id === 's-start' || id === 's-end' || id === 's-attmin' || (el.dataset && el.dataset.brk))) {
+    if (id === 's-attmin') { const n = Math.max(0, Math.min(100, Math.round(+el.value || 0))); patchSemester({ attMin: n || 80 }); return; }
     if (id === 's-name') patchSemester({ name: el.value.trim() });
     else if (id === 's-start') patchSemester({ start: isDate(el.value) ? el.value : '' });
     else if (id === 's-end') patchSemester({ end: isDate(el.value) ? el.value : '' });

@@ -14,6 +14,9 @@ Single HTML file. No build step, no server, no dependencies to install.
 - **Grades**: give assignments, quizzes and exams a weight and a score to see your current grade, what you have earned so far, and the average you need on the rest to reach a target.
 - **Task details**: bucket, progress, priority, start and due date, assigned person, labels, notes, checklist.
 - **Timetable**: a weekly class timetable (day, time, room, lecturer, colour per course) with week-by-week navigation. One-time make-up classes have a date and appear only on that day. A weekly class can be moved or cancelled for a single day without changing other weeks. Make-up, moved and cancelled classes show in My Day and in the daily reminder. Today's classes also show in My Day. A timetable can be read from a screenshot (week grid or list): the picture is read on the device with Tesseract.js, every class is shown in an editable review table, then added or used to replace the weekly classes. It can also be imported as a backup file with a `classes` section.
+- **Exams**: add exams with date, time, room and type; the Overview shows an exam countdown, exams are marked in red on the calendars, and the daily reminder warns about exams in the next 3 days.
+- **Attendance**: mark each class present or absent in My Day (or on the timetable for earlier days); attendance per course is shown on the timetable and the course's plan, with a warning below the minimum (80% by default, set in Semester settings).
+- **Course plans**: one click creates a plan for each course code and links its classes and exams; a course's plan shows its weekly times, next exam and attendance.
 - **Semester**: set the first and last day and any breaks; the timetable shows the teaching week (Week 5 of 14, skipping break weeks), and weekly classes only appear on teaching days.
 - **My Day**: pick tasks from any plan to work on today; the list clears itself every night.
 - **Search all plans** from the Overview.
