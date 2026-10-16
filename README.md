@@ -28,6 +28,7 @@ Single HTML file. No build step, no server, no dependencies to install.
 - Search and filters (due date, priority, hide completed).
 - Multi-select: select tasks one by one, a whole column, or everything shown, then delete or mark complete in one go.
 - English and Chinese, switch with the EN / 中 button. English by default.
+- Times shown in 24-hour or AM/PM format (24h / AM/PM switch); stored times are unchanged.
 - White, pale pink and pale blue light theme by default, with an optional dark theme (sun / moon switch). Works on phone width.
 
 ## Usage

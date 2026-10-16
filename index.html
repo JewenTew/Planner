@@ -112,7 +112,7 @@ button { cursor: pointer; }
 .lang button { border: 0; background: transparent; border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 700; color: var(--muted); }
 .lang button.on { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: var(--accent-ink); }
 .lang button svg { width: 13px; height: 13px; display: block; }
-.prefs { display: flex; gap: 8px; padding: 0 6px; }
+.prefs { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 6px; }
 .rail-label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: 0 10px; margin-bottom: 4px; font-weight: 700; }
 .nav { display: flex; flex-direction: column; gap: 2px; }
 .nav-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; border: 0; background: none; padding: 8px 10px; border-radius: 10px; color: var(--ink); font-weight: 600; }
@@ -519,7 +519,7 @@ textarea.input { width: 100%; min-height: 96px; resize: vertical; line-height: 1
 /* ---------- strings ---------- */
 const I18N = {
   en: {
-    appSub: 'Tasks and due dates', theme: 'Theme', light: 'Light', dark: 'Dark', overview: 'Overview', plans: 'Plans', newPlan: 'New plan', planNamePh: 'Plan name, e.g. Data Structures', create: 'Create',
+    appSub: 'Tasks and due dates', theme: 'Theme', light: 'Light', dark: 'Dark', timeFmt: 'Time format', overview: 'Overview', plans: 'Plans', newPlan: 'New plan', planNamePh: 'Plan name, e.g. Data Structures', create: 'Create',
     syncOn: 'Synced to the cloud. Share this page to plan together.', syncRO: 'Read only. You can view but not edit.', syncLocal: 'Saved in this browser only.',
     loading: 'Loading your plans…', openN: n => `${n} open`, newTask: 'New task', planSettings: 'Plan settings',
     views: { board: 'Board', grid: 'Grid', schedule: 'Schedule', charts: 'Charts', grades: 'Grades' },
@@ -607,7 +607,7 @@ const I18N = {
     taskDeleted: 'Task deleted', planDeleted: 'Plan deleted', errPerm: 'You do not have permission to edit this planner. Switched to read only.', errQuota: 'Storage is full. Delete some finished tasks and try again.', errNet: 'Could not save. Check your connection and try again.'
   },
   zh: {
-    appSub: '任务与截止日期', theme: '主题', light: '浅色', dark: '深色', overview: '概览', plans: '计划', newPlan: '新建计划', planNamePh: '计划名称，例如：数据结构', create: '创建',
+    appSub: '任务与截止日期', theme: '主题', light: '浅色', dark: '深色', timeFmt: '时间格式', overview: '概览', plans: '计划', newPlan: '新建计划', planNamePh: '计划名称，例如：数据结构', create: '创建',
     syncOn: '已云端同步。分享这个页面就能一起规划。', syncRO: '只读模式。你可以查看，但不能修改。', syncLocal: '数据只保存在这个浏览器里。',
     loading: '正在加载计划…', openN: n => `${n} 项未完成`, newTask: '新建任务', planSettings: '计划设置',
     views: { board: '看板', grid: '表格', schedule: '日程', charts: '图表', grades: '成绩' },
@@ -737,7 +737,7 @@ const diffDays = (a, b) => Math.round((parse(b) - parse(a)) / 86400000);
 const state = { plans: {}, tasks: {}, classes: {}, settings: {}, plansReady: false, tasksReady: false, mode: 'local', readonly: false };
 const PREF_KEY = 'planner-prefs';
 const LOCAL_KEY = 'planner-data';
-let ui = { lang: 'en', theme: 'light', planId: 'hub', view: 'board', groupBy: 'bucket', filter: { q: '', due: 'all', pri: 'all', hideDone: false }, calMonth: today().slice(0, 7), hubCal: { mode: 'week', anchor: today() }, boardSort: 'due', showArchived: false, sort: { key: 'due', dir: 1 } };
+let ui = { lang: 'en', theme: 'light', timeFmt: '24', planId: 'hub', view: 'board', groupBy: 'bucket', filter: { q: '', due: 'all', pri: 'all', hideDone: false }, calMonth: today().slice(0, 7), hubCal: { mode: 'week', anchor: today() }, boardSort: 'due', showArchived: false, sort: { key: 'due', dir: 1 } };
 try { const p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null'); if (p) ui = Object.assign(ui, p, { filter: Object.assign(ui.filter, p.filter || {}) }); } catch (e) {}
 if (!I18N[ui.lang]) ui.lang = 'en';
 if (!ui.hubCal || !/^\d{4}-\d{2}-\d{2}$/.test(ui.hubCal.anchor || '')) ui.hubCal = { mode: 'week', anchor: today() };
@@ -917,6 +917,13 @@ function dayRowHTML(t, mode) {
   </div>`;
 }
 /* ---------- timetable ---------- */
+// show a stored HH:MM time in the chosen format (24-hour or AM/PM); the stored value never changes
+function fmtTime(v) {
+  if (ui.timeFmt !== '12' || typeof v !== 'string' || !/^\d{2}:\d{2}$/.test(v)) return v;
+  const [h, m] = v.split(':').map(Number);
+  return `${h % 12 || 12}:${pad(m)} ${h < 12 ? 'AM' : 'PM'}`;
+}
+const fmtHour = h => ui.timeFmt === '12' ? `${h % 12 || 12} ${h % 24 < 12 ? 'AM' : 'PM'}` : pad(h) + ':00';
 const validTime = v => typeof v === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(v);
 const toMin = v => { const [h, m] = v.split(':').map(Number); return h * 60 + m; };
 const fromMin = n => `${pad(Math.floor(n / 60) % 24)}:${pad(n % 60)}`;
@@ -1047,13 +1054,13 @@ function timetableHTML() {
     <div class="tt-wrap"><div class="tt" style="grid-template-columns:52px repeat(${cols.length}, minmax(110px, 1fr))">
     <div class="tt-dow"></div>
     ${cols.map(({ d }) => `<div class="tt-dow ${d === td ? 'is-today' : ''}">${esc(WEEKDAYS[ui.lang][dowOf(d) - 1])} ${parse(d).getDate()}</div>`).join('')}
-    <div class="tt-gutter" style="height:${H}px">${hours.map(h => `<span style="top:${(h - startH) * 60}px">${h === startH ? '' : pad(h) + ':00'}</span>`).join('')}</div>
+    <div class="tt-gutter" style="height:${H}px">${hours.map(h => `<span style="top:${(h - startH) * 60}px">${h === startH ? '' : fmtHour(h)}</span>`).join('')}</div>
     ${cols.map(({ d, list, cx }) => `<div class="tt-col ${d === td ? 'is-today' : ''}" style="height:${H}px">
       ${d === td && nowM > base && nowM < base + H ? `<div class="tt-now" style="top:${nowM - base}px"></div>` : ''}
       ${layoutDay(list.concat(cx)).map(({ c, lane, lanes }) => {
         const st = toMin(c.start), en = toMin(c.end), isCx = cx.includes(c);
-        return `<button class="tt-block lbl-${classColor(c)} ${c.date ? 'oneoff' : ''} ${isCx ? 'cancelled' : ''}" data-act="class-open" data-id="${esc(c.id)}" data-date="${d}" style="top:${st - base + 1}px;height:${en - st - 2}px;left:calc(${(lane / lanes * 100).toFixed(3)}% + 3px);width:calc(${(100 / lanes).toFixed(3)}% - 6px)" title="${esc(c.title)} ${esc(c.start)} - ${esc(c.end)}">
-          ${classTag(c, isCx)}<b>${esc(c.title)}</b><span>${esc(c.start)} - ${esc(c.end)}</span>${classLine(c) ? `<span>${esc(classLine(c))}</span>` : ''}${c.lecturer ? `<span>${esc(c.lecturer)}</span>` : ''}
+        return `<button class="tt-block lbl-${classColor(c)} ${c.date ? 'oneoff' : ''} ${isCx ? 'cancelled' : ''}" data-act="class-open" data-id="${esc(c.id)}" data-date="${d}" style="top:${st - base + 1}px;height:${en - st - 2}px;left:calc(${(lane / lanes * 100).toFixed(3)}% + 3px);width:calc(${(100 / lanes).toFixed(3)}% - 6px)" title="${esc(c.title)} ${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}">
+          ${classTag(c, isCx)}<b>${esc(c.title)}</b><span>${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}</span>${classLine(c) ? `<span>${esc(classLine(c))}</span>` : ''}${c.lecturer ? `<span>${esc(c.lecturer)}</span>` : ''}
         </button>`;
       }).join('')}
     </div>`).join('')}
@@ -1064,7 +1071,7 @@ function classRowHTML(c, withDate, isCancelled) {
   const L = T(), now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
   const past = !withDate && !isCancelled && toMin(c.end) <= nowM;
   return `<div class="class-row lbl-${classColor(c)} ${past ? 'past' : ''} ${isCancelled ? 'cancelled' : ''}" data-act="class-open" data-id="${esc(c.id)}" data-date="${withDate ? esc(c.date) : today()}" tabindex="0">
-      <span class="tm">${withDate ? esc(fmtDate(c.date)) + ' ' + esc(weekday(c.date)) + '<br>' : ''}${esc(c.start)} - ${esc(c.end)}</span>
+      <span class="tm">${withDate ? esc(fmtDate(c.date)) + ' ' + esc(weekday(c.date)) + '<br>' : ''}${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}</span>
       <div style="min-width:0"><div style="font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${classTag(c, isCancelled)}<span class="ttl">${esc(c.title)}</span></div>${classLine(c) || c.lecturer ? `<div class="p">${esc([classLine(c), c.lecturer].filter(Boolean).join(' · '))}</div>` : ''}</div>
       <span></span>
     </div>`;
@@ -1395,7 +1402,7 @@ function openClass(id, focusTitle, occDate) {
     ${!c.date && occDate && !RO ? `<div class="occ"><b>${esc(L.occH(fmtDate(occDate) + ' ' + weekday(occDate)))}</b>
       <div class="row">${skipped(c, occDate) ? `<em class="mk cx">${esc(L.cancelled)}</em><button class="btn" data-act="occ-restore">${esc(L.occRestore)}</button>` : `<button class="btn primary" data-act="occ-move">${esc(L.occMove)}</button><button class="btn" data-act="occ-cancel">${esc(L.occCancel)}</button>`}</div>
       <span class="faint" style="font-size:12px">${esc(L.weeklyHint)}</span></div>` : ''}
-    ${c.replaces ? `<div class="occ"><span>${classTag(c, false)} ${esc(L.movedFrom(fmtDate(c.replaces.date) + ' ' + weekday(c.replaces.date), orig ? orig.start + ' - ' + orig.end : ''))}</span></div>` : ''}
+    ${c.replaces ? `<div class="occ"><span>${classTag(c, false)} ${esc(L.movedFrom(fmtDate(c.replaces.date) + ' ' + weekday(c.replaces.date), orig ? fmtTime(orig.start) + ' - ' + fmtTime(orig.end) : ''))}</span></div>` : ''}
     <input class="title-input" id="c-title" value="${esc(c.title)}" maxlength="120" ${dis} aria-label="${esc(L.cTitle)}">
     <div class="fields">
       <label class="field"><span>${esc(L.cDate)}</span><input class="input" type="date" id="c-date" value="${esc(c.date || '')}" ${dis}></label>
@@ -1769,6 +1776,7 @@ function renderRail() {
     <div class="prefs">
       <div class="lang" role="group" aria-label="Language"><button class="${ui.lang === 'en' ? 'on' : ''}" data-act="lang" data-lang="en">EN</button><button class="${ui.lang === 'zh' ? 'on' : ''}" data-act="lang" data-lang="zh">中</button></div>
       <div class="lang" role="group" aria-label="${esc(L.theme)}"><button class="${ui.theme !== 'dark' ? 'on' : ''}" data-act="theme" data-theme-val="light" aria-label="${esc(L.light)}" title="${esc(L.light)}">${ICON_SUN}</button><button class="${ui.theme === 'dark' ? 'on' : ''}" data-act="theme" data-theme-val="dark" aria-label="${esc(L.dark)}" title="${esc(L.dark)}">${ICON_MOON}</button></div>
+      <div class="lang" role="group" aria-label="${esc(L.timeFmt)}" title="${esc(L.timeFmt)}"><button class="${ui.timeFmt !== '12' ? 'on' : ''}" data-act="timefmt" data-fmt="24">24h</button><button class="${ui.timeFmt === '12' ? 'on' : ''}" data-act="timefmt" data-fmt="12">AM/PM</button></div>
     </div>
     <div>
       <nav class="nav">
@@ -2463,6 +2471,7 @@ document.addEventListener('click', e => {
   switch (act) {
     case 'lang': ui.lang = el.dataset.lang; savePrefs(); render(); break;
     case 'theme': ui.theme = el.dataset.themeVal; savePrefs(); render(); break;
+    case 'timefmt': ui.timeFmt = el.dataset.fmt === '12' ? '12' : '24'; savePrefs(); render(); break;
     case 'backup': closeBackup(); openBackup(); break;
     case 'undo': undoDelete(); break;
     case 'class-new': if (!RO) { const id = createClass({}); openClass(id, true); } break;
