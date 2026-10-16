@@ -64,6 +64,9 @@ Add the GitHub Pages domain under Authentication, Settings, Authorized domains. 
 
 ## Development
 
+Project status, accounts, data layout and next steps (in Chinese): [docs/HANDOFF.md](docs/HANDOFF.md).
+
+
 The whole app is one page. Edit `src/planner.html`, then rebuild `index.html`:
 
 ```
