@@ -61,7 +61,7 @@ Add the GitHub Pages domain under Authentication, Settings, Authorized domains. 
 
 ## Data storage
 
-Use **Backup & restore** in the sidebar to export a backup file now and then.
+Use **Settings, Backup & restore** in the sidebar to export a backup file now and then.
 
 
 - Signed in (cloud sync on), data is saved in Firestore under your account and syncs across devices.
