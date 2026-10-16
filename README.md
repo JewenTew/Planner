@@ -24,7 +24,7 @@ Single HTML file. No build step, no server, no dependencies to install.
 - **Archive plans**: hide finished classes or projects without deleting them; restore any time.
 - **Keyboard shortcuts**: N new task, / search, 1 to 4 switch views, Esc close, ? show the list.
 - **Repeating tasks**: daily, weekdays, weekly, every 2 weeks or monthly. Completing one adds the next.
-- **Backup and restore**: export everything to a `.json` file and import it on another computer or browser.
+- **Backup and restore**: export everything to a `.json` file and import it on another computer or browser. The Overview reminds you when there has been no backup for 30 days.
 - Search and filters (due date, priority, hide completed).
 - Multi-select: select tasks one by one, a whole column, or everything shown, then delete or mark complete in one go.
 - English and Chinese, switch with the EN / 中 button. English by default.
@@ -58,6 +58,18 @@ service cloud.firestore {
 ```
 
 Add the GitHub Pages domain under Authentication, Settings, Authorized domains. With `apiKey` left empty, the app runs without sign-in and keeps data in the browser.
+
+## Development
+
+The whole app is one page. Edit `src/planner.html`, then rebuild `index.html`:
+
+```
+python tools/build.py
+```
+
+`src/planner.html` is the page body without the `<html>`/`<head>` wrapper, so the same file can also be published as a Claude artifact. `tools/build.py` adds the wrapper: web app manifest, icons, Firebase settings and the offline service worker.
+
+When you publish a change, also raise the `CACHE` version in `sw.js` so installed copies pick it up straight away.
 
 ## Data storage
 

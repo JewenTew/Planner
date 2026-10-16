@@ -534,7 +534,7 @@ textarea.input { width: 100%; min-height: 96px; resize: vertical; line-height: 1
 /* ---------- strings ---------- */
 const I18N = {
   en: {
-    appSub: 'Tasks and due dates', theme: 'Theme', light: 'Light', dark: 'Dark', timeFmt: 'Time format', settings: 'Settings', display: 'Display', language: 'Language', dataH: 'Data', account: 'Account', backupHint: 'Export or import a backup file', addMenu: 'Add', more: 'More', overview: 'Overview', plans: 'Plans', newPlan: 'New plan', planNamePh: 'Plan name, e.g. Data Structures', create: 'Create',
+    appSub: 'Tasks and due dates', theme: 'Theme', light: 'Light', dark: 'Dark', timeFmt: 'Time format', settings: 'Settings', display: 'Display', language: 'Language', dataH: 'Data', account: 'Account', backupHint: 'Export or import a backup file', backupDue: n => `It has been ${n} days since your last backup.`, backupNever: 'You have not made a backup yet.', backupWhy: 'A backup file keeps a copy of your plans, tasks and timetable in case something goes wrong.', backupNow: 'Back up now', remindLater: 'Remind me in a week', lastBackup: d => `Last backup: ${d}`, neverBackedUp: 'No backup yet', daysAgo: n => n === 0 ? 'today' : n === 1 ? 'yesterday' : `${n} days ago`, addMenu: 'Add', more: 'More', overview: 'Overview', plans: 'Plans', newPlan: 'New plan', planNamePh: 'Plan name, e.g. Data Structures', create: 'Create',
     syncOn: 'Synced to the cloud. Share this page to plan together.', syncRO: 'Read only. You can view but not edit.', syncLocal: 'Saved in this browser only.',
     loading: 'Loading your plans…', openN: n => `${n} open`, newTask: 'New task', planSettings: 'Plan settings',
     views: { board: 'Board', grid: 'Grid', schedule: 'Schedule', charts: 'Charts', grades: 'Grades' },
@@ -622,7 +622,7 @@ const I18N = {
     taskDeleted: 'Task deleted', planDeleted: 'Plan deleted', errPerm: 'You do not have permission to edit this planner. Switched to read only.', errQuota: 'Storage is full. Delete some finished tasks and try again.', errNet: 'Could not save. Check your connection and try again.'
   },
   zh: {
-    appSub: '任务与截止日期', theme: '主题', light: '浅色', dark: '深色', timeFmt: '时间格式', settings: '设置', display: '显示', language: '语言', dataH: '数据', account: '账号', backupHint: '导出或导入备份文件', addMenu: '添加', more: '更多', overview: '概览', plans: '计划', newPlan: '新建计划', planNamePh: '计划名称，例如：数据结构', create: '创建',
+    appSub: '任务与截止日期', theme: '主题', light: '浅色', dark: '深色', timeFmt: '时间格式', settings: '设置', display: '显示', language: '语言', dataH: '数据', account: '账号', backupHint: '导出或导入备份文件', backupDue: n => `已经 ${n} 天没有备份了。`, backupNever: '你还没有备份过。', backupWhy: '备份文件会保存你的计划、任务和课程表，万一出问题还能还原。', backupNow: '立即备份', remindLater: '一周后再提醒', lastBackup: d => `上次备份：${d}`, neverBackedUp: '还没备份过', daysAgo: n => n === 0 ? '今天' : n === 1 ? '昨天' : `${n} 天前`, addMenu: '添加', more: '更多', overview: '概览', plans: '计划', newPlan: '新建计划', planNamePh: '计划名称，例如：数据结构', create: '创建',
     syncOn: '已云端同步。分享这个页面就能一起规划。', syncRO: '只读模式。你可以查看，但不能修改。', syncLocal: '数据只保存在这个浏览器里。',
     loading: '正在加载计划…', openN: n => `${n} 项未完成`, newTask: '新建任务', planSettings: '计划设置',
     views: { board: '看板', grid: '表格', schedule: '日程', charts: '图表', grades: '成绩' },
@@ -1802,7 +1802,7 @@ function openSettings() {
       <div class="set-row"><span>${esc(L.timeFmt)}</span>${seg('timefmt', 'data-fmt', [['24', '24h · 14:00'], ['12', 'AM/PM · 2:00 PM']], ui.timeFmt === '12' ? '12' : '24')}</div>
     </section>
     <section class="set-group"><h3>${esc(L.dataH)}</h3>
-      ${state.mode !== 'signin' ? `<button class="set-link" data-act="backup">${ICON_BACKUP}<span>${esc(L.backup)}</span><span class="faint">${esc(L.backupHint)}</span></button>` : ''}
+      ${state.mode !== 'signin' ? `<button class="set-link" data-act="backup">${ICON_BACKUP}<span>${esc(L.backup)}</span><span class="faint">${esc(backupMeta().lastBackup ? L.lastBackup(L.daysAgo(Math.floor((Date.now() - backupMeta().lastBackup) / DAY_MS))) : L.neverBackedUp)}</span></button>` : ''}
       <button class="set-link desk-only" data-act="shortcuts">${ICON_KEYS}<span>${esc(L.shortcuts)}</span><span class="faint"><kbd>?</kbd></span></button>
     </section>
     <section class="set-group"><h3>${esc(L.account)}</h3>
@@ -1858,7 +1858,7 @@ function renderMain() {
   if (state.mode === 'signin') { main.classList.remove('selecting'); main.innerHTML = signinHTML(); return; }
   if (ui.planId === 'myday') { main.classList.remove('selecting'); main.innerHTML = myDayHTML(); return; }
   if (ui.planId === 'timetable') { main.classList.remove('selecting'); main.innerHTML = timetableHTML(); return; }
-  if (ui.planId === 'hub') { main.classList.remove('selecting'); main.innerHTML = migrateBannerHTML() + (hubQ.trim() ? hubHeadHTML() + searchResultsHTML() : hubHTML()); return; }
+  if (ui.planId === 'hub') { main.classList.remove('selecting'); main.innerHTML = migrateBannerHTML() + backupBannerHTML() + (hubQ.trim() ? hubHeadHTML() + searchResultsHTML() : hubHTML()); return; }
   const plan = state.plans[ui.planId];
   const RO = state.readonly;
   main.innerHTML = `
@@ -2189,6 +2189,29 @@ function chartsHTML(plan) {
   </div>`;
 }
 
+/* ---------- backup reminder ---------- */
+const DAY_MS = 86400000;
+const backupMeta = () => (state.settings && state.settings.meta) || {};
+function noteBackup(patch) {
+  const cur = clone(backupMeta()); delete cur.id;
+  write('settings', 'meta', Object.assign(cur, patch), true);
+}
+// remind after 30 days without a backup; with no backup yet, once the first plan is a week old
+function backupDueDays() {
+  if (state.mode === 'signin' || state.readonly || !state.plansReady) return null;
+  const plans = plansList(); if (!plans.length) return null;
+  const m = backupMeta(), now = Date.now();
+  if (m.snoozeUntil && now < m.snoozeUntil) return null;
+  if (m.lastBackup) { const days = Math.floor((now - m.lastBackup) / DAY_MS); return days >= 30 ? days : null; }
+  const oldest = Math.min(...plans.map(p => p.createdAt || now));
+  return now - oldest >= 7 * DAY_MS ? 0 : null;
+}
+function backupBannerHTML() {
+  const days = backupDueDays(); if (days === null) return '';
+  const L = T();
+  return `<div class="banner"><span class="grow">${esc(days ? L.backupDue(days) : L.backupNever)} <span class="faint">${esc(L.backupWhy)}</span></span><button class="btn primary" data-act="export">${ICON_BACKUP}${esc(L.backupNow)}</button><button class="btn ghost" data-act="backup-snooze">${esc(L.remindLater)}</button></div>`;
+}
+
 function migrateBannerHTML() {
   const d = pendingLocalData(); if (!d) return '';
   const L = T();
@@ -2375,7 +2398,7 @@ async function exportData() {
     let dl = null;
     try { dl = await window.claude.use('downloads'); } catch (e) {}
     if (!dl) { toast(L.exportFail); return; }
-    try { await dl.save({ filename, data: text }); toast(L.exported); }
+    try { await dl.save({ filename, data: text }); noteBackup({ lastBackup: Date.now(), snoozeUntil: 0 }); render(); toast(L.exported); }
     catch (e) { if (!e || e.code !== 'declined') toast(L.exportFail); }
     return;
   }
@@ -2384,6 +2407,7 @@ async function exportData() {
     const a = document.createElement('a');
     a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
+    noteBackup({ lastBackup: Date.now(), snoozeUntil: 0 }); render();
     toast(L.exported);
   } catch (e) { toast(L.exportFail); }
 }
@@ -2515,6 +2539,7 @@ document.addEventListener('click', e => {
   switch (act) {
     case 'menu': { const m = $('#menu-' + el.dataset.menu); if (!m) break; const open = m.hidden; closeMenus(); m.hidden = !open; el.setAttribute('aria-expanded', String(open)); if (open) m.querySelector('button')?.focus(); break; }
     case 'settings': openSettings(); break;
+    case 'backup-snooze': noteBackup({ snoozeUntil: Date.now() + 7 * DAY_MS }); render(); break;
     case 'lang': ui.lang = el.dataset.lang; savePrefs(); render(); if ($('#settings-sheet')) openSettings(); break;
     case 'theme': ui.theme = el.dataset.themeVal; savePrefs(); render(); if ($('#settings-sheet')) openSettings(); break;
     case 'timefmt': ui.timeFmt = el.dataset.fmt === '12' ? '12' : '24'; savePrefs(); render(); if ($('#settings-sheet')) openSettings(); break;
