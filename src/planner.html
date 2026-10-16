@@ -1711,6 +1711,8 @@ function cloudWrite(col, id, data) {
 function signIn() {
   if (!cloud.available) return;
   const provider = new firebase.auth.GoogleAuthProvider();
+  // always show Google's account chooser instead of reusing the last account
+  provider.setCustomParameters({ prompt: 'select_account' });
   cloud.auth.signInWithPopup(provider).catch(e => {
     const code = e && e.code;
     if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') cloud.auth.signInWithRedirect(provider);
