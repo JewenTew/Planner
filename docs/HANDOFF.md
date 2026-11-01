@@ -1,6 +1,6 @@
 # Planner 项目交接文件
 
-最后更新：2026 年 10 月 16 日
+最后更新：2026 年 11 月 1 日
 
 这份文件记录 Planner 的全部现况，方便在新的对话里接着做。开新对话时，请让 Claude 先读这份文件（开场提示词见最后一节）。
 
@@ -77,7 +77,7 @@ Planner/
 
 1. 修改 `src/planner.html`。
 2. 打包：`python tools/build.py`
-3. 把 `sw.js` 里的 `CACHE` 版本号加 1（目前是 `planner-v21`），让已安装的 App 尽快更新。
+3. 把 `sw.js` 里的 `CACHE` 版本号加 1（目前是 `planner-v22`），让已安装的 App 尽快更新。
 4. **测试时不要碰真实数据**：复制一份 `index.html` 成 `_localtest.html`，把 `<script src="firebase-config.js"></script>` 换成 `<script>window.PLANNER_FIREBASE={apiKey:""};</script>`，这样会用浏览器本地储存，不会连云端。用 `python -m http.server 5178` 在本机开来测，测完删掉测试文件。
 5. 提交并推送：`git add -A`、`git commit`、`git push`。GitHub Pages 大约 1 分钟后更新。
 6. （可选）把 `src/planner.html` 重新发布到上面的 Claude 版本链接。
@@ -121,6 +121,7 @@ Planner/
 - 考试：倒计时、日历红色标示、考前 3 天提醒。
 - 出席记录：在“我的一天”或课程表标记，每科出席率，低于标准会提醒（默认 80%）。
 - 为每门课一键建立计划并连接；计划页面显示每周上课时间、下次考试和出席率。
+- 改课程名称时，同一课程代码、原本同名的其他课会一起改名（每科只要改一次）。
 - 清空课程表（可撤销）。
 
 **其他**

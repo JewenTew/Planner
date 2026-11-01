@@ -586,7 +586,7 @@ const I18N = {
     timetable: 'Timetable', timetableSub: 'Your weekly classes', addClass: 'Add class', newClass: 'New class',
     ttEmptyH: 'No classes yet', ttEmptyP: 'Add your weekly classes here, or import a timetable file under Backup & restore.',
     classDetails: 'Class details', cTitle: 'Class name', cCode: 'Course code', cType: 'Type', cDay: 'Day', cStart: 'Starts', cEnd: 'Ends', cRoom: 'Room', cLecturer: 'Lecturer', cPlan: 'Linked plan', cNoPlan: 'None', openPlan: 'Open plan',
-    deleteClass: 'Delete class', classDeleted: 'Class deleted', todayClasses: "Today's classes", noClassesToday: 'No classes today.', classesN: n => `${n} class${n === 1 ? '' : 'es'}`,
+    deleteClass: 'Delete class', classDeleted: 'Class deleted', todayClasses: "Today's classes", noClassesToday: 'No classes today.', classesN: n => `${n} class${n === 1 ? '' : 'es'}`, renamedSiblings: n => `Also renamed ${n} other class${n === 1 ? '' : 'es'} with the same course code`,
     typeOpts: ['Lecture', 'Tutorial', 'Lab', 'Practical'], dayNames: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     makeup: 'Make-up', addMakeup: 'Add make-up class', cDate: 'Date (one time only)', cDateHint: 'Leave the date empty for a class that repeats every week.',
     upcomingMakeups: 'Upcoming one-time classes', thisWeek: 'This week', prevWeek: 'Previous week', nextWeek: 'Next week',
@@ -681,7 +681,7 @@ const I18N = {
     timetable: '课程表', timetableSub: '每周固定的课程', addClass: '添加课程', newClass: '新课程',
     ttEmptyH: '还没有课程', ttEmptyP: '把每周的课加进来，或在“备份与还原”里导入课程表文件。',
     classDetails: '课程详情', cTitle: '课程名称', cCode: '课程代码', cType: '类型', cDay: '星期', cStart: '开始', cEnd: '结束', cRoom: '教室', cLecturer: '讲师', cPlan: '关联计划', cNoPlan: '无', openPlan: '打开计划',
-    deleteClass: '删除课程', classDeleted: '课程已删除', todayClasses: '今天的课', noClassesToday: '今天没有课。', classesN: n => `${n} 节课`,
+    deleteClass: '删除课程', classDeleted: '课程已删除', todayClasses: '今天的课', noClassesToday: '今天没有课。', classesN: n => `${n} 节课`, renamedSiblings: n => `同一课程代码的另外 ${n} 节课也一起改名了`,
     typeOpts: ['讲课', '辅导', '实验', '实践'], dayNames: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
     makeup: '补课', addMakeup: '添加补课', cDate: '日期（只上一次）', cDateHint: '日期留空 = 每周都上的课。',
     upcomingMakeups: '接下来的补课', thisWeek: '本周', prevWeek: '上一周', nextWeek: '下一周',
@@ -1499,6 +1499,15 @@ function createClass(fields) {
 function patchClass(id, patch) {
   const c = state.classes[id]; if (!c) return;
   write('classes', id, Object.assign(clone(c), patch));
+}
+// renaming a class also renames the other classes of the same course that still had the old name
+function renameClass(id, title) {
+  const c = state.classes[id]; if (!c || title === c.title) return;
+  const key = String(c.code || '').trim().toUpperCase();
+  const others = key ? classesList().filter(o => o.id !== id && o.title === c.title && String(o.code || '').trim().toUpperCase() === key) : [];
+  patchClass(id, { title });
+  others.forEach(o => patchClass(o.id, { title }));
+  if (others.length) toast(T().renamedSiblings(others.length));
 }
 let openClassId = null, openClassDate = null;
 function openClass(id, focusTitle, occDate) {
@@ -2396,7 +2405,7 @@ let openPlanSettingsId = null;
 function closeDialog() {
   if (openTaskId) flushTaskDialog();
   if ($('#tti-sheet')) closeTtImport();
-  if (openClassId) { const ti = $('#c-title'); const c = state.classes[openClassId]; if (ti && c && ti.value.trim() && ti.value.trim() !== c.title && !state.readonly) patchClass(openClassId, { title: ti.value.trim() }); openClassId = null; }
+  if (openClassId) { const ti = $('#c-title'); const c = state.classes[openClassId]; if (ti && c && ti.value.trim() && ti.value.trim() !== c.title && !state.readonly) renameClass(openClassId, ti.value.trim()); openClassId = null; }
   closeBackup();
   openTaskId = null; openPlanSettingsId = null;
   $('#dialog-root').innerHTML = '';
@@ -2943,7 +2952,7 @@ document.addEventListener('change', e => {
   if (id === 'grade-pick' && el.value && !state.readonly) { patchTask(el.value, { inGrades: true }); return; }
   if (openClassId && /^c-/.test(id) && !state.readonly) {
     const c = state.classes[openClassId]; if (!c) return;
-    if (id === 'c-title') { const v = el.value.trim(); if (v) patchClass(c.id, { title: v }); else el.value = c.title; }
+    if (id === 'c-title') { const v = el.value.trim(); if (v) renameClass(c.id, v); else el.value = c.title; }
     else if (id === 'c-day') patchClass(c.id, { day: +el.value });
     else if (id === 'c-date') {
       if (isDate(el.value)) patchClass(c.id, { date: el.value, day: dowOf(el.value) });
