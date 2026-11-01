@@ -1495,7 +1495,7 @@ function applyTtImport(replace) {
     return col;
   };
   rows.forEach(r => write('classes', uid(), {
-    title: r.code || r.type || L.newClass, code: r.code.trim(), type: r.type.trim(), date: '', day: r.day, start: r.start, end: r.end,
+    title: courseName(r.code) || r.code || r.type || L.newClass, code: r.code.trim(), type: r.type.trim(), date: '', day: r.day, start: r.start, end: r.end,
     room: r.room.trim(), lecturer: '', color: pick(r.code.trim()), planId: '', createdAt: Date.now()
   }, true));
   closeTtImport();
@@ -1526,6 +1526,22 @@ function renameClass(id, title) {
   patchClass(id, { title });
   others.forEach(o => patchClass(o.id, { title }));
   if (others.length) toast(T().renamedSiblings(others.length));
+}
+// subject names for course codes, used when a class is still named after its code
+const COURSE_NAMES = {
+  CCP6224: 'OOAD',
+  CCS6314: 'Cryptography & Data Security',
+  CCS6344: 'Database and Cloud Security',
+  COB6223: 'Organisational Behaviour',
+  CSN6314: 'Cybersecurity: Theory & Practice'
+};
+const courseName = code => COURSE_NAMES[String(code || '').trim().toUpperCase()] || '';
+function fillCourseNames() {
+  if (state.readonly) return;
+  Object.values(state.classes || {}).forEach(c => {
+    const name = c && c.code && c.title === c.code && courseName(c.code);
+    if (name) write('classes', c.id, Object.assign(clone(c), { title: name }), true);
+  });
 }
 let openClassId = null, openClassDate = null;
 function openClass(id, focusTitle, occDate) {
@@ -1760,7 +1776,7 @@ async function initStore() {
     }, onErr);
     db.collection('classes').onSnapshot(snap => {
       const m = {}; snap.docs.forEach(d => { m[d.id] = Object.assign({}, d.data(), { id: d.id }); });
-      state.classes = m; render();
+      state.classes = m; fillCourseNames(); render();
     }, onErr);
     db.collection('settings').onSnapshot(snap => {
       const m = {}; snap.docs.forEach(d => { m[d.id] = Object.assign({}, d.data(), { id: d.id }); });
@@ -1791,6 +1807,7 @@ function startLocal() {
   const saved = readLocal();
   state.plans = saved ? saved.plans : {}; state.tasks = saved ? saved.tasks : {}; state.classes = saved ? saved.classes : {}; state.settings = saved ? saved.settings : {};
   state.plansReady = state.tasksReady = true;
+  fillCourseNames();
   render();
 }
 
@@ -1840,7 +1857,7 @@ function subscribeCloud(uid) {
   }, onErr));
   cloud.unsub.push(cloudCol(uid, 'classes').onSnapshot(snap => {
     const m = {}; snap.docs.forEach(d => { m[d.id] = Object.assign({}, d.data(), { id: d.id }); });
-    state.classes = m; render();
+    state.classes = m; fillCourseNames(); render();
   }, onErr));
   cloud.unsub.push(cloudCol(uid, 'settings').onSnapshot(snap => {
     const m = {}; snap.docs.forEach(d => { m[d.id] = Object.assign({}, d.data(), { id: d.id }); });
