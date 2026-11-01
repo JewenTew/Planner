@@ -1535,12 +1535,15 @@ const COURSE_NAMES = {
   COB6223: 'Organisational Behaviour',
   CSN6314: 'Cybersecurity: Theory & Practice'
 };
-const courseName = code => COURSE_NAMES[String(code || '').trim().toUpperCase()] || '';
+const courseName = code => COURSE_NAMES[String(code || '').replace(/\s+/g, '').toUpperCase()] || '';
 function fillCourseNames() {
   if (state.readonly) return;
   Object.values(state.classes || {}).forEach(c => {
-    const name = c && c.code && c.title === c.code && courseName(c.code);
-    if (name) write('classes', c.id, Object.assign(clone(c), { title: name }), true);
+    const norm = v => String(v || '').replace(/\s+/g, '').toUpperCase();
+    const name = c && (courseName(c.code) || courseName(c.title));
+    // still named after a course code (ignoring spaces and case), or after its code and type, or unnamed
+    if (!name || !(courseName(c.title) || [norm(c.code + c.type), ''].includes(norm(c.title)))) return;
+    write('classes', c.id, Object.assign(clone(c), { title: name }), true);
   });
 }
 let openClassId = null, openClassDate = null;
