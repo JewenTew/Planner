@@ -77,7 +77,7 @@ Planner/
 
 1. 修改 `src/planner.html`。
 2. 打包：`python tools/build.py`
-3. 把 `sw.js` 里的 `CACHE` 版本号加 1（目前是 `planner-v24`），让已安装的 App 尽快更新。
+3. 把 `sw.js` 里的 `CACHE` 版本号加 1（目前是 `planner-v25`），让已安装的 App 尽快更新。
 4. **测试时不要碰真实数据**：复制一份 `index.html` 成 `_localtest.html`，把 `<script src="firebase-config.js"></script>` 换成 `<script>window.PLANNER_FIREBASE={apiKey:""};</script>`，这样会用浏览器本地储存，不会连云端。用 `python -m http.server 5178` 在本机开来测，测完删掉测试文件。
 5. 提交并推送：`git add -A`、`git commit`、`git push`。GitHub Pages 大约 1 分钟后更新。
 6. （可选）把 `src/planner.html` 重新发布到上面的 Claude 版本链接。
@@ -95,7 +95,7 @@ Planner/
 |---|---|
 | `plans` | 计划：`name`、`color`（c1 到 c6）、`buckets[{id,name}]`、`labels`、`archived`、`gradeTarget` |
 | `tasks` | 任务：`planId`、`title`、`bucketId`、`progress`（todo/doing/done）、`priority`、`start`、`due`（YYYY-MM-DD）、`assignee`、`labels`、`notes`、`checklist`、`links`、`repeat`、`myDay`、`order`、成绩字段 `inGrades`/`weight`/`score`/`outOf` |
-| `classes` | 课程：`title`、`code`、`type`、`day`（1=星期一）、`start`/`end`（HH:MM 24 小时）、`room`、`lecturer`、`color`、`planId`；只上一次的课有 `date`；改时间的课有 `replaces{id,date}`；每周课程取消某天记在 `skip[]`；考试 `kind:'exam'`；出席记录 `att{日期: present/absent}` |
+| `classes` | 课程：`title`、`code`、`type`、`day`（1=星期一）、`start`/`end`（HH:MM 24 小时）、`room`、`lecturer`、`section`（班别）、`color`、`planId`；只上一次的课有 `date`；改时间的课有 `replaces{id,date}`；每周课程取消某天记在 `skip[]`；考试 `kind:'exam'`；出席记录 `att{日期: present/absent}` |
 | `settings` | `semester`（`name`、`start`、`end`、`breaks[]`、`attMin` 最低出席率）；`meta`（`lastBackup`、`snoozeUntil`） |
 
 - 没登录时，同样的结构存在浏览器 `localStorage` 的 `planner-data`；介面偏好（语言、主题、时间格式等）存在 `planner-prefs`。
@@ -121,6 +121,7 @@ Planner/
 - 考试：倒计时、日历红色标示、考前 3 天提醒。
 - 出席记录：在“我的一天”或课程表标记，每科出席率，低于标准会提醒（默认 80%）。
 - 为每门课一键建立计划并连接；计划页面显示每周上课时间、下次考试和出席率。
+- 班别（`section`，例如 TC3L、TT7L）：课程详情可以改，格子里显示在类型后面；`COURSE_SECTIONS` 会自动填上还没有班别的课。
 - 内置科目名称对照表（`COURSE_NAMES`，在 `src/planner.html`）：名称还是课程代码的课，打开 App 时自动换成科目名称；新导入的课程也会用这个名称。换学期时更新这张表。
 - 改课程名称时，同一课程代码、原本同名的其他课会一起改名（每科只要改一次）。
 - 清空课程表（可撤销）。
