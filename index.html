@@ -360,6 +360,7 @@ table.grades { min-width: 760px; }
 .class-row.cancelled { opacity: .6; }
 .mk.moved { color: var(--info); background: var(--info-soft); }
 .mk.cx { color: var(--danger); background: var(--danger-soft); }
+.mk.online { color: var(--surface-solid); background: var(--info); }
 .occ { background: var(--blue-soft); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
 .occ .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .wk { font-size: 12px; font-weight: 800; border-radius: 999px; padding: 3px 12px; background: linear-gradient(135deg, var(--accent-soft), var(--blue-soft)); color: var(--ink); white-space: nowrap; }
@@ -610,7 +611,7 @@ const I18N = {
     upcomingMakeups: 'Upcoming one-time classes', thisWeek: 'This week', prevWeek: 'Previous week', nextWeek: 'Next week',
     remindMakeup: n => `${n} extra or moved class${n === 1 ? '' : 'es'} today`, makeupToday: 'Changes to today\'s classes',
     moved: 'Moved', cancelled: 'Cancelled', occH: d => `This time only: ${d}`, occMove: 'Change the time for this day only', occCancel: 'Cancel this day only', occRestore: 'Undo: class happens as usual',
-    movedFrom: (d, t) => `Moved from ${d}${t ? ' ' + t : ''}`, weeklyHint: 'Changes in the fields below apply to every week.', occMovedToast: 'Set the new date and time for this one.', occCancelToast: 'Cancelled for that day', occRestoreToast: 'Back to the usual time',
+    movedFrom: (d, t) => `Moved from ${d}${t ? ' ' + t : ''}`, weeklyHint: 'Changes in the fields below apply to every week.', occMovedToast: 'Set the new date and time for this one.', occCancelToast: 'Cancelled for that day', occRestoreToast: 'Back to the usual time', online: 'Online', occOnline: 'Make this one online', occInPerson: 'Back to in person', occOnlineToast: 'Online for that day only', occInPersonToast: 'Back to in person',
     remindCancelled: n => `${n} class${n === 1 ? '' : 'es'} cancelled today`,
     weekN: n => `Week ${n}`, weekOf: (n, t) => `Week ${n} of ${t}`, semBreak: 'Break', semBefore: 'Before the semester', semAfter: 'After the semester',
     semSettings: 'Semester', semH: 'Semester settings', semName: 'Name', semNamePh: 'e.g. Trimester Oct 2026', semStart: 'First day', semEnd: 'Last day',
@@ -705,7 +706,7 @@ const I18N = {
     upcomingMakeups: '接下来的补课', thisWeek: '本周', prevWeek: '上一周', nextWeek: '下一周',
     remindMakeup: n => `今天有 ${n} 节补课或改时间的课`, makeupToday: '今天的课有变动',
     moved: '改时间', cancelled: '已取消', occH: d => `只针对这一次：${d}`, occMove: '只改这一次的时间', occCancel: '这一次取消', occRestore: '恢复，这一次照常上课',
-    movedFrom: (d, t) => `原本：${d}${t ? ' ' + t : ''}`, weeklyHint: '下面栏位的修改会套用到每一周。', occMovedToast: '请设定这一次的新日期和时间。', occCancelToast: '这一天的课已取消', occRestoreToast: '已恢复原本的上课时间',
+    movedFrom: (d, t) => `原本：${d}${t ? ' ' + t : ''}`, weeklyHint: '下面栏位的修改会套用到每一周。', occMovedToast: '请设定这一次的新日期和时间。', occCancelToast: '这一天的课已取消', occRestoreToast: '已恢复原本的上课时间', online: 'Online', occOnline: '这堂改成 Online', occInPerson: '改回实体课', occOnlineToast: '只有这一堂改成 Online', occInPersonToast: '已改回实体课',
     remindCancelled: n => `今天有 ${n} 节课取消`,
     weekN: n => `第 ${n} 周`, weekOf: (n, t) => `第 ${n} 周 / 共 ${t} 周`, semBreak: '假期', semBefore: '学期还没开始', semAfter: '学期已结束',
     semSettings: '学期设置', semH: '学期设置', semName: '名称', semNamePh: '例如：2026 年 10 月学期', semStart: '开始日期', semEnd: '结束日期',
@@ -989,6 +990,8 @@ const dowOf = d => (parse(d).getDay() + 6) % 7 + 1;
 // a class either repeats weekly (day 1-7) or happens once (date)
 const classesList = () => Object.values(state.classes || {}).filter(c => c && validTime(c.start) && validTime(c.end) && toMin(c.end) > toMin(c.start) && (c.date ? isDate(c.date) : c.day >= 1 && c.day <= 7));
 const skipped = (c, d) => Array.isArray(c.skip) && c.skip.includes(d);
+// online for one date only; a one-off class has a single date, so it keeps the mark if that date changes
+const isOnline = (c, d) => Array.isArray(c.online) && (c.date ? c.online.length > 0 : c.online.includes(d));
 /* semester: weekly classes only run on teaching days; week numbers skip break weeks */
 function semester() {
   const s = state.settings && state.settings.semester;
@@ -1127,16 +1130,16 @@ function courseStripHTML(plan) {
     ${att ? `<span class="chip ${att.rate < min ? 'overdue' : att.rate < min + 5 ? 'today' : 'done'}">${esc(L.attendance)} ${att.rate}%</span>` : ''}
   </div>`;
 }
-function classTag(c, isCancelled) {
-  const L = T();
+function classTag(c, isCancelled, d) {
+  const L = T(), on = d && isOnline(c, d) ? `<em class="mk online">${esc(L.online)}</em>` : '';
   if (isExam(c)) return `<em class="mk ex">${esc(c.type || L.exam)}</em>`;
   if (isCancelled) return `<em class="mk cx">${esc(L.cancelled)}</em>`;
-  if (c.date) return c.replaces ? `<em class="mk moved">${esc(L.moved)}</em>` : `<em class="mk">${esc(L.makeup)}</em>`;
-  return '';
+  if (c.date) return (c.replaces ? `<em class="mk moved">${esc(L.moved)}</em>` : `<em class="mk">${esc(L.makeup)}</em>`) + on;
+  return on;
 }
 let ttAnchor = null; // any date in the week shown on the timetable; null = this week
 const classColor = c => LABEL_KEYS.includes(c.color) ? c.color : 'c5';
-const classLine = c => [c.code, [c.type, c.section].filter(Boolean).join(' '), c.room].filter(Boolean).join(' · ');
+const classLine = (c, d) => [c.code, [c.type, c.section].filter(Boolean).join(' '), d && isOnline(c, d) ? '' : c.room].filter(Boolean).join(' · ');
 function layoutDay(list) {
   list = list.slice().sort((a, b) => toMin(a.start) - toMin(b.start) || toMin(a.end) - toMin(b.end));
   const out = []; let cluster = [], clusterEnd = -1, lanesEnd = [];
@@ -1188,7 +1191,7 @@ function timetableHTML() {
         const st = toMin(c.start), en = toMin(c.end), isCx = cx.includes(c);
         const mark = !isCx && c.att && c.att[d];
         return `<button class="tt-block lbl-${classColor(c)} ${c.date ? 'oneoff' : ''} ${isExam(c) ? 'exam' : ''} ${isCx ? 'cancelled' : ''}" data-act="class-open" data-id="${esc(c.id)}" data-date="${d}" style="top:${st - base + 1}px;height:${en - st - 2}px;left:calc(${(lane / lanes * 100).toFixed(3)}% + 3px);width:calc(${(100 / lanes).toFixed(3)}% - 6px)" title="${esc(c.title)} ${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}">
-          ${classTag(c, isCx)}<b>${mark ? `<i class="attm ${mark === 'present' ? 'p' : 'a'}">${mark === 'present' ? '✓' : '✗'}</i> ` : ''}${esc(c.title)}</b><span>${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}</span>${classLine(c) ? `<span>${esc(classLine(c))}</span>` : ''}${c.lecturer ? `<span>${esc(c.lecturer)}</span>` : ''}
+          ${classTag(c, isCx, d)}<b>${mark ? `<i class="attm ${mark === 'present' ? 'p' : 'a'}">${mark === 'present' ? '✓' : '✗'}</i> ` : ''}${esc(c.title)}</b><span>${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}</span>${classLine(c, d) ? `<span>${esc(classLine(c, d))}</span>` : ''}${c.lecturer ? `<span>${esc(c.lecturer)}</span>` : ''}
         </button>`;
       }).join('')}
     </div>`).join('')}
@@ -1199,10 +1202,10 @@ function timetableHTML() {
 }
 function classRowHTML(c, withDate, isCancelled) {
   const L = T(), now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
-  const past = !withDate && !isCancelled && toMin(c.end) <= nowM;
+  const past = !withDate && !isCancelled && toMin(c.end) <= nowM, d = withDate ? c.date : today();
   return `<div class="class-row lbl-${classColor(c)} ${past ? 'past' : ''} ${isCancelled ? 'cancelled' : ''}" data-act="class-open" data-id="${esc(c.id)}" data-date="${withDate ? esc(c.date) : today()}" tabindex="0">
       <span class="tm">${withDate ? esc(fmtDate(c.date)) + ' ' + esc(weekday(c.date)) + '<br>' : ''}${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}</span>
-      <div style="min-width:0"><div style="font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${classTag(c, isCancelled)}<span class="ttl">${esc(c.title)}</span></div>${classLine(c) || c.lecturer ? `<div class="p">${esc([classLine(c), c.lecturer].filter(Boolean).join(' · '))}</div>` : ''}</div>
+      <div style="min-width:0"><div style="font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${classTag(c, isCancelled, d)}<span class="ttl">${esc(c.title)}</span></div>${classLine(c, d) || c.lecturer ? `<div class="p">${esc([classLine(c, d), c.lecturer].filter(Boolean).join(' · '))}</div>` : ''}</div>
       ${!withDate && !isCancelled && !isExam(c) && !state.readonly ? attButtonsHTML(c, today()) : '<span></span>'}
     </div>`;
 }
@@ -1576,8 +1579,9 @@ function openClass(id, focusTitle, occDate) {
     <div class="sheet-head"><span class="dot bg-${classColor(c)}"></span><span>${esc(exam ? L.examDetails : L.timetable)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
     ${canMark ? `<div class="occ"><b>${esc(L.attH(fmtDate(attDate) + ' ' + weekday(attDate)))}</b><div class="row">${attButtonsHTML(c, attDate)}</div></div>` : ''}
     ${!c.date && occDate && !RO ? `<div class="occ"><b>${esc(L.occH(fmtDate(occDate) + ' ' + weekday(occDate)))}</b>
-      <div class="row">${skipped(c, occDate) ? `<em class="mk cx">${esc(L.cancelled)}</em><button class="btn" data-act="occ-restore">${esc(L.occRestore)}</button>` : `<button class="btn primary" data-act="occ-move">${esc(L.occMove)}</button><button class="btn" data-act="occ-cancel">${esc(L.occCancel)}</button>`}</div>
+      <div class="row">${skipped(c, occDate) ? `<em class="mk cx">${esc(L.cancelled)}</em><button class="btn" data-act="occ-restore">${esc(L.occRestore)}</button>` : `${isOnline(c, occDate) ? `<em class="mk online">${esc(L.online)}</em>` : ''}<button class="btn primary" data-act="occ-move">${esc(L.occMove)}</button><button class="btn" data-act="occ-cancel">${esc(L.occCancel)}</button><button class="btn" data-act="occ-online">${esc(isOnline(c, occDate) ? L.occInPerson : L.occOnline)}</button>`}</div>
       <span class="faint" style="font-size:12px">${esc(L.weeklyHint)}</span></div>` : ''}
+    ${c.date && !exam && !RO ? `<div class="occ"><div class="row">${isOnline(c, c.date) ? `<em class="mk online">${esc(L.online)}</em>` : ''}<button class="btn" data-act="occ-online">${esc(isOnline(c, c.date) ? L.occInPerson : L.occOnline)}</button></div></div>` : ''}
     ${c.replaces ? `<div class="occ"><span>${classTag(c, false)} ${esc(L.movedFrom(fmtDate(c.replaces.date) + ' ' + weekday(c.replaces.date), orig ? fmtTime(orig.start) + ' - ' + fmtTime(orig.end) : ''))}</span></div>` : ''}
     <input class="title-input" id="c-title" value="${esc(c.title)}" maxlength="120" ${dis} aria-label="${esc(L.cTitle)}">
     <div class="fields">
@@ -2631,6 +2635,7 @@ function parseBackup(text) {
         kind: c.kind === 'exam' ? 'exam' : '',
         att: c.att && typeof c.att === 'object' ? Object.fromEntries(Object.entries(c.att).filter(([d, v]) => isDate(d) && (v === 'present' || v === 'absent')).slice(0, 400)) : {},
         skip: Array.isArray(c.skip) ? c.skip.filter(isDate).slice(0, 300) : [],
+        online: Array.isArray(c.online) ? c.online.filter(isDate).slice(0, 300) : [],
         replaces: c.replaces && validId(c.replaces.id) && isDate(c.replaces.date) ? { id: c.replaces.id, date: c.replaces.date } : null
       };
     }
@@ -2751,6 +2756,12 @@ document.addEventListener('click', e => {
       patchClass(c.id, { skip: [...new Set([...(c.skip || []), d])] });
       openClass(c.id, false, d); toast(L.occCancelToast); break;
     }
+    case 'occ-online': {
+      const c = state.classes[openClassId], d = c && (c.date || openClassDate); if (!c || !d || RO) break;
+      const on = isOnline(c, d);
+      patchClass(c.id, { online: c.date ? (on ? [] : [d]) : on ? c.online.filter(x => x !== d) : [...new Set([...(c.online || []), d])] });
+      openClass(c.id, false, openClassDate); toast(on ? L.occInPersonToast : L.occOnlineToast); break;
+    }
     case 'occ-restore': {
       const c = state.classes[openClassId], d = openClassDate; if (!c || !d || RO) break;
       patchClass(c.id, { skip: (c.skip || []).filter(x => x !== d) });
@@ -2760,7 +2771,7 @@ document.addEventListener('click', e => {
     case 'occ-move': {
       const c = state.classes[openClassId], d = openClassDate; if (!c || !d || RO) break;
       patchClass(c.id, { skip: [...new Set([...(c.skip || []), d])] });
-      const nid = createClass({ title: c.title, code: c.code || '', type: c.type || '', section: c.section || '', room: c.room || '', lecturer: c.lecturer || '', color: c.color, planId: c.planId || '', start: c.start, end: c.end, date: d, day: dowOf(d), replaces: { id: c.id, date: d } });
+      const nid = createClass({ title: c.title, code: c.code || '', type: c.type || '', section: c.section || '', online: isOnline(c, d) ? [d] : [], room: c.room || '', lecturer: c.lecturer || '', color: c.color, planId: c.planId || '', start: c.start, end: c.end, date: d, day: dowOf(d), replaces: { id: c.id, date: d } });
       openClass(nid, false, null); toast(L.occMovedToast);
       setTimeout(() => $('#c-date')?.focus(), 0); break;
     }
