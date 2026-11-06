@@ -346,6 +346,8 @@ table.grades { min-width: 760px; }
 .tt-block:hover { filter: brightness(1.03); outline: 2px solid color-mix(in srgb, var(--lc) 55%, transparent); }
 .tt-block b { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tt-block span { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.tt-col.is-off { background-color: color-mix(in srgb, var(--warn-soft) 55%, transparent); }
+.tt-off { position: absolute; top: 4px; left: 4px; right: 4px; font-size: 11px; font-weight: 800; color: var(--warn); text-align: center; pointer-events: none; }
 .tt-now { position: absolute; left: 0; right: 0; height: 2px; background: var(--danger); z-index: 2; }
 .tt-now::before { content: ""; position: absolute; left: -4px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
 .class-row { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 6px; border-top: 1px solid var(--line); cursor: pointer; border-radius: 8px; border-left: 4px solid var(--lc); }
@@ -618,7 +620,7 @@ const I18N = {
     moved: 'Moved', cancelled: 'Cancelled', occH: d => `This time only: ${d}`, occMove: 'Change the time for this day only', occCancel: 'Cancel this day only', occRestore: 'Undo: class happens as usual',
     movedFrom: (d, t) => `Moved from ${d}${t ? ' ' + t : ''}`, weeklyHint: 'Changes in the fields below apply to every week.', occMovedToast: 'Set the new date and time for this one.', occCancelToast: 'Cancelled for that day', occRestoreToast: 'Back to the usual time', online: 'Online', occOnline: 'Make this one online', occInPerson: 'Back to in person', occOnlineToast: 'Online for that day only', occInPersonToast: 'Back to in person',
     remindCancelled: n => `${n} class${n === 1 ? '' : 'es'} cancelled today`,
-    weekN: n => `Week ${n}`, weekOf: (n, t) => `Week ${n} of ${t}`, semBreak: 'Break', semBefore: 'Before the semester', semAfter: 'After the semester',
+    weekN: n => `Week ${n}`, weekOf: (n, t) => `Week ${n} of ${t}`, semBreak: 'Break', holidaysH: 'Holidays', holidaysN: n => `${n} recorded`, holidaysEdit: 'Add or edit', holidaysEmpty: 'No holidays recorded yet.', holidayMisses: s => `No class: ${s}`, holidayPast: 'Past', semBefore: 'Before the semester', semAfter: 'After the semester',
     semSettings: 'Semester', semH: 'Semester settings', semName: 'Name', semNamePh: 'e.g. Trimester Oct 2026', semStart: 'First day', semEnd: 'Last day',
     breaksH: 'Breaks (no classes)', breakNamePh: 'e.g. Mid-term break', addBreak: 'Add break', clearSem: 'Clear semester', semCleared: 'Semester settings cleared',
     semHint: 'Weekly classes only show between the first and last day, and not during breaks. Week numbers skip break weeks. Make-up and moved classes always show.',
@@ -713,7 +715,7 @@ const I18N = {
     moved: '改时间', cancelled: '已取消', occH: d => `只针对这一次：${d}`, occMove: '只改这一次的时间', occCancel: '这一次取消', occRestore: '恢复，这一次照常上课',
     movedFrom: (d, t) => `原本：${d}${t ? ' ' + t : ''}`, weeklyHint: '下面栏位的修改会套用到每一周。', occMovedToast: '请设定这一次的新日期和时间。', occCancelToast: '这一天的课已取消', occRestoreToast: '已恢复原本的上课时间', online: 'Online', occOnline: '这堂改成 Online', occInPerson: '改回实体课', occOnlineToast: '只有这一堂改成 Online', occInPersonToast: '已改回实体课',
     remindCancelled: n => `今天有 ${n} 节课取消`,
-    weekN: n => `第 ${n} 周`, weekOf: (n, t) => `第 ${n} 周 / 共 ${t} 周`, semBreak: '假期', semBefore: '学期还没开始', semAfter: '学期已结束',
+    weekN: n => `第 ${n} 周`, weekOf: (n, t) => `第 ${n} 周 / 共 ${t} 周`, semBreak: '假期', holidaysH: '假期', holidaysN: n => `共 ${n} 个`, holidaysEdit: '添加或修改', holidaysEmpty: '还没有记录假期。', holidayMisses: s => `没有的课：${s}`, holidayPast: '已过', semBefore: '学期还没开始', semAfter: '学期已结束',
     semSettings: '学期设置', semH: '学期设置', semName: '名称', semNamePh: '例如：2026 年 10 月学期', semStart: '开始日期', semEnd: '结束日期',
     breaksH: '假期（不上课）', breakNamePh: '例如：期中假期', addBreak: '添加假期', clearSem: '清除学期设置', semCleared: '学期设置已清除',
     semHint: '每周的课只会在开始到结束日期之间显示，假期不显示。周数不计算假期周。补课和改时间的课一定会显示。',
@@ -1162,6 +1164,25 @@ function layoutDay(list) {
   flush();
   return out;
 }
+// the holidays recorded under the semester, soonest first; past ones stay at the end for reference
+function holidaysHTML() {
+  const L = T(), td = today(), RO = state.readonly;
+  const s = state.settings && state.settings.semester;
+  const list = (s && Array.isArray(s.breaks) ? s.breaks : []).filter(b => isDate(b.start) && isDate(b.end) && b.start <= b.end);
+  const isPast = b => b.end < td;
+  list.sort((a, b) => isPast(a) - isPast(b) || (a.start < b.start ? -1 : 1));
+  const label = d => `${fmtDate(d)} ${weekday(d)}`;
+  const missed = b => {
+    const days = []; for (let d = b.start; d <= b.end && days.length < 7; d = addDays(d, 1)) days.push(dowOf(d));
+    return [...new Set(classesList().filter(c => !c.date && days.includes(c.day)).map(c => [c.title, c.type].filter(Boolean).join(' ')))].join(', ');
+  };
+  return `<section class="panel"><h2>${esc(L.holidaysH)} ${list.length ? `<small>${esc(L.holidaysN(list.length))}</small>` : ''}${!RO ? `<button class="btn mini" style="margin-left:auto" data-act="sem-open">${esc(L.holidaysEdit)}</button>` : ''}</h2>
+    ${list.length ? list.map(b => `<div class="exam-row lbl-c5" data-act="tt-goto" data-date="${esc(b.start)}" tabindex="0" style="${isPast(b) ? 'opacity:.55' : ''}">
+      <div style="min-width:0"><div class="t">${esc(b.name || L.semBreak)}</div><div class="p">${esc(label(b.start))}${b.end !== b.start ? ' - ' + esc(label(b.end)) : ''}${missed(b) ? ' · ' + esc(L.holidayMisses(missed(b))) : ''}</div></div>
+      <span class="chip">${esc(isPast(b) ? L.holidayPast : b.start <= td ? L.cd(0) : L.cd(diffDays(td, b.start)))}</span>
+    </div>`).join('') : `<p class="faint" style="margin:0">${esc(L.holidaysEmpty)}</p>`}
+  </section>`;
+}
 function timetableHTML() {
   const L = T(), RO = state.readonly;
   const all = classesList();
@@ -1192,7 +1213,8 @@ function timetableHTML() {
     <div class="tt-dow"></div>
     ${cols.map(({ d }) => `<div class="tt-dow ${d === td ? 'is-today' : ''}">${esc(WEEKDAYS[ui.lang][dowOf(d) - 1])} ${parse(d).getDate()}</div>`).join('')}
     <div class="tt-gutter" style="height:${H}px">${hours.map(h => `<span style="top:${(h - startH) * 60}px">${h === startH ? '' : fmtHour(h)}</span>`).join('')}</div>
-    ${cols.map(({ d, list, cx }) => `<div class="tt-col ${d === td ? 'is-today' : ''}" style="height:${H}px">
+    ${cols.map(({ d, list, cx }) => { const off = semester() && breakOn(semester(), d); return `<div class="tt-col ${d === td ? 'is-today' : ''} ${off ? 'is-off' : ''}" style="height:${H}px">
+      ${off ? `<div class="tt-off">${esc(off.name || L.semBreak)}</div>` : ''}
       ${d === td && nowM > base && nowM < base + H ? `<div class="tt-now" style="top:${nowM - base}px"></div>` : ''}
       ${layoutDay(list.concat(cx)).map(({ c, lane, lanes }) => {
         const st = toMin(c.start), en = toMin(c.end), isCx = cx.includes(c);
@@ -1201,8 +1223,9 @@ function timetableHTML() {
           ${classTag(c, isCx, d)}<b>${mark ? `<i class="attm ${mark === 'present' ? 'p' : 'a'}">${mark === 'present' ? '✓' : '✗'}</i> ` : ''}${esc(c.title)}</b><span>${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}</span>${classLine(c, d) ? `<span>${esc(classLine(c, d))}</span>` : ''}${c.lecturer ? `<span>${esc(c.lecturer)}</span>` : ''}
         </button>`;
       }).join('')}
-    </div>`).join('')}
+    </div>`; }).join('')}
   </div></div>
+  ${holidaysHTML()}
   ${upcomingExams().length ? `<section class="panel"><h2>${esc(L.examsSub)}</h2>${upcomingExams().map(examRowHTML).join('')}</section>` : ''}
   ${upcoming.length ? `<section class="panel"><h2>${esc(L.upcomingMakeups)} <small>${esc(L.classesN(upcoming.length))}</small></h2>${upcoming.map(c => classRowHTML(c, true)).join('')}</section>` : ''}
   <section class="panel"><h2>${esc(L.attendance)} <small>${esc(L.attSub(attMin()))}</small></h2>${attendanceStats().length ? attendanceHTML(attendanceStats()) : ''}<p class="faint" style="margin:${attendanceStats().length ? '10px' : '0'} 0 0;font-size:12px">${esc(L.attHint)}</p></section>`;
@@ -2770,6 +2793,7 @@ document.addEventListener('click', e => {
     case 'class-new': if (!RO) { const id = createClass({}); openClass(id, true); } break;
     case 'makeup-new': if (!RO) { const d = ttAnchor && ttAnchor > today() ? ttAnchor : today(); const id = createClass({ date: d, day: dowOf(d) }); openClass(id, true); } break;
     case 'sem-open': openSemester(); break;
+    case 'tt-goto': ttAnchor = el.dataset.date; render(); $('.tt-wrap')?.scrollIntoView({ block: 'center' }); break;
     case 'tti-open': closeTtImport(); openTtImport(); break;
     case 'tt-clear': if (!RO) { const ids = Object.keys(state.classes || {}); if (ids.length) deleteWithUndo([], [], L.ttCleared(ids.length), ids); } break;
     case 'tti-del': if (ttImport) { ttImport.rows.splice(+el.dataset.ri, 1); openTtImport(); } break;

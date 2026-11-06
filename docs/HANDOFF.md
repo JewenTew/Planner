@@ -77,7 +77,7 @@ Planner/
 
 1. 修改 `src/planner.html`。
 2. 打包：`python tools/build.py`
-3. 把 `sw.js` 里的 `CACHE` 版本号加 1（目前是 `planner-v31`），让已安装的 App 尽快更新。
+3. 把 `sw.js` 里的 `CACHE` 版本号加 1（目前是 `planner-v32`），让已安装的 App 尽快更新。
 4. **测试时不要碰真实数据**：复制一份 `index.html` 成 `_localtest.html`，把 `<script src="firebase-config.js"></script>` 换成 `<script>window.PLANNER_FIREBASE={apiKey:""};</script>`，这样会用浏览器本地储存，不会连云端。用 `python -m http.server 5178` 在本机开来测，测完删掉测试文件。
 5. 提交并推送：`git add -A`、`git commit`、`git push`。GitHub Pages 大约 1 分钟后更新。
 6. （可选）把 `src/planner.html` 重新发布到上面的 Claude 版本链接。
@@ -119,6 +119,7 @@ Planner/
 - 补课（只上一次）、只改某一次的时间、只取消某一次。
 - 学期设置：开始与结束日期、假期（周数不计算假期周），学期外不显示每周课程。
 - 从图片导入课程表（本机文字识别，导入前可在表格里检查修改）；课程代码保留前面的字母（例如 C CS6314 会变成 CCS6314）。
+- 假期记录：课程表页列出学期假期（倒计时、当天没有的课，点一下跳到那一周），放假当天的格子标出假期名字；在学期设置里添加或修改。
 - 考试：倒计时、日历红色标示、考前 3 天提醒。
 - 出席记录：在“我的一天”或课程表标记，每科出席率，低于标准会提醒（默认 80%）。
 - 为每门课一键建立计划并连接；计划页面显示每周上课时间、下次考试和出席率。
