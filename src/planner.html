@@ -182,6 +182,9 @@ main { min-width: 0; padding-inline: 28px; padding-block: 22px 44px; display: fl
 .selbar .hint { color: var(--muted); font-size: 12px; font-weight: 600; }
 .selbar .q { font-weight: 700; color: var(--danger); }
 main.selecting { padding-bottom: 110px; }
+.nav-item.dragging { opacity: .4; }
+.nav-item.ins-before { box-shadow: 0 -2px 0 0 var(--accent-deep); }
+.nav-item.ins-after { box-shadow: 0 2px 0 0 var(--accent-deep); }
 .col.drop-before { box-shadow: -5px 0 0 0 var(--accent-deep); }
 .col.drop-after { box-shadow: 5px 0 0 0 var(--accent-deep); }
 .qa { width: 100%; background: var(--surface); border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 10px; padding: 7px 10px; min-height: 36px; }
@@ -514,6 +517,8 @@ textarea.input { width: 100%; min-height: 96px; resize: vertical; line-height: 1
   .rail-label, .brand small, .rail-foot { display: none; }
   .nav { flex-direction: row; overflow-x: auto; gap: 6px; padding-bottom: 2px; }
   .nav-item { width: auto; flex: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; }
+  .nav-item.ins-before { box-shadow: -3px 0 0 0 var(--accent-deep); }
+  .nav-item.ins-after { box-shadow: 3px 0 0 0 var(--accent-deep); }
   .nav-item .name { max-width: 140px; }
   main { padding-inline: 16px; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -837,7 +842,9 @@ function cmpTasks(a, b) {
   return (a.createdAt || 0) - (b.createdAt || 0);
 }
 
-const plansList = () => Object.values(state.plans).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+// plans you have dragged keep their place; a new plan has no order yet, so it goes last
+const planOrder = p => typeof p.order === 'number' ? p.order : p.createdAt || 0;
+const plansList = () => Object.values(state.plans).sort((a, b) => planOrder(a) - planOrder(b));
 const tasksOf = planId => Object.values(state.tasks).filter(t => t.planId === planId);
 const activePlans = () => plansList().filter(p => !p.archived);
 const archivedPlans = () => plansList().filter(p => p.archived);
@@ -2005,7 +2012,7 @@ function renderRail() {
       <nav class="nav">
         ${plans.map(p => {
           const od = tasksOf(p.id).filter(t => dueStatus(t) === 'overdue').length;
-          return `<button class="nav-item ${ui.planId === p.id ? 'active' : ''}" data-act="goto" data-plan="${p.id}"><span class="dot bg-${esc(p.color)}"></span><span class="name">${esc(p.name)}</span>${od ? `<span class="badge" title="${esc(L.overdue)}">${od}</span>` : ''}</button>`;
+          return `<button class="nav-item ${ui.planId === p.id ? 'active' : ''}" ${!RO && state.mode !== 'signin' ? 'draggable="true"' : ''} data-act="goto" data-plan="${p.id}"><span class="dot bg-${esc(p.color)}"></span><span class="name">${esc(p.name)}</span>${od ? `<span class="badge" title="${esc(L.overdue)}">${od}</span>` : ''}</button>`;
         }).join('')}
         ${!RO && state.mode !== 'signin' ? `<button class="nav-item" data-act="new-plan-show" style="color:var(--muted)">${ICON_PLUS}<span class="name">${esc(L.newPlan)}</span></button>` : ''}
       </nav>
@@ -2603,7 +2610,7 @@ function parseBackup(text) {
     const buckets = Array.isArray(p.buckets) ? p.buckets.filter(b => b && typeof b.name === 'string').slice(0, 50).map(b => ({ id: str(b.id, 60) || uid(), name: b.name.slice(0, 40) })) : [];
     const labels = {};
     if (p.labels && typeof p.labels === 'object') LABEL_KEYS.forEach(k => { if (typeof p.labels[k] === 'string' && p.labels[k]) labels[k] = p.labels[k].slice(0, 24); });
-    plans[id] = { name: str(p.name, 80) || 'Plan', color: LABEL_KEYS.includes(p.color) ? p.color : 'c1', createdAt: +p.createdAt || Date.now(), archived: !!p.archived, gradeTarget: typeof p.gradeTarget === 'number' ? p.gradeTarget : null, labels, buckets: buckets.length ? buckets : T().defaultBuckets.map(n => ({ id: uid(), name: n })) };
+    plans[id] = { name: str(p.name, 80) || 'Plan', color: LABEL_KEYS.includes(p.color) ? p.color : 'c1', createdAt: +p.createdAt || Date.now(), archived: !!p.archived, ...(typeof p.order === 'number' && isFinite(p.order) ? { order: p.order } : {}), gradeTarget: typeof p.gradeTarget === 'number' ? p.gradeTarget : null, labels, buckets: buckets.length ? buckets : T().defaultBuckets.map(n => ({ id: uid(), name: n })) };
   }
   for (const [rid, t] of Object.entries(d.tasks)) {
     if (!t || typeof t !== 'object' || !idMap[t.planId]) continue;
@@ -3198,7 +3205,15 @@ document.addEventListener('submit', e => {
 /* drag and drop between board columns */
 let dragId = null;
 let dragBucket = null;
+let dragPlan = null;
 document.addEventListener('dragstart', e => {
+  const nav = e.target.closest && e.target.closest('.nav-item[draggable="true"]');
+  if (nav) {
+    dragPlan = nav.dataset.plan; nav.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', dragPlan); } catch (err) {}
+    return;
+  }
   const head = e.target.closest && e.target.closest('.col-head[draggable="true"]');
   if (head) {
     dragBucket = head.dataset.bucketId; head.closest('.col').classList.add('bucket-dragging');
@@ -3213,11 +3228,26 @@ document.addEventListener('dragstart', e => {
   try { e.dataTransfer.setData('text/plain', dragId); } catch (err) {}
 });
 document.addEventListener('dragend', () => {
-  dragId = null; dragBucket = null;
+  dragId = null; dragBucket = null; dragPlan = null;
   document.querySelectorAll('.dragging, .drop-ok, .bucket-dragging, .drop-before, .drop-after, .ins-before, .ins-after').forEach(n => n.classList.remove('dragging', 'drop-ok', 'bucket-dragging', 'drop-before', 'drop-after', 'ins-before', 'ins-after'));
 });
 const dropSide = (col, e) => { const r = col.getBoundingClientRect(); return e.clientX < r.left + r.width / 2 ? 'before' : 'after'; };
+// the plan list runs down the sidebar, or across the top on a narrow window
+const navSide = (item, e) => {
+  const r = item.getBoundingClientRect(), across = getComputedStyle(item.parentElement).flexDirection.startsWith('row');
+  return (across ? e.clientX < r.left + r.width / 2 : e.clientY < r.top + r.height / 2) ? 'before' : 'after';
+};
 document.addEventListener('dragover', e => {
+  if (dragPlan) {
+    const over = e.target.closest && e.target.closest('.nav-item[draggable="true"]');
+    document.querySelectorAll('.nav-item.ins-before, .nav-item.ins-after').forEach(n => { if (n !== over) n.classList.remove('ins-before', 'ins-after'); });
+    if (!over) return;
+    e.preventDefault();
+    const side = navSide(over, e);
+    over.classList.toggle('ins-before', side === 'before');
+    over.classList.toggle('ins-after', side === 'after');
+    return;
+  }
   if (dragBucket) {
     const target = e.target.closest && e.target.closest('.col[data-bucket-id]');
     document.querySelectorAll('.drop-before, .drop-after').forEach(n => { if (n !== target) n.classList.remove('drop-before', 'drop-after'); });
@@ -3242,6 +3272,19 @@ document.addEventListener('dragover', e => {
 });
 const cardSide = (card, e) => { const r = card.getBoundingClientRect(); return e.clientY < r.top + r.height / 2 ? 'before' : 'after'; };
 document.addEventListener('drop', e => {
+  if (dragPlan) {
+    const target = e.target.closest && e.target.closest('.nav-item[draggable="true"]');
+    const id = dragPlan; dragPlan = null;
+    if (!target) return;
+    e.preventDefault();
+    const list = activePlans().map(p => p.id), from = list.indexOf(id);
+    let to = list.indexOf(target.dataset.plan) + (navSide(target, e) === 'after' ? 1 : 0);
+    if (from < to) to -= 1;
+    list.splice(from, 1); list.splice(to, 0, id);
+    list.forEach((pid, i) => { if (state.plans[pid].order !== i) write('plans', pid, Object.assign(clone(state.plans[pid]), { order: i }), true); });
+    render();
+    return;
+  }
   if (dragBucket) {
     const target = e.target.closest && e.target.closest('.col[data-bucket-id]');
     const id = dragBucket; dragBucket = null;
