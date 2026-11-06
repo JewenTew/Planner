@@ -586,7 +586,7 @@ const I18N = {
     gradeShort: g => `Grade ${g}%`, weightL: 'Weight %', scoreL: 'Score', outOfL: 'Out of',
     timetable: 'Timetable', timetableSub: 'Your weekly classes', addClass: 'Add class', newClass: 'New class',
     ttEmptyH: 'No classes yet', ttEmptyP: 'Add your weekly classes here, or import a timetable file under Backup & restore.',
-    classDetails: 'Class details', cTitle: 'Class name', cCode: 'Course code', cType: 'Type', cDay: 'Day', cStart: 'Starts', cEnd: 'Ends', cSection: 'Section', cRoom: 'Room', cLecturer: 'Lecturer', cPlan: 'Linked plan', cNoPlan: 'None', openPlan: 'Open plan',
+    classDetails: 'Class details', cTitle: 'Class name', cCode: 'Course code', cType: 'Type', cDay: 'Day', cStart: 'Starts', cEnd: 'Ends', cSection: 'Section', cLink: 'Meeting link', cLinkPh: 'Paste the Zoom, Teams or Meet link', joinMeeting: 'Join', cRoom: 'Room', cLecturer: 'Lecturer', cPlan: 'Linked plan', cNoPlan: 'None', openPlan: 'Open plan',
     deleteClass: 'Delete class', classDeleted: 'Class deleted', todayClasses: "Today's classes", noClassesToday: 'No classes today.', classesN: n => `${n} class${n === 1 ? '' : 'es'}`, renamedSiblings: n => `Also renamed ${n} other class${n === 1 ? '' : 'es'} with the same course code`,
     typeOpts: ['Lecture', 'Tutorial', 'Lab', 'Practical'], dayNames: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     makeup: 'Make-up', addMakeup: 'Add make-up class', cDate: 'Date (one time only)', cDateHint: 'Leave the date empty for a class that repeats every week.',
@@ -681,7 +681,7 @@ const I18N = {
     gradeShort: g => `成绩 ${g}%`, weightL: '占比 %', scoreL: '得分', outOfL: '满分',
     timetable: '课程表', timetableSub: '每周固定的课程', addClass: '添加课程', newClass: '新课程',
     ttEmptyH: '还没有课程', ttEmptyP: '把每周的课加进来，或在“备份与还原”里导入课程表文件。',
-    classDetails: '课程详情', cTitle: '课程名称', cCode: '课程代码', cType: '类型', cDay: '星期', cStart: '开始', cEnd: '结束', cSection: '班别', cRoom: '教室', cLecturer: '讲师', cPlan: '关联计划', cNoPlan: '无', openPlan: '打开计划',
+    classDetails: '课程详情', cTitle: '课程名称', cCode: '课程代码', cType: '类型', cDay: '星期', cStart: '开始', cEnd: '结束', cSection: '班别', cLink: '会议链接', cLinkPh: '贴上 Zoom、Teams 或 Meet 链接', joinMeeting: '进入会议', cRoom: '教室', cLecturer: '讲师', cPlan: '关联计划', cNoPlan: '无', openPlan: '打开计划',
     deleteClass: '删除课程', classDeleted: '课程已删除', todayClasses: '今天的课', noClassesToday: '今天没有课。', classesN: n => `${n} 节课`, renamedSiblings: n => `同一课程代码的另外 ${n} 节课也一起改名了`,
     typeOpts: ['讲课', '辅导', '实验', '实践'], dayNames: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
     makeup: '补课', addMakeup: '添加补课', cDate: '日期（只上一次）', cDateHint: '日期留空 = 每周都上的课。',
@@ -1182,12 +1182,16 @@ function timetableHTML() {
   ${upcoming.length ? `<section class="panel"><h2>${esc(L.upcomingMakeups)} <small>${esc(L.classesN(upcoming.length))}</small></h2>${upcoming.map(c => classRowHTML(c, true)).join('')}</section>` : ''}
   <section class="panel"><h2>${esc(L.attendance)} <small>${esc(L.attSub(attMin()))}</small></h2>${attendanceStats().length ? attendanceHTML(attendanceStats()) : ''}<p class="faint" style="margin:${attendanceStats().length ? '10px' : '0'} 0 0;font-size:12px">${esc(L.attHint)}</p></section>`;
 }
+function joinHTML(c) {
+  const url = normalizeUrl(c.link);
+  return url ? `<a class="btn primary" href="${esc(url)}" target="_blank" rel="noopener noreferrer" data-act="class-join" title="${esc(url)}">${ICON_LINK}<span>${esc(T().joinMeeting)}</span></a>` : '';
+}
 function classRowHTML(c, withDate, isCancelled) {
   const L = T(), now = new Date(), nowM = now.getHours() * 60 + now.getMinutes();
   const past = !withDate && !isCancelled && toMin(c.end) <= nowM, d = withDate ? c.date : today();
   return `<div class="class-row lbl-${classColor(c)} ${past ? 'past' : ''} ${isCancelled ? 'cancelled' : ''}" data-act="class-open" data-id="${esc(c.id)}" data-date="${withDate ? esc(c.date) : today()}" tabindex="0">
       <span class="tm">${withDate ? esc(fmtDate(c.date)) + ' ' + esc(weekday(c.date)) + '<br>' : ''}${esc(fmtTime(c.start))} - ${esc(fmtTime(c.end))}</span>
-      <div style="min-width:0"><div style="font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${classTag(c, isCancelled, d)}<span class="ttl">${esc(c.title)}</span></div>${classLine(c, d) || c.lecturer ? `<div class="p">${esc([classLine(c, d), c.lecturer].filter(Boolean).join(' · '))}</div>` : ''}</div>
+      <div style="min-width:0"><div style="font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap">${classTag(c, isCancelled, d)}<span class="ttl">${esc(c.title)}</span></div>${classLine(c, d) || c.lecturer ? `<div class="p">${esc([classLine(c, d), c.lecturer].filter(Boolean).join(' · '))}</div>` : ''}${!isCancelled && isOnline(c, d) && joinHTML(c) ? `<div style="margin-top:6px">${joinHTML(c)}</div>` : ''}</div>
       ${!withDate && !isCancelled && !isExam(c) && !state.readonly ? attButtonsHTML(c, today()) : '<span></span>'}
     </div>`;
 }
@@ -1561,9 +1565,9 @@ function openClass(id, focusTitle, occDate) {
     <div class="sheet-head"><span class="dot bg-${classColor(c)}"></span><span>${esc(exam ? L.examDetails : L.timetable)}</span><span class="grow"></span><button class="icon-btn" data-act="close" aria-label="${esc(L.close)}">${ICON_X}</button></div>
     ${canMark ? `<div class="occ"><b>${esc(L.attH(fmtDate(attDate) + ' ' + weekday(attDate)))}</b><div class="row">${attButtonsHTML(c, attDate)}</div></div>` : ''}
     ${!c.date && occDate && !RO ? `<div class="occ"><b>${esc(L.occH(fmtDate(occDate) + ' ' + weekday(occDate)))}</b>
-      <div class="row">${skipped(c, occDate) ? `<em class="mk cx">${esc(L.cancelled)}</em><button class="btn" data-act="occ-restore">${esc(L.occRestore)}</button>` : `${isOnline(c, occDate) ? `<em class="mk online">${esc(L.online)}</em>` : ''}<button class="btn primary" data-act="occ-move">${esc(L.occMove)}</button><button class="btn" data-act="occ-cancel">${esc(L.occCancel)}</button><button class="btn" data-act="occ-online">${esc(isOnline(c, occDate) ? L.occInPerson : L.occOnline)}</button>`}</div>
+      <div class="row">${skipped(c, occDate) ? `<em class="mk cx">${esc(L.cancelled)}</em><button class="btn" data-act="occ-restore">${esc(L.occRestore)}</button>` : `${isOnline(c, occDate) ? `<em class="mk online">${esc(L.online)}</em>${joinHTML(c)}` : ''}<button class="btn ${isOnline(c, occDate) && joinHTML(c) ? '' : 'primary'}" data-act="occ-move">${esc(L.occMove)}</button><button class="btn" data-act="occ-cancel">${esc(L.occCancel)}</button><button class="btn" data-act="occ-online">${esc(isOnline(c, occDate) ? L.occInPerson : L.occOnline)}</button>`}</div>
       <span class="faint" style="font-size:12px">${esc(L.weeklyHint)}</span></div>` : ''}
-    ${c.date && !exam && !RO ? `<div class="occ"><div class="row">${isOnline(c, c.date) ? `<em class="mk online">${esc(L.online)}</em>` : ''}<button class="btn" data-act="occ-online">${esc(isOnline(c, c.date) ? L.occInPerson : L.occOnline)}</button></div></div>` : ''}
+    ${c.date && !exam && !RO ? `<div class="occ"><div class="row">${isOnline(c, c.date) ? `<em class="mk online">${esc(L.online)}</em>${joinHTML(c)}` : ''}<button class="btn" data-act="occ-online">${esc(isOnline(c, c.date) ? L.occInPerson : L.occOnline)}</button></div></div>` : ''}
     ${c.replaces ? `<div class="occ"><span>${classTag(c, false)} ${esc(L.movedFrom(fmtDate(c.replaces.date) + ' ' + weekday(c.replaces.date), orig ? fmtTime(orig.start) + ' - ' + fmtTime(orig.end) : ''))}</span></div>` : ''}
     <input class="title-input" id="c-title" value="${esc(c.title)}" maxlength="120" ${dis} aria-label="${esc(L.cTitle)}">
     <div class="fields">
@@ -1577,6 +1581,7 @@ function openClass(id, focusTitle, occDate) {
       <label class="field"><span>${esc(L.cRoom)}</span><input class="input" id="c-room" value="${esc(c.room || '')}" maxlength="80" ${dis}></label>
       <label class="field"><span>${esc(L.cLecturer)}</span><input class="input" id="c-lecturer" value="${esc(c.lecturer || '')}" maxlength="80" ${dis}></label>
       <label class="field"><span>${esc(L.cPlan)}</span><select class="input" id="c-plan" ${dis}><option value="">${esc(L.cNoPlan)}</option>${plans.map(p => `<option value="${p.id}" ${c.planId === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>
+      ${exam ? '' : `<label class="field" style="grid-column:1/-1"><span>${esc(L.cLink)}</span><span style="display:flex;gap:8px;align-items:center"><input class="input" id="c-link" type="url" style="flex:1;min-width:0" value="${esc(c.link || '')}" maxlength="500" placeholder="${esc(L.cLinkPh)}" ${dis}>${joinHTML(c)}</span></label>`}
     </div>
     <p class="faint" style="margin:-6px 0 0;font-size:12px">${esc(exam ? L.examHint : L.cDateHint)}</p>
     <datalist id="class-types">${L.typeOpts.map(o => `<option value="${esc(o)}">`).join('')}</datalist>
@@ -2612,7 +2617,7 @@ function parseBackup(text) {
       if (!(day >= 1 && day <= 7) || !validTime(c.start) || !validTime(c.end) || toMin(c.end) <= toMin(c.start)) continue;
       classes[validId(rid) ? rid : uid()] = {
         title: str(c.title, 120) || 'Class', code: str(c.code, 40), type: str(c.type, 40), date, day, start: c.start, end: c.end,
-        section: str(c.section, 40), room: str(c.room, 80), lecturer: str(c.lecturer, 80), color: LABEL_KEYS.includes(c.color) ? c.color : 'c5',
+        section: str(c.section, 40), link: normalizeUrl(c.link) || '', room: str(c.room, 80), lecturer: str(c.lecturer, 80), color: LABEL_KEYS.includes(c.color) ? c.color : 'c5',
         planId: c.planId && idMap[c.planId] ? idMap[c.planId] : '', createdAt: +c.createdAt || Date.now(),
         kind: c.kind === 'exam' ? 'exam' : '',
         att: c.att && typeof c.att === 'object' ? Object.fromEntries(Object.entries(c.att).filter(([d, v]) => isDate(d) && (v === 'present' || v === 'absent')).slice(0, 400)) : {},
@@ -2753,7 +2758,7 @@ document.addEventListener('click', e => {
     case 'occ-move': {
       const c = state.classes[openClassId], d = openClassDate; if (!c || !d || RO) break;
       patchClass(c.id, { skip: [...new Set([...(c.skip || []), d])] });
-      const nid = createClass({ title: c.title, code: c.code || '', type: c.type || '', section: c.section || '', online: isOnline(c, d) ? [d] : [], room: c.room || '', lecturer: c.lecturer || '', color: c.color, planId: c.planId || '', start: c.start, end: c.end, date: d, day: dowOf(d), replaces: { id: c.id, date: d } });
+      const nid = createClass({ title: c.title, code: c.code || '', type: c.type || '', section: c.section || '', link: c.link || '', online: isOnline(c, d) ? [d] : [], room: c.room || '', lecturer: c.lecturer || '', color: c.color, planId: c.planId || '', start: c.start, end: c.end, date: d, day: dowOf(d), replaces: { id: c.id, date: d } });
       openClass(nid, false, null); toast(L.occMovedToast);
       setTimeout(() => $('#c-date')?.focus(), 0); break;
     }
@@ -3023,6 +3028,11 @@ document.addEventListener('change', e => {
     }
     else if (id === 'c-type') patchClass(c.id, { type: el.value.trim() });
     else if (id === 'c-section') patchClass(c.id, { section: el.value.trim() });
+    else if (id === 'c-link') {
+      const url = el.value.trim() ? normalizeUrl(el.value) : '';
+      if (url === null) { toast(T().badLink); el.value = c.link || ''; return; }
+      patchClass(c.id, { link: url }); openClass(c.id);
+    }
     else if (id === 'c-room') patchClass(c.id, { room: el.value.trim() });
     else if (id === 'c-lecturer') patchClass(c.id, { lecturer: el.value.trim() });
     else if (id === 'c-plan') { patchClass(c.id, { planId: el.value }); openClass(c.id); }
