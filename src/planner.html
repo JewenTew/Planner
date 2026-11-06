@@ -2656,7 +2656,7 @@ function parseBackup(text) {
   }
   return { plans, tasks, classes, settings };
 }
-function applyImport(data, replace) {
+function applyImport(data, replace, byName) {
   if (replace) {
     Object.keys(state.tasks).forEach(id => write('tasks', id, null, true));
     Object.keys(state.plans).forEach(id => write('plans', id, null, true));
@@ -2665,8 +2665,20 @@ function applyImport(data, replace) {
   }
   Object.entries(data.classes || {}).forEach(([id, c]) => write('classes', id, c, true));
   Object.entries(data.settings || {}).forEach(([id, v]) => write('settings', id, v, true));
-  Object.entries(data.plans).forEach(([id, p]) => write('plans', id, p, true));
-  Object.entries(data.tasks).forEach(([id, t]) => write('tasks', id, t, true));
+  // merging: a plan with the same name as one you have adds its tasks to that plan
+  const sameName = n => String(n || '').replace(/\s+/g, '').toLowerCase(), into = {};
+  if (byName) Object.entries(data.plans).forEach(([id, p]) => {
+    const m = !state.plans[id] && Object.values(state.plans).find(x => !x.archived && sameName(x.name) === sameName(p.name));
+    if (m) into[id] = m;
+  });
+  Object.entries(data.plans).forEach(([id, p]) => { if (!into[id]) write('plans', id, p, true); });
+  Object.entries(data.tasks).forEach(([id, t]) => {
+    const m = into[t.planId];
+    if (!m) { write('tasks', id, t, true); return; }
+    const from = (data.plans[t.planId].buckets || []).find(b => b.id === t.bucketId);
+    const b = (m.buckets || []).find(x => from && sameName(x.name) === sameName(from.name)) || (m.buckets || [])[0];
+    write('tasks', id, Object.assign({}, t, { planId: m.id, bucketId: b ? b.id : '' }), true);
+  });
   render();
 }
 function openBackup() {
@@ -2819,7 +2831,7 @@ document.addEventListener('click', e => {
     case 'migrate': { const d = pendingLocalData(); if (d) { applyImport(parseBackup(JSON.stringify({ app: 'planner', plans: d.plans, tasks: d.tasks, classes: d.classes || {}, settings: d.settings || {} })) || { plans: {}, tasks: {}, classes: {} }, false); lsSet(MIGRATED_KEY, '1'); render(); toast(L.uploaded); } break; }
     case 'migrate-skip': lsSet(MIGRATED_KEY, '1'); render(); break;
     case 'export': exportData(); break;
-    case 'import-merge': if (pendingImport && !RO) { const d = pendingImport; applyImport(d, false); closeDialog(); toast(L.imported(Object.keys(d.plans).length, Object.keys(d.tasks).length) + (Object.keys(d.classes || {}).length ? ' · ' + L.classesN(Object.keys(d.classes).length) : '')); } break;
+    case 'import-merge': if (pendingImport && !RO) { const d = pendingImport; applyImport(d, false, true); closeDialog(); toast(L.imported(Object.keys(d.plans).length, Object.keys(d.tasks).length) + (Object.keys(d.classes || {}).length ? ' · ' + L.classesN(Object.keys(d.classes).length) : '')); } break;
     case 'import-replace-ask': importConfirm = true; openBackup(); break;
     case 'import-cancel': importConfirm = false; openBackup(); break;
     case 'import-replace': if (pendingImport && !RO) { const d = pendingImport; applyImport(d, true); closeDialog(); ui.planId = 'hub'; savePrefs(); render(); toast(L.imported(Object.keys(d.plans).length, Object.keys(d.tasks).length)); } break;

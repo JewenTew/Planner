@@ -77,7 +77,7 @@ Planner/
 
 1. 修改 `src/planner.html`。
 2. 打包：`python tools/build.py`
-3. 把 `sw.js` 里的 `CACHE` 版本号加 1（目前是 `planner-v28`），让已安装的 App 尽快更新。
+3. 把 `sw.js` 里的 `CACHE` 版本号加 1（目前是 `planner-v29`），让已安装的 App 尽快更新。
 4. **测试时不要碰真实数据**：复制一份 `index.html` 成 `_localtest.html`，把 `<script src="firebase-config.js"></script>` 换成 `<script>window.PLANNER_FIREBASE={apiKey:""};</script>`，这样会用浏览器本地储存，不会连云端。用 `python -m http.server 5178` 在本机开来测，测完删掉测试文件。
 5. 提交并推送：`git add -A`、`git commit`、`git push`。GitHub Pages 大约 1 分钟后更新。
 6. （可选）把 `src/planner.html` 重新发布到上面的 Claude 版本链接。
@@ -132,7 +132,7 @@ Planner/
 **其他**
 - Google 登录与云端同步（电脑和手机同步）。
 - 可安装成 App、可离线打开；图标显示“逾期 + 今天到期”数量；每天第一次打开时提醒。
-- 备份与还原（导出或导入 JSON），超过 30 天没备份会提醒。
+- 备份与还原（导出或导入 JSON；合并导入时，同名计划的任务会并进现有计划），超过 30 天没备份会提醒。
 - 中英文切换、浅色或深色、24 小时或 AM/PM（都在左下角“设置”里）。
 - 介面：白色 + 淡粉 + 淡蓝。
 
