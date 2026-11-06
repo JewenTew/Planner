@@ -77,7 +77,7 @@ Planner/
 
 1. 修改 `src/planner.html`。
 2. 打包：`python tools/build.py`
-3. 把 `sw.js` 里的 `CACHE` 版本号加 1（目前是 `planner-v29`），让已安装的 App 尽快更新。
+3. 把 `sw.js` 里的 `CACHE` 版本号加 1（目前是 `planner-v30`），让已安装的 App 尽快更新。
 4. **测试时不要碰真实数据**：复制一份 `index.html` 成 `_localtest.html`，把 `<script src="firebase-config.js"></script>` 换成 `<script>window.PLANNER_FIREBASE={apiKey:""};</script>`，这样会用浏览器本地储存，不会连云端。用 `python -m http.server 5178` 在本机开来测，测完删掉测试文件。
 5. 提交并推送：`git add -A`、`git commit`、`git push`。GitHub Pages 大约 1 分钟后更新。
 6. （可选）把 `src/planner.html` 重新发布到上面的 Claude 版本链接。

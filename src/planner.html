@@ -1087,7 +1087,7 @@ function linkCoursePlans() {
   let made = 0, linked = 0;
   Object.entries(groups).forEach(([k, list]) => {
     let pid = (list.find(c => c.planId && state.plans[c.planId]) || {}).planId;
-    if (!pid) { const ex = plansList().find(p => p.name.trim().toUpperCase() === k); if (ex) pid = ex.id; }
+    if (!pid) { const ex = plansList().find(p => [k, String(list[0].title || '').trim().toUpperCase()].includes(p.name.trim().toUpperCase())); if (ex) pid = ex.id; }
     if (!pid) {
       pid = uid(); made++;
       write('plans', pid, { name: list[0].code.trim(), color: classColor(list.find(c => !isExam(c)) || list[0]), createdAt: Date.now(), labels: {}, buckets: T().defaultBuckets.map(n => ({ id: uid(), name: n })) }, true);
@@ -1100,7 +1100,7 @@ function linkCoursePlans() {
 // what a course plan shows under its title: weekly times, next exam, attendance
 function courseStripHTML(plan) {
   const L = T();
-  const mine = classesList().filter(c => c.planId === plan.id || (!c.planId && courseKey(c) && courseKey(c) === plan.name.trim().toUpperCase()));
+  const mine = classesList().filter(c => c.planId === plan.id || (!c.planId && [courseKey(c), String(c.title || '').trim().toUpperCase()].includes(plan.name.trim().toUpperCase())));
   if (!mine.length) return '';
   const weekly = mine.filter(c => !c.date).sort((a, b) => a.day - b.day || toMin(a.start) - toMin(b.start));
   const exam = mine.filter(c => isExam(c) && c.date >= today()).sort((a, b) => a.date < b.date ? -1 : 1)[0];
