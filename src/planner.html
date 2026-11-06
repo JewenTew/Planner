@@ -270,8 +270,8 @@ table.grid { width: 100%; border-collapse: collapse; min-width: 820px; }
 .link-row a svg { flex: none; color: var(--accent-deep); }
 .link-row .host { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }
 .link-add { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-.link-add #link-url { flex: 2 1 220px; min-width: 0; }
-.link-add #link-name { flex: 1 1 120px; min-width: 0; }
+.link-add #link-url, .link-add #doc-url { flex: 2 1 220px; min-width: 0; }
+.link-add #link-name, .link-add #doc-name { flex: 1 1 120px; min-width: 0; }
 .nav-item.archived { opacity: .6; }
 .nav-item.arch-toggle { color: var(--muted); font-size: 13px; }
 .card.ins-before { box-shadow: 0 -3px 0 0 var(--accent-deep), var(--shadow); }
@@ -586,7 +586,7 @@ const I18N = {
     gradeShort: g => `Grade ${g}%`, weightL: 'Weight %', scoreL: 'Score', outOfL: 'Out of',
     timetable: 'Timetable', timetableSub: 'Your weekly classes', addClass: 'Add class', newClass: 'New class',
     ttEmptyH: 'No classes yet', ttEmptyP: 'Add your weekly classes here, or import a timetable file under Backup & restore.',
-    classDetails: 'Class details', cTitle: 'Class name', cCode: 'Course code', cType: 'Type', cDay: 'Day', cStart: 'Starts', cEnd: 'Ends', cSection: 'Section', cLink: 'Meeting link', cLinkPh: 'Paste the Zoom, Teams or Meet link', joinMeeting: 'Join', cRoom: 'Room', cLecturer: 'Lecturer', cPlan: 'Linked plan', cNoPlan: 'None', openPlan: 'Open plan',
+    classDetails: 'Class details', cTitle: 'Class name', cCode: 'Course code', cType: 'Type', cDay: 'Day', cStart: 'Starts', cEnd: 'Ends', cDocs: c => `Documents for ${c}`, docNamePh: 'Name, e.g. Teaching Plan', docsHint: 'Shared by every class with this course code. Put the file in Google Drive or OneDrive and paste its link.', cSection: 'Section', cLink: 'Meeting link', cLinkPh: 'Paste the Zoom, Teams or Meet link', joinMeeting: 'Join', cRoom: 'Room', cLecturer: 'Lecturer', cPlan: 'Linked plan', cNoPlan: 'None', openPlan: 'Open plan',
     deleteClass: 'Delete class', classDeleted: 'Class deleted', todayClasses: "Today's classes", noClassesToday: 'No classes today.', classesN: n => `${n} class${n === 1 ? '' : 'es'}`, renamedSiblings: n => `Also renamed ${n} other class${n === 1 ? '' : 'es'} with the same course code`,
     typeOpts: ['Lecture', 'Tutorial', 'Lab', 'Practical'], dayNames: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     makeup: 'Make-up', addMakeup: 'Add make-up class', cDate: 'Date (one time only)', cDateHint: 'Leave the date empty for a class that repeats every week.',
@@ -681,7 +681,7 @@ const I18N = {
     gradeShort: g => `成绩 ${g}%`, weightL: '占比 %', scoreL: '得分', outOfL: '满分',
     timetable: '课程表', timetableSub: '每周固定的课程', addClass: '添加课程', newClass: '新课程',
     ttEmptyH: '还没有课程', ttEmptyP: '把每周的课加进来，或在“备份与还原”里导入课程表文件。',
-    classDetails: '课程详情', cTitle: '课程名称', cCode: '课程代码', cType: '类型', cDay: '星期', cStart: '开始', cEnd: '结束', cSection: '班别', cLink: '会议链接', cLinkPh: '贴上 Zoom、Teams 或 Meet 链接', joinMeeting: '进入会议', cRoom: '教室', cLecturer: '讲师', cPlan: '关联计划', cNoPlan: '无', openPlan: '打开计划',
+    classDetails: '课程详情', cTitle: '课程名称', cCode: '课程代码', cType: '类型', cDay: '星期', cStart: '开始', cEnd: '结束', cDocs: c => `${c} 的文档`, docNamePh: '名称，例如 Teaching Plan', docsHint: '同一课程代码的课共用。把文件放到 Google Drive 或 OneDrive，再贴上链接。', cSection: '班别', cLink: '会议链接', cLinkPh: '贴上 Zoom、Teams 或 Meet 链接', joinMeeting: '进入会议', cRoom: '教室', cLecturer: '讲师', cPlan: '关联计划', cNoPlan: '无', openPlan: '打开计划',
     deleteClass: '删除课程', classDeleted: '课程已删除', todayClasses: '今天的课', noClassesToday: '今天没有课。', classesN: n => `${n} 节课`, renamedSiblings: n => `同一课程代码的另外 ${n} 节课也一起改名了`,
     typeOpts: ['讲课', '辅导', '实验', '实践'], dayNames: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
     makeup: '补课', addMakeup: '添加补课', cDate: '日期（只上一次）', cDateHint: '日期留空 = 每周都上的课。',
@@ -1182,6 +1182,20 @@ function timetableHTML() {
   ${upcoming.length ? `<section class="panel"><h2>${esc(L.upcomingMakeups)} <small>${esc(L.classesN(upcoming.length))}</small></h2>${upcoming.map(c => classRowHTML(c, true)).join('')}</section>` : ''}
   <section class="panel"><h2>${esc(L.attendance)} <small>${esc(L.attSub(attMin()))}</small></h2>${attendanceStats().length ? attendanceHTML(attendanceStats()) : ''}<p class="faint" style="margin:${attendanceStats().length ? '10px' : '0'} 0 0;font-size:12px">${esc(L.attHint)}</p></section>`;
 }
+// document links belong to a course, so every class with the same code shares them
+const allCourseDocs = () => { const d = state.settings && state.settings.courseDocs; return d && Array.isArray(d.list) ? d.list : []; };
+function courseDocsHTML(c) {
+  const RO = state.readonly, L = T(), key = courseKey(c);
+  const docs = allCourseDocs().filter(d => d.course === key);
+  return `<span class="section-label">${esc(L.cDocs(c.code || c.title))}</span>
+    <div class="link-list">${docs.map(l => `<div class="link-row">
+      <a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer" title="${esc(l.url)}">${ICON_LINK}<span>${esc(l.title || hostOf(l.url) || l.url)}</span></a>
+      ${l.title ? `<span class="host">${esc(hostOf(l.url))}</span>` : ''}
+      ${!RO ? `<button class="icon-btn" data-act="doc-del" data-doc="${esc(l.id)}" aria-label="${esc(L.deleteLink)}">${ICON_X}</button>` : ''}
+    </div>`).join('')}</div>
+    ${!RO ? `<form id="doc-add" class="link-add"><input class="input" id="doc-url" placeholder="${esc(L.linkUrlPh)}" maxlength="2000" autocomplete="off" inputmode="url"><input class="input" id="doc-name" placeholder="${esc(L.docNamePh)}" maxlength="80" autocomplete="off"><button class="btn" type="submit">${esc(L.add)}</button></form>
+    <p class="faint" style="margin:6px 0 0;font-size:12px">${esc(L.docsHint)}</p>` : ''}`;
+}
 function joinHTML(c) {
   const url = normalizeUrl(c.link);
   return url ? `<a class="btn primary" href="${esc(url)}" target="_blank" rel="noopener noreferrer" data-act="class-join" title="${esc(url)}">${ICON_LINK}<span>${esc(T().joinMeeting)}</span></a>` : '';
@@ -1570,6 +1584,7 @@ function openClass(id, focusTitle, occDate) {
     ${c.date && !exam && !RO ? `<div class="occ"><div class="row">${isOnline(c, c.date) ? `<em class="mk online">${esc(L.online)}</em>${joinHTML(c)}` : ''}<button class="btn" data-act="occ-online">${esc(isOnline(c, c.date) ? L.occInPerson : L.occOnline)}</button></div></div>` : ''}
     ${c.replaces ? `<div class="occ"><span>${classTag(c, false)} ${esc(L.movedFrom(fmtDate(c.replaces.date) + ' ' + weekday(c.replaces.date), orig ? fmtTime(orig.start) + ' - ' + fmtTime(orig.end) : ''))}</span></div>` : ''}
     <input class="title-input" id="c-title" value="${esc(c.title)}" maxlength="120" ${dis} aria-label="${esc(L.cTitle)}">
+    ${courseKey(c) ? `<div id="c-docs">${courseDocsHTML(c)}</div>` : ''}
     <div class="fields">
       <label class="field"><span>${esc(L.cDate)}</span><input class="input" type="date" id="c-date" value="${esc(c.date || '')}" ${dis}></label>
       <label class="field"><span>${esc(L.cDay)}</span><select class="input" id="c-day" ${dis || (c.date ? 'disabled' : '')}>${L.dayNames.map((n, i) => `<option value="${i + 1}" ${c.day === i + 1 ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></label>
@@ -2635,6 +2650,10 @@ function parseBackup(text) {
       breaks: Array.isArray(sm.breaks) ? sm.breaks.filter(b => b && typeof b === 'object').slice(0, 20).map(b => ({ id: str(b.id, 60) || uid(), name: str(b.name, 60), start: isDate(b.start) ? b.start : '', end: isDate(b.end) ? b.end : '' })) : []
     };
   }
+  const cd = d.settings && d.settings.courseDocs;
+  if (cd && Array.isArray(cd.list)) {
+    settings.courseDocs = { list: cd.list.slice(0, 500).map(l => l && str(l.course, 120) && normalizeUrl(l.url) ? { id: str(l.id, 60) || uid(), course: str(l.course, 120), url: normalizeUrl(l.url), title: str(l.title, 80) } : null).filter(Boolean) };
+  }
   return { plans, tasks, classes, settings };
 }
 function applyImport(data, replace) {
@@ -2784,6 +2803,11 @@ document.addEventListener('click', e => {
     case 'toggle-archived': ui.showArchived = !ui.showArchived; savePrefs(); render(); break;
     case 'archive': if (!RO) { patchPlan(el.dataset.plan, { archived: true }); closeDialog(); ui.planId = 'hub'; savePrefs(); render(); toast(L.archivedToast); } break;
     case 'unarchive': if (!RO) { patchPlan(el.dataset.plan, { archived: false }); closeDialog(); ui.planId = el.dataset.plan; savePrefs(); render(); toast(L.unarchivedToast); } break;
+    case 'doc-del': {
+      const c = state.classes[openClassId]; if (!c || RO) break;
+      write('settings', 'courseDocs', { list: allCourseDocs().filter(d => d.id !== el.dataset.doc) });
+      $('#c-docs').innerHTML = courseDocsHTML(c); break;
+    }
     case 'link-del': {
       const t = state.tasks[openTaskId]; if (!t || RO) break;
       patchTask(t.id, { links: (t.links || []).filter(l => l.id !== el.dataset.link) });
@@ -3134,6 +3158,14 @@ document.addEventListener('submit', e => {
     $('#grade-new-name').value = '';
     createTask(ui.planId, { title: name, inGrades: true });
     setTimeout(() => $("#grade-new-name")?.focus(), 0);
+  } else if (f.id === 'doc-add') {
+    const c = state.classes[openClassId]; if (!c) return;
+    const url = normalizeUrl($('#doc-url').value);
+    if (!url) { toast(T().badLink); $('#doc-url').focus(); return; }
+    const title = $('#doc-name').value.trim().slice(0, 80);
+    write('settings', 'courseDocs', { list: [...allCourseDocs(), { id: uid(), course: courseKey(c), url, title }] });
+    $('#c-docs').innerHTML = courseDocsHTML(c);
+    $('#doc-url').focus();
   } else if (f.id === 'link-add') {
     const t = state.tasks[openTaskId]; if (!t) return;
     const url = normalizeUrl($('#link-url').value);
