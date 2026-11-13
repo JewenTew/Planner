@@ -30,7 +30,7 @@
   --ok-soft: #dcf3e8;
   --info: #3f73cf;
   --info-soft: #e0ebff;
-  --c1: #ec5f97; --c2: #f59a5b; --c3: #d9b52e; --c4: #3fb48f; --c5: #4d9be6; --c6: #9a7be0;
+  --c1: #ec5f97; --c2: #f59a5b; --c3: #d9b52e; --c4: #3fb48f; --c5: #4d9be6; --c6: #9a7be0; --c7: #7a879e;
   --shadow: 0 1px 2px rgba(120, 80, 160, .08), 0 6px 18px rgba(120, 80, 160, .07);
   --overlay: rgba(60, 40, 90, .28);
   --font-display: "Quicksand", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
@@ -44,7 +44,7 @@
     --ink: #f2edff; --muted: #a9a1ca; --line: #3a3363;
     --accent: #f5b8d2; --accent-2: #afd3f7; --accent-ink: #231d38; --accent-deep: #f5b8d2; --accent-soft: #45293f; --blue-soft: #1f3150;
     --danger: #ff7d8f; --danger-soft: #4a1f2b; --warn: #ffbd7a; --warn-soft: #43301c; --ok: #6fdcaa; --ok-soft: #173a2e; --info: #8fb8ff; --info-soft: #1f2f58;
-    --c1: #ff85b5; --c2: #ffb07a; --c3: #f0d060; --c4: #62d4ad; --c5: #7ab8ff; --c6: #b89cff;
+    --c1: #ff85b5; --c2: #ffb07a; --c3: #f0d060; --c4: #62d4ad; --c5: #7ab8ff; --c6: #b89cff; --c7: #a9b5cb;
     --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
     --overlay: rgba(5, 3, 15, .55);
     color-scheme: dark;
@@ -56,7 +56,7 @@
   --ink: #f2edff; --muted: #a9a1ca; --line: #3a3363;
   --accent: #f5b8d2; --accent-2: #afd3f7; --accent-ink: #231d38; --accent-deep: #f5b8d2; --accent-soft: #45293f; --blue-soft: #1f3150;
   --danger: #ff7d8f; --danger-soft: #4a1f2b; --warn: #ffbd7a; --warn-soft: #43301c; --ok: #6fdcaa; --ok-soft: #173a2e; --info: #8fb8ff; --info-soft: #1f2f58;
-  --c1: #ff85b5; --c2: #ffb07a; --c3: #f0d060; --c4: #62d4ad; --c5: #7ab8ff; --c6: #b89cff;
+  --c1: #ff85b5; --c2: #ffb07a; --c3: #f0d060; --c4: #62d4ad; --c5: #7ab8ff; --c6: #b89cff; --c7: #a9b5cb;
   --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 6px 18px rgba(0, 0, 0, .25);
   --overlay: rgba(5, 3, 15, .55);
   color-scheme: dark;
@@ -150,8 +150,8 @@ main { min-width: 0; padding-inline: 28px; padding-block: 22px 44px; display: fl
 .chip.pri-urgent { background: var(--danger-soft); color: var(--danger); }
 .chip.pri-important { background: var(--warn-soft); color: var(--warn); }
 .chip.doing { background: var(--info-soft); color: var(--info); }
-.lbl-c1 { --lc: var(--c1); } .lbl-c2 { --lc: var(--c2); } .lbl-c3 { --lc: var(--c3); } .lbl-c4 { --lc: var(--c4); } .lbl-c5 { --lc: var(--c5); } .lbl-c6 { --lc: var(--c6); }
-.bg-c1 { background: var(--c1); } .bg-c2 { background: var(--c2); } .bg-c3 { background: var(--c3); } .bg-c4 { background: var(--c4); } .bg-c5 { background: var(--c5); } .bg-c6 { background: var(--c6); }
+.lbl-c1 { --lc: var(--c1); } .lbl-c2 { --lc: var(--c2); } .lbl-c3 { --lc: var(--c3); } .lbl-c4 { --lc: var(--c4); } .lbl-c5 { --lc: var(--c5); } .lbl-c6 { --lc: var(--c6); } .lbl-c7 { --lc: var(--c7); }
+.bg-c1 { background: var(--c1); } .bg-c2 { background: var(--c2); } .bg-c3 { background: var(--c3); } .bg-c4 { background: var(--c4); } .bg-c5 { background: var(--c5); } .bg-c6 { background: var(--c6); } .bg-c7 { background: var(--c7); }
 .tag { font-size: 11px; line-height: 18px; padding: 0 8px; border-radius: 999px; color: var(--ink); background: color-mix(in srgb, var(--lc) 20%, transparent); border: 1px solid color-mix(in srgb, var(--lc) 45%, transparent); white-space: nowrap; font-weight: 700; }
 .avatar { width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 10px; font-weight: 800; color: #fff; flex: none; }
 
@@ -557,7 +557,7 @@ const I18N = {
     groupOpts: { bucket: 'Bucket', due: 'Due date', progress: 'Progress', priority: 'Priority' },
     progress: { todo: 'Not started', doing: 'In progress', done: 'Completed' },
     priority: { urgent: 'Urgent', important: 'Important', medium: 'Medium', low: 'Low' },
-    labels: { c1: 'Assignment', c2: 'Quiz/Test', c3: 'Group', c4: 'Lab/Tutorial', c5: 'Online', c6: 'Presentation' },
+    labels: { c1: 'Assignment', c2: 'Quiz/Test', c3: 'Group', c4: 'Lab/Tutorial', c5: 'Online', c6: 'Presentation', c7: 'Revision' },
     dueGroups: { overdue: 'Overdue', today: 'Today', tomorrow: 'Tomorrow', week: 'This week', nextweek: 'Next week', later: 'Later', none: 'No due date' },
     defaultBuckets: ['To do', 'In progress', 'Waiting'], newTaskTitle: 'New task',
     quickAdd: '+ Add task, press Enter', noTasks: 'No tasks yet', addBucket: 'Add bucket', add: 'Add', repeat: 'Repeat', repeatOpts: { '': 'Does not repeat', daily: 'Daily', weekdays: 'Weekdays', weekly: 'Weekly', biweekly: 'Every 2 weeks', monthly: 'Monthly' }, repeatNext: d => `Next one added for ${d}`, repeatNextN: n => `${n} repeating task${n === 1 ? '' : 's'} added for next time`,
@@ -652,7 +652,7 @@ const I18N = {
     groupOpts: { bucket: '存储桶', due: '截止日期', progress: '进度', priority: '优先级' },
     progress: { todo: '未开始', doing: '进行中', done: '已完成' },
     priority: { urgent: '紧急', important: '重要', medium: '中等', low: '低' },
-    labels: { c1: '作业', c2: '小测/考试', c3: '小组', c4: 'Lab/Tutorial', c5: '线上学习', c6: '报告' },
+    labels: { c1: '作业', c2: '小测/考试', c3: '小组', c4: 'Lab/Tutorial', c5: '线上学习', c6: '报告', c7: '复习' },
     dueGroups: { overdue: '已逾期', today: '今天', tomorrow: '明天', week: '本周', nextweek: '下周', later: '以后', none: '没有截止日期' },
     defaultBuckets: ['待办', '进行中', '等待中'], newTaskTitle: '新任务',
     quickAdd: '+ 添加任务，回车保存', noTasks: '暂无任务', addBucket: '添加存储桶', add: '添加', repeat: '重复', repeatOpts: { '': '不重复', daily: '每天', weekdays: '工作日', weekly: '每周', biweekly: '每两周', monthly: '每月' }, repeatNext: d => `已添加下一次：${d}`, repeatNextN: n => `已为 ${n} 项重复任务添加下一次`,
@@ -741,7 +741,7 @@ const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July
 const WEEKDAYS = { en: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], zh: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'] };
 
 /* ---------- constants ---------- */
-const LABEL_KEYS = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'];
+const LABEL_KEYS = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7'];
 const PRI_ORDER = { urgent: 0, important: 1, medium: 2, low: 3 };
 const AVATAR_COLORS = ['#d9588f', '#4f86d9', '#8a6ad6', '#2f9e7e', '#d07a3c', '#c0508a', '#3f8fb8', '#7a68c9'];
 const ICON_MARK = '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 1.8l1.7 4.6 4.7 1.6-4.7 1.7L9 14.3l-1.7-4.6L2.6 8l4.7-1.6z"/></svg>';
@@ -1804,7 +1804,7 @@ function createTask(planId, fields, quiet) {
 function createPlan(name) {
   const id = uid();
   const used = plansList().map(p => p.color);
-  const color = LABEL_KEYS.find(c => !used.includes(c)) || LABEL_KEYS[plansList().length % 6];
+  const color = LABEL_KEYS.find(c => !used.includes(c)) || LABEL_KEYS[plansList().length % LABEL_KEYS.length];
   write('plans', id, { name, color, createdAt: Date.now(), labels: {}, buckets: T().defaultBuckets.map(n => ({ id: uid(), name: n })) });
   return id;
 }
