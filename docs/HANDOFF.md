@@ -77,7 +77,7 @@ Planner/
 
 1. 修改 `src/planner.html`。
 2. 打包：`python tools/build.py`
-3. 把 `sw.js` 里的 `CACHE` 版本号加 1（目前是 `planner-v32`），让已安装的 App 尽快更新。
+3. 把 `sw.js` 里的 `CACHE` 版本号加 1（目前是 `planner-v33`），让已安装的 App 尽快更新。
 4. **测试时不要碰真实数据**：复制一份 `index.html` 成 `_localtest.html`，把 `<script src="firebase-config.js"></script>` 换成 `<script>window.PLANNER_FIREBASE={apiKey:""};</script>`，这样会用浏览器本地储存，不会连云端。用 `python -m http.server 5178` 在本机开来测，测完删掉测试文件。
 5. 提交并推送：`git add -A`、`git commit`、`git push`。GitHub Pages 大约 1 分钟后更新。
 6. （可选）把 `src/planner.html` 重新发布到上面的 Claude 版本链接。
@@ -108,7 +108,7 @@ Planner/
 **计划与任务**
 - 概览：逾期、今天、本周统计；全部计划的周或月日历；截止日期倒计时清单；全局搜索。
 - 看板（拖动任务、拖动存储桶、自定义排序）、表格、日程、图表、成绩。
-- 任务：存储桶、进度、优先级、开始与截止日期、负责人、标签、备注、清单、链接、重复任务。
+- 任务：存储桶、进度、优先级、开始与截止日期、负责人、标签（默认：作业、小测/考试、小组、Lab/Tutorial、线上学习、报告；每个计划可改名）、备注、清单、链接、重复任务。
 - 多选（批量删除、批量完成），删除可撤销（10 秒内，或 Ctrl + Z）。
 - 我的一天：每天挑任务，隔天自动清空，也会显示今天的课。
 - 拖动左侧的计划可以改变顺序（`plans` 的 `order` 字段，手机触控暂不支持）。

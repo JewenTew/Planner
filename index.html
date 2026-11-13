@@ -575,7 +575,7 @@ const I18N = {
     groupOpts: { bucket: 'Bucket', due: 'Due date', progress: 'Progress', priority: 'Priority' },
     progress: { todo: 'Not started', doing: 'In progress', done: 'Completed' },
     priority: { urgent: 'Urgent', important: 'Important', medium: 'Medium', low: 'Low' },
-    labels: { c1: 'Important', c2: 'Waiting on others', c3: 'Group', c4: 'Research', c5: 'Reading', c6: 'Personal' },
+    labels: { c1: 'Assignment', c2: 'Quiz/Test', c3: 'Group', c4: 'Lab/Tutorial', c5: 'Online', c6: 'Presentation' },
     dueGroups: { overdue: 'Overdue', today: 'Today', tomorrow: 'Tomorrow', week: 'This week', nextweek: 'Next week', later: 'Later', none: 'No due date' },
     defaultBuckets: ['To do', 'In progress', 'Waiting'], newTaskTitle: 'New task',
     quickAdd: '+ Add task, press Enter', noTasks: 'No tasks yet', addBucket: 'Add bucket', add: 'Add', repeat: 'Repeat', repeatOpts: { '': 'Does not repeat', daily: 'Daily', weekdays: 'Weekdays', weekly: 'Weekly', biweekly: 'Every 2 weeks', monthly: 'Monthly' }, repeatNext: d => `Next one added for ${d}`, repeatNextN: n => `${n} repeating task${n === 1 ? '' : 's'} added for next time`,
@@ -670,7 +670,7 @@ const I18N = {
     groupOpts: { bucket: '存储桶', due: '截止日期', progress: '进度', priority: '优先级' },
     progress: { todo: '未开始', doing: '进行中', done: '已完成' },
     priority: { urgent: '紧急', important: '重要', medium: '中等', low: '低' },
-    labels: { c1: '重要', c2: '等待他人', c3: '小组', c4: '调研', c5: '阅读', c6: '个人' },
+    labels: { c1: '作业', c2: '小测/考试', c3: '小组', c4: 'Lab/Tutorial', c5: '线上学习', c6: '报告' },
     dueGroups: { overdue: '已逾期', today: '今天', tomorrow: '明天', week: '本周', nextweek: '下周', later: '以后', none: '没有截止日期' },
     defaultBuckets: ['待办', '进行中', '等待中'], newTaskTitle: '新任务',
     quickAdd: '+ 添加任务，回车保存', noTasks: '暂无任务', addBucket: '添加存储桶', add: '添加', repeat: '重复', repeatOpts: { '': '不重复', daily: '每天', weekdays: '工作日', weekly: '每周', biweekly: '每两周', monthly: '每月' }, repeatNext: d => `已添加下一次：${d}`, repeatNextN: n => `已为 ${n} 项重复任务添加下一次`,
@@ -820,8 +820,8 @@ const monthTitle = (y, m) => ui.lang === 'zh' ? `${y}年${m}月` : `${MONTHS_EN[
 // default bucket names (from either language, old or new) follow the language switch; custom names stay as typed
 const DEFAULT_BUCKET_IDX = { 'To do': 0, '待办': 0, 'In progress': 1, '进行中': 1, 'Waiting': 2, '等待中': 2, '等待客户': 2 };
 const bName = name => name in DEFAULT_BUCKET_IDX ? T().defaultBuckets[DEFAULT_BUCKET_IDX[name]] : name;
-// label names saved by the first version count as defaults, so they also follow the language switch
-const OLD_LABEL_DEFAULTS = ['紧急客户', '等待回复', '采购', '内部', '现场', '文档'];
+// label names saved by earlier versions count as defaults, so they also follow the language switch
+const OLD_LABEL_DEFAULTS = ['紧急客户', '等待回复', '采购', '内部', '现场', '文档', 'Important', 'Waiting on others', 'Research', 'Reading', 'Personal', '重要', '等待他人', '调研', '阅读', '个人'];
 const labelName = (plan, k) => { const v = plan && plan.labels && plan.labels[k]; return v && !OLD_LABEL_DEFAULTS.includes(v) ? v : T().labels[k]; };
 
 function dueGroup(t) {
